@@ -46,7 +46,7 @@ def client_appointments_api(request):
         except ValueError:
             pass
     
-    # Apply limit if specified
+    # Apply limit if specified lol
     total_count = appointments.count()
     if limit:
         try:
