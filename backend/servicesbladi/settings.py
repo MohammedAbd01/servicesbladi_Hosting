@@ -26,8 +26,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dj217004uhfoid
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'  # Set to False in production
 # NOTE: For local development, set DJANGO_DEBUG=True in your environment variables.
 
-# Allow all hosts for now. Change to your domain in production.
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+# ALLOWED_HOSTS for Azure
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net').split(',')
 
 # Application definition
 
@@ -97,11 +97,17 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='mysql://servicesbladiadmin%40servicesbladi:Aa123456a@servicesbladi.mysql.database.azure.com:3306/servicesbladi',
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DATABASE_NAME', 'servicesbladi'),
+        'USER': os.environ.get('DATABASE_USER', 'servicesbladiadmin'),  # Changed default admin user
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'Aa123456a'),
+        'HOST': os.environ.get('DATABASE_HOST', 'servicesbladi.mysql.database.azure.com'),
+        'PORT': '3306',
+        'OPTIONS': {
+            'ssl': {'ca': os.path.join(BASE_DIR, 'DigiCertGlobalRootCA.crt.pem')},
+        },
+    }
 }
 
 
