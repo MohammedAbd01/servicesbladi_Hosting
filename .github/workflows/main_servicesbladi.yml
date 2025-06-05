@@ -35,6 +35,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: servicesbladi-dqf3hchmcqeudmfm
+          app-name: servicesbladi
           slot-name: production
           package: .
