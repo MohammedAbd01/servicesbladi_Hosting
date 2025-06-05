@@ -27,7 +27,9 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'  # Set to False in pro
 # NOTE: For local development, set DJANGO_DEBUG=True in your environment variables.
 
 # ALLOWED_HOSTS for Azure
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+DEBUG = False
+
+ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net']
 
 # Application definition
 
@@ -99,13 +101,13 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'servicesbladi',
-        'USER': 'servicesbladiadmin@servicesbladi',  # NOTE: include @hostname
+        'NAME': 'servicesbladi',  # Replace with the actual DB name you created on Azure
+        'USER': 'servicesbladiadmin@servicesbladi',
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {'ssl-disabled': True},  # <== ADD THIS LINE
+            'ssl': {'ssl-ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'},  # See next step
         }
     }
 }
