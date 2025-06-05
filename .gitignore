@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environment
+env/
+venv/
+ENV/
+
+# Django static and media
+backend/staticfiles/
+backend/media/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Local settings
+*.env
+.env.*
+
+# Azure deployment artifacts
+*.bak
+*.swp
+
+# Jupyter Notebooks
+*.ipynb_checkpoints/
+
+# Node modules (if any)
+node_modules/
+
+# Coverage
+htmlcov/
+.coverage
+.tox/
+
+# Misc
+*.sqlite3
+
+# Ignore compiled files in all subfolders
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd

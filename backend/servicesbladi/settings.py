@@ -13,17 +13,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG using environment variable for Azure. Default is False for production.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'  # Set to False in production
+# NOTE: For local development, set DJANGO_DEBUG=True in your environment variables.
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.servicesbladi.com']
+# Allow all hosts for now. Change to your domain in production.
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
 # Application definition
 
@@ -93,18 +97,11 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'servicesbladi',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-            'charset': 'utf8mb4',
-        },
-    }
+    'default': dj_database_url.config(
+        default='mysql://root:@127.0.0.1:3306/servicesbladi',
+        conn_max_age=600,
+        ssl_require=False
+    )
 }
 
 
@@ -162,7 +159,7 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Ajouter versioning aux fichiers statiques pour éviter les problèmes de cache
+# Use ManifestStaticFilesStorage for Azure static file versioning
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 # Media files
@@ -181,6 +178,13 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Email Configuration (using SMTP for production)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'adval.devteam@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Adval Services Marketplace <adval.devteam@gmail.com>')
+EMAIL_SUBJECT_PREFIX = '[Adval Services] '
 
 # REST Framework settings
 REST_FRAMEWORK = {
