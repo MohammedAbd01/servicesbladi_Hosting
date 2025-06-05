@@ -99,14 +99,16 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': os.getenv('DATABASE_HOST'),
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'NAME': 'servicesbladi',
+        'USER': 'servicesbladiadmin@servicesbladi',  # NOTE: include @hostname
+        'PASSWORD': 'Aa123456a',
+        'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
         'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
+            'ssl': {
+                'ca': '/home/site/wwwroot/BaltimoreCyberTrustRoot.crt.pem'
+            }
+        }
     }
 }
 
