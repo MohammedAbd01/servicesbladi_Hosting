@@ -105,9 +105,7 @@ DATABASES = {
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {
-                'ca': '/home/site/wwwroot/BaltimoreCyberTrustRoot.crt.pem'
-            }
+            'ssl': {'ssl-disabled': True},  # <== ADD THIS LINE
         }
     }
 }
