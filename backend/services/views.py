@@ -17,7 +17,7 @@ def all_services_view(request):
     """View for the main services page showing all categories"""
     categories = ServiceCategory.objects.all()
     
-    # If no categories exist yet, create default ones
+    # If no categories exist yet, create default ones lol again
     if not categories.exists():
         categories = create_default_categories()
     
