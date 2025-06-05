@@ -98,9 +98,9 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='mysql://root:@127.0.0.1:3306/servicesbladi',
+        default='mysql://servicesbladiadmin%40servicesbladi:Aa123456a@servicesbladi.mysql.database.azure.com:3306/servicesbladi',
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=True
     )
 }
 
