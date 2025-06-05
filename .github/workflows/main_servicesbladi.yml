@@ -32,6 +32,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Copy SSL cert to wwwroot
+        run: cp backend/BaltimoreCyberTrustRoot.crt.pem /home/site/wwwroot/
+
+      
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
