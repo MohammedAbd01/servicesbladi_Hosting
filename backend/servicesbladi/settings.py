@@ -27,7 +27,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'  # Set to False in pro
 # NOTE: For local development, set DJANGO_DEBUG=True in your environment variables.
 
 # ALLOWED_HOSTS for Azure
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net').split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 # Application definition
 
@@ -99,13 +99,13 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DATABASE_NAME', 'servicesbladi'),
-        'USER': os.environ.get('DATABASE_USER', 'servicesbladiadmin'),  # Changed default admin user
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD', 'Aa123456a'),
-        'HOST': os.environ.get('DATABASE_HOST', 'servicesbladi.mysql.database.azure.com'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {'ca': os.path.join(BASE_DIR, 'DigiCertGlobalRootCA.crt.pem')},
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
