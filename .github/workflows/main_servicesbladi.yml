@@ -1,19 +1,19 @@
-name: Django Azure Deployment
+name: Deploy Django to Azure
 
 on:
   push:
     branches:
-      - main   # Change if your main branch has a different name
+      - main  # or your default branch
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-      - name: Set up Python 3.10
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
@@ -23,20 +23,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      - name: Collect static files
+      - name: Run Collectstatic
         run: |
           python backend/manage.py collectstatic --noinput
 
-      # Optional: Run migrations if you want
-      #- name: Run migrations
-      #  run: |
-      #    python backend/manage.py migrate
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Deployment step: Deploy to Azure Web App
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: servicesbladi-dqf3hchmcqeudmfm      # Your Azure Web App name
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          app-name: servicesbladi-dqf3hchmcqeudmfm  # your app name
           package: .
-
