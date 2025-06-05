@@ -1,0 +1,392 @@
+{% extends 'client/base.html' %}
+
+{% block title %}Rendez-vous #{{ appointment.id }} - Service Bladi{% endblock %}
+
+{% block extra_css %}
+<style>
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 1rem 1.25rem;
+  }
+
+  .badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+  }
+
+  .badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .btn {
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .btn:hover:after {
+    width: 300%;
+    height: 300%;
+  }
+
+  .btn-primary {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-danger {
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+  }
+
+  .btn-danger:hover {
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  .modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1.25rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-footer {
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding: 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .btn-action {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+    
+    .card {
+      margin-bottom: 1rem;
+    }
+
+    .card:hover {
+      transform: none;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Main content -->
+<div class="container-fluid px-0">
+  <div class="row">
+    <!-- Main content -->
+    <div class="col-md-8">
+      <!-- Appointment information card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Informations du rendez-vous</h5>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Date et heure:</div>
+            <div class="col-md-8">{{ appointment.date_time|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Durée:</div>
+            <div class="col-md-8">{{ appointment.duration|default:"60" }} minutes</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Type de consultation:</div>
+            <div class="col-md-8">
+              {% if appointment.consultation_type == 'in_person' %}
+                En personne
+              {% elif appointment.consultation_type == 'video' %}
+                Vidéoconférence
+              {% elif appointment.consultation_type == 'phone' %}
+                Téléphone
+              {% else %}
+                En personne
+              {% endif %}
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Statut:</div>
+            <div class="col-md-8">
+              <span class="badge {% if appointment.status == 'scheduled' %}bg-info{% elif appointment.status == 'confirmed' %}bg-success{% elif appointment.status == 'completed' %}bg-primary{% elif appointment.status == 'cancelled' %}bg-danger{% endif %}">
+                {% if appointment.status == 'scheduled' %}Planifié{% elif appointment.status == 'confirmed' %}Confirmé{% elif appointment.status == 'completed' %}Terminé{% elif appointment.status == 'cancelled' %}Annulé{% else %}Planifié{% endif %}
+              </span>
+            </div>
+          </div>
+          {% if appointment.notes %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Notes:</div>
+            <div class="col-md-8">{{ appointment.notes }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Service request card -->
+      {% if appointment.service_request %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Demande associée</h5>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Titre:</div>
+            <div class="col-md-8">{{ appointment.service_request.title }}</div>
+          </div>
+          {% if appointment.service_request.description %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Description:</div>
+            <div class="col-md-8">{{ appointment.service_request.description }}</div>
+          </div>
+          {% endif %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Date de création:</div>
+            <div class="col-md-8">{{ appointment.service_request.created_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="text-end">
+            <a href="{% url 'custom_requests:request_detail' appointment.service_request.id %}" class="btn btn-outline-primary btn-sm">
+              <i class="bi bi-eye me-1"></i>Voir la demande
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+      <!-- Actions card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Actions</h5>
+        </div>
+        <div class="card-body">
+          {% if appointment.status == 'scheduled' or appointment.status == 'confirmed' %}
+            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              <i class="bi bi-x-circle me-2"></i> Annuler le rendez-vous
+            </button>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-2"></i> 
+              {% if appointment.status == 'completed' %}
+                Ce rendez-vous est terminé.
+              {% elif appointment.status == 'cancelled' %}
+                Ce rendez-vous a été annulé.
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Expert information card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Expert</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="avatar-circle me-3">
+              <span class="initials">{{ appointment.expert.first_name|first }}{{ appointment.expert.name|first }}</span>
+            </div>
+            <div>
+              <h6 class="mb-0">{{ appointment.expert.name }} {{ appointment.expert.first_name }}</h6>
+              <small class="text-muted">Expert</small>
+            </div>
+          </div>
+          {% if appointment.expert.email %}
+          <div class="mb-3">
+            <strong><i class="bi bi-envelope me-2"></i> Email:</strong>
+            <p>{{ appointment.expert.email }}</p>
+          </div>
+          {% endif %}
+          {% if appointment.expert.phone %}
+          <div class="mb-3">
+            <strong><i class="bi bi-telephone me-2"></i> Téléphone:</strong>
+            <p>{{ appointment.expert.phone }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Service information card -->
+      {% if appointment.service %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>Service</h5>
+        </div>
+        <div class="card-body">
+          <h6>{{ appointment.service.title }}</h6>
+          {% if appointment.service.description %}
+          <p class="text-muted">{{ appointment.service.description }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">Annuler le rendez-vous #{{ appointment.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler ce rendez-vous ? Cette action ne peut pas être annulée.</p>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          L'expert sera automatiquement notifié de l'annulation.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Garder le rendez-vous</button>
+        <form method="post" action="{% url 'custom_requests:cancel_appointment' appointment.id %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Annuler le rendez-vous</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effects to cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.zIndex = '10';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.zIndex = '1';
+      });
+    });
+
+    // Add ripple effect to buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const x = e.clientX - this.getBoundingClientRect().left;
+        const y = e.clientY - this.getBoundingClientRect().top;
+        
+        const ripple = document.createElement('span');
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+        ripple.style.width = '10px';
+        ripple.style.height = '10px';
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        ripple.style.animation = 'ripple-effect 0.6s linear';
+        ripple.style.transform = 'scale(0)';
+        ripple.style.pointerEvents = 'none';
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+  });
+
+  // Add CSS for ripple animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes ripple-effect {
+      to {
+        transform: scale(20);
+        opacity: 0;
+      }
+    }
+    
+    .avatar-circle {
+      width: 60px;
+      height: 60px;
+      background-color: #007bff;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .avatar-circle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+    }
+    
+    .initials {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+    }
+  `;
+  document.head.appendChild(style);
+</script>
+{% endblock %}

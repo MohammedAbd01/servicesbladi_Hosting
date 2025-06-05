@@ -1,0 +1,46 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Nouveau Message - Services Bladi{% endblock %}
+
+{% block header_title %}Nouveau Message{% endblock %}
+{% block header_subtitle %}Vous avez reçu un nouveau message{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    Vous avez reçu un nouveau message de <strong>{{ sender_name }}</strong> sur la plateforme Services Bladi.
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">💬 Message:</div>
+    <div class="info-value" style="margin-top: 10px; font-style: italic;">
+        "{{ message_content }}"
+    </div>
+</div>
+
+{% if request_title %}
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">📋 Demande concernée:</div>
+        <div class="info-value">{{ request_title }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">👤 Expéditeur:</div>
+        <div class="info-value">{{ sender_name }}</div>
+    </div>
+</div>
+{% endif %}
+
+<div class="content">
+    Pour répondre à ce message et continuer la conversation, connectez-vous à votre espace personnel.
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        💬 Répondre au message
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>💡 Conseil:</strong> Répondez rapidement pour assurer une communication efficace avec votre interlocuteur.
+</div>
+{% endblock %}

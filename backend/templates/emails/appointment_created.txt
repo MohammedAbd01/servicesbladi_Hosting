@@ -1,0 +1,32 @@
+Services Bladi - Rendez-vous confirmé
+
+Bonjour {{ client_name }},
+
+Votre rendez-vous avec {{ expert_name }} a été confirmé avec succès!
+
+Détails du rendez-vous:
+Date: {{ appointment_date }}
+Heure: {{ appointment_time }}
+Type: {{ appointment_type }}
+
+Expert: {{ expert_name }}
+Client: {{ client_name }}
+
+Préparez votre rendez-vous:
+- Préparez vos documents nécessaires
+- Notez vos questions importantes
+- Assurez-vous d'avoir une connexion internet stable (pour les rendez-vous en ligne)
+- Arrivez 5 minutes avant l'heure prévue
+
+Pour voir vos rendez-vous:
+{{ site_url }}/accounts/dashboard/
+
+Rappel: Vous recevrez un rappel par email 24h avant votre rendez-vous.
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

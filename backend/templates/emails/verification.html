@@ -1,0 +1,41 @@
+{% extends 'emails/base.html' %}
+
+{% block title %}Vérifiez votre adresse email{% endblock %}
+
+{% block header_title %}Vérification d'email{% endblock %}
+{% block header_subtitle %}Activez votre compte Services Bladi{% endblock %}
+
+{% block email_content %}
+<div class="greeting">Bonjour {{ user_name }},</div>
+
+<div class="content">
+    <p>Merci de vous être inscrit sur Services Bladi. Pour activer votre compte et commencer à utiliser nos services, veuillez vérifier votre adresse email en cliquant sur le bouton ci-dessous :</p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ verification_url }}" class="button">Vérifier mon email</a>
+    </div>
+    
+    <div class="highlight-box">
+        <h3>Informations importantes :</h3>
+        <ul>
+            <li>Ce lien de vérification expire dans 24 heures</li>
+            <li>Si vous n'avez pas créé de compte, ignorez cet email</li>
+            <li>Pour votre sécurité, ne partagez jamais ce lien</li>
+        </ul>
+    </div>
+    
+    <p>Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :</p>
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; word-break: break-all;">
+        <a href="{{ verification_url }}" style="color: #1e3c72; text-decoration: none;">{{ verification_url }}</a>
+    </div>
+    
+    <p>Une fois votre email vérifié, vous pourrez :</p>
+    <ul>
+        <li>Accéder à votre tableau de bord personnalisé</li>
+        <li>Utiliser tous nos services</li>
+        <li>Recevoir des notifications importantes</li>
+    </ul>
+    
+    <p style="margin-top: 30px;"><strong>Besoin d'aide ?</strong> Contactez notre équipe support à <a href="mailto:support@servicesbladi.com" style="color: #1e3c72;">support@servicesbladi.com</a></p>
+</div>
+{% endblock %}

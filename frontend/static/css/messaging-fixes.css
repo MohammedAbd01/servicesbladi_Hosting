@@ -1,0 +1,241 @@
+/* 
+ * ServicesBladi - Consolidated Messaging Fixes
+ * This file contains all CSS fixes for both the expert chat interface 
+ * and the client messaging interface. It addresses:
+ * 1. Bug 1: Expert's sent messages text color (white text on light background issue)
+ * 2. Bug 2: Client profile image fallbacks
+ */
+
+/*** FIX 1: Proper text coloring for outgoing messages ***/
+/* Reset all Bootstrap variables for outgoing messages */
+.message-outgoing,
+.message.sent,
+.sent,
+.outgoing,
+.sent .message-content,
+.message.sent .message-content {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+    /* Box shadow for better visibility */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    /* Override ALL Bootstrap CSS variables */
+    --bs-body-color: #1f1f1f !important;
+    --bs-body-color-rgb: 31, 31, 31 !important;
+    --bs-text-opacity: 1 !important;
+    --bs-link-color: #1f1f1f !important;
+    --bs-link-color-rgb: 31, 31, 31 !important;
+    --bs-emphasis-color: #1f1f1f !important;
+    --bs-emphasis-color-rgb: 31, 31, 31 !important;
+    --bs-secondary-color: #1f1f1f !important;
+    --bs-secondary-color-rgb: 31, 31, 31 !important;
+    --bs-tertiary-color: #1f1f1f !important;
+    --bs-tertiary-color-rgb: 31, 31, 31 !important;
+    /* Ensure proper position and shape */
+    border-radius: 15px 0px 15px 15px !important;
+    position: relative !important;
+}
+
+/* Special treatment for iOS/Safari */
+@supports (-webkit-touch-callout: none) {
+    .message-outgoing,
+    .message.sent,
+    .sent,
+    .outgoing {
+        color: #1f1f1f !important;
+        background-color: #DCF8C6 !important;
+        -webkit-text-fill-color: #1f1f1f !important;
+    }
+}
+
+/* Target every element inside outgoing messages */
+.message-outgoing *,
+.message-outgoing div,
+.message-outgoing span,
+.message-outgoing p,
+.message-outgoing .message-sender,
+.message-outgoing .message-content,
+.message.sent *,
+.sent *,
+.outgoing * {
+    color: #1f1f1f !important;
+    --bs-body-color: #1f1f1f !important;
+    --bs-body-color-rgb: 31, 31, 31 !important;
+    --bs-text-opacity: 1 !important;
+    --bs-link-color: #1f1f1f !important;
+    --bs-emphasis-color: #1f1f1f !important;
+    /* Force text color in all browsers */
+    -webkit-text-fill-color: #1f1f1f !important;
+}
+
+/* Specific overrides for message timestamp with transparency */
+.message-outgoing .message-timestamp,
+.message-outgoing .message-status,
+.message.sent .message-time,
+.sent .message-time {
+    color: rgba(31, 31, 31, 0.7) !important;
+    --bs-body-color: rgba(31, 31, 31, 0.7) !important;
+    --bs-text-opacity: 0.7 !important;
+    /* Force text color in all browsers */
+    -webkit-text-fill-color: rgba(31, 31, 31, 0.7) !important;
+}
+
+/* Fix for any bubble/content containers */
+.sent .message-content,
+.message.sent .message-content,
+.message-outgoing .message-content,
+.outgoing .message-content,
+.chat-messages .message.sent .message-content,
+.chat-messages .message-outgoing .message-content {
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+}
+
+/* Additional fix for any sent message elements to ensure proper contrast */
+.sent .message-content *,
+.message.sent .message-content *,
+.message-outgoing .message-content *,
+.outgoing .message-content *,
+.message.sent *,
+.message-outgoing * {
+    color: #1f1f1f !important;
+    -webkit-text-fill-color: #1f1f1f !important;
+}
+
+/* Override any gradient backgrounds specifically */
+.sent .message-content,
+.message.sent .message-content {
+    background: #DCF8C6 !important;
+    background-image: none !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+}
+
+/* Force override of CSS custom properties that might be set by variables */
+.sent .message-content,
+.message.sent .message-content,
+.message-outgoing,
+.message.sent,
+.sent,
+.outgoing {
+    --primary-color: #DCF8C6 !important;
+    --primary-color-light: #DCF8C6 !important;
+    --bs-primary: #DCF8C6 !important;
+    --bs-primary-rgb: 220, 248, 198 !important;
+}
+
+/* Handle any CSS custom properties that might override our styles */
+:root {
+    --sent-message-bg: #DCF8C6 !important;
+    --sent-message-color: #1f1f1f !important;
+}
+
+/* Additional specific targeting for all possible sent message variations */
+.message.sent,
+.sent,
+.message-sent,
+.chat-message.sent,
+.chat-message.outgoing,
+div[class*="sent"],
+div[class*="outgoing"] {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+}
+
+.message.sent .message-content,
+.sent .message-content,
+.message-sent .message-content,
+.chat-message.sent .message-content,
+.chat-message.outgoing .message-content,
+div[class*="sent"] .message-content,
+div[class*="outgoing"] .message-content {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    background-image: none !important;
+    color: #1f1f1f !important;
+}
+
+/*** FIX 2: Profile image fallbacks ***/
+/* Base styles for all avatar images */
+img.contact-avatar,
+img.chat-avatar,
+img.profile-image,
+.avatar,
+.profile-pic,
+.user-avatar {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #6c757d;
+    object-fit: cover;
+    position: relative;
+    overflow: hidden; /* Ensure content stays within rounded bounds */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+/* Special styling for fallback avatars */
+img.avatar-fallback,
+.avatar-fallback {
+    background-color: #f0f2f5; /* Lighter background for the fallback */
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.2s ease-in-out; /* Smooth transition for hover effects */
+}
+
+/* Hover effect for fallback avatars */
+img.avatar-fallback:hover,
+.avatar-fallback:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* Ensure profile images have proper dimensions and consistent styling */
+.contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0; /* Prevent avatar from shrinking */
+}
+
+.chat-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0; /* Prevent avatar from shrinking */
+}
+
+/* Profile image in user profile or larger contexts */
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0; /* Prevent avatar from shrinking */
+}
+
+/* Ensure status indicators are also properly visible */
+.message-status {
+    font-size: 0.85em;
+    margin-top: 4px;
+}
+
+/* Additional fixes for specific interfaces */
+/* Messages list container scrolling fix */
+.messages-container {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* Improve visibility of message input area */
+.chat-input {
+    background-color: #ffffff;
+    border-top: 1px solid #e1e4e8;
+    padding: 10px 15px;
+    z-index: 10;
+}

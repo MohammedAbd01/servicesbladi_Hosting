@@ -1,0 +1,661 @@
+{% extends 'admin/base.html' %}
+
+{% load static %}
+
+
+
+{% block title %}Gestion des Utilisateurs | Administration{% endblock %}
+
+
+
+{% block admin_content %}
+
+<div class="container-fluid">
+
+  <!-- Header -->
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>Gestion des Utilisateurs</h2>
+
+  </div>
+
+
+
+  <!-- Stats Cards -->
+
+  <div class="row dashboard-stats">
+
+    <div class="col-xl-3 col-md-6 mb-3">
+
+      <div class="dashboard-card">
+
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <h6 class="text-muted">Total Utilisateurs</h6>
+
+              <h3>{{ total_users }}</h3>
+
+            </div>
+
+            <i class="bi bi-people-fill text-primary"></i>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="col-xl-3 col-md-6 mb-3">
+
+      <div class="dashboard-card">
+
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <h6 class="text-muted">Clients</h6>
+
+              <h3>{{ clients_count }}</h3>
+
+            </div>
+
+            <i class="bi bi-person-vcard text-success"></i>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="col-xl-3 col-md-6 mb-3">
+
+      <div class="dashboard-card">
+
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <h6 class="text-muted">Experts</h6>
+
+              <h3>{{ experts_count }}</h3>
+
+            </div>
+
+            <i class="bi bi-person-workspace text-warning"></i>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="col-xl-3 col-md-6 mb-3">
+
+      <div class="dashboard-card">
+
+        <div class="card-body">
+
+          <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+              <h6 class="text-muted">Administrateurs</h6>
+
+              <h3>{{ admins_count }}</h3>
+
+            </div>
+
+            <i class="bi bi-shield-lock text-info"></i>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Filters & Search -->
+
+  <div class="card mb-4 shadow">
+
+    <div class="card-body">
+
+      <form method="get" class="row g-3">
+
+        <div class="col-md-3">
+
+          <label for="user_type" class="form-label">Type d'utilisateur</label>
+
+          <select class="form-select" id="user_type" name="user_type">
+
+            <option value="" {% if not user_type %}selected{% endif %}>Tous</option>
+
+            <option value="client" {% if user_type == 'client' %}selected{% endif %}>Clients</option>
+
+            <option value="expert" {% if user_type == 'expert' %}selected{% endif %}>Experts</option>
+
+            <option value="admin" {% if user_type == 'admin' %}selected{% endif %}>Administrateurs</option>
+
+          </select>
+
+        </div>
+
+        <div class="col-md-3">
+
+          <label for="status" class="form-label">Statut</label>
+
+          <select class="form-select" id="status" name="status">
+
+            <option value="" {% if not status_filter %}selected{% endif %}>Tous</option>
+
+            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Actifs</option>
+
+            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactifs</option>
+
+          </select>
+
+        </div>
+
+        <div class="col-md-4">
+
+          <label for="search" class="form-label">Recherche</label>
+
+          <div class="input-group">
+
+            <input type="text" class="form-control" id="search" name="search" placeholder="Nom, email..." value="{{ search_query }}">
+
+            <button class="btn btn-outline-primary" type="submit">
+
+              <i class="bi bi-search"></i>
+
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+
+          <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Users Table -->
+
+  <div class="card shadow mb-4">
+
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+
+      <h6 class="m-0 font-weight-bold text-primary">Liste des Utilisateurs</h6>
+
+      {% if users.paginator.count > 0 %}
+
+      <span class="badge bg-primary">{{ users.paginator.count }} utilisateur(s)</span>
+
+      {% endif %}
+
+    </div>
+
+    <div class="card-body">
+
+      {% if users.paginator.count > 0 %}
+
+      <div class="table-responsive">
+
+        <table class="table table-hover">
+
+          <thead>
+
+            <tr>
+
+              <th>Nom</th>
+
+              <th>Email</th>
+
+              <th>Type</th>
+
+              <th>Date d'inscription</th>
+
+              <th>Statut</th>
+
+              <th>Actions</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {% for user in users %}
+
+            <tr>
+
+              <td>
+
+                <div class="d-flex align-items-center">
+
+                  <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'img/profile-placeholder.jpg' %}{% endif %}" alt="Profile" class="rounded-circle me-2" width="40">
+
+                  <div>
+
+                    <div class="fw-bold">{{ user.name }} {{ user.first_name }}</div>
+
+                    {% if user.phone %}
+
+                    <div class="small text-muted">{{ user.phone }}</div>
+
+                    {% endif %}
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <td>{{ user.email }}</td>
+
+              <td>
+
+                {% if user.account_type == 'CLIENT' or user.account_type == 'client' %}
+
+                <span class="badge bg-success">Client</span>
+
+                {% elif user.account_type == 'EXPERT' or user.account_type == 'expert' %}
+
+                <span class="badge bg-warning text-dark">Expert</span>
+
+                {% elif user.account_type == 'ADMIN' or user.account_type == 'admin' %}
+
+                <span class="badge bg-info">Admin</span>
+
+                {% else %}
+
+                <span class="badge bg-secondary">{{ user.account_type }}</span>
+
+                {% endif %}
+
+              </td>
+
+              <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+
+              <td>
+
+                {% if user.is_active %}
+
+                <span class="badge bg-success">Actif</span>
+
+                {% else %}
+
+                <span class="badge bg-danger">Inactif</span>
+
+                {% endif %}
+
+              </td>
+
+              <td>
+
+                <div class="d-flex gap-1">
+
+                  <a href="{% url 'admin_user_detail' user_id=user.id %}" class="btn btn-sm btn-outline-primary" title="Voir détails">
+
+                    <i class="bi bi-eye"></i>
+
+                  </a>
+
+                  <a href="{% url 'admin_edit_user' user_id=user.id %}" class="btn btn-sm btn-outline-success" title="Éditer">
+
+                    <i class="bi bi-pencil"></i>
+
+                  </a>
+
+                  <button type="button" class="btn btn-sm btn-outline-warning" 
+
+                    onclick="confirmToggleStatus({{ user.id }}, {% if user.is_active %}false{% else %}true{% endif %})" 
+
+                    title="{% if user.is_active %}Désactiver{% else %}Activer{% endif %}">
+
+                    <i class="bi {% if user.is_active %}bi-x-circle{% else %}bi-check-circle{% endif %}"></i>
+
+                  </button>
+
+                  <button type="button" class="btn btn-sm btn-outline-danger" 
+
+                    onclick="confirmDelete({{ user.id }})" 
+
+                    title="Supprimer">
+
+                    <i class="bi bi-trash"></i>
+
+                  </button>
+
+                </div>
+
+              </td>
+
+            </tr>
+
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+
+      <!-- Pagination -->
+
+      {% if users.paginator.num_pages > 1 %}
+
+      <nav aria-label="Pagination">
+
+        <ul class="pagination justify-content-center mt-4">
+
+          {% if users.has_previous %}
+
+          <li class="page-item">
+
+            <a class="page-link" href="?page=1{% if user_type %}&user_type={{ user_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+
+              <span aria-hidden="true">&laquo;&laquo;</span>
+
+            </a>
+
+          </li>
+
+          <li class="page-item">
+
+            <a class="page-link" href="?page={{ users.previous_page_number }}{% if user_type %}&user_type={{ user_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+
+              <span aria-hidden="true">&laquo;</span>
+
+            </a>
+
+          </li>
+
+          {% else %}
+
+          <li class="page-item disabled">
+
+            <a class="page-link" href="#" aria-label="First">
+
+              <span aria-hidden="true">&laquo;&laquo;</span>
+
+            </a>
+
+          </li>
+
+          <li class="page-item disabled">
+
+            <a class="page-link" href="#" aria-label="Previous">
+
+              <span aria-hidden="true">&laquo;</span>
+
+            </a>
+
+          </li>
+
+          {% endif %}
+
+
+
+          {% for num in users.paginator.page_range %}
+
+          {% if num == users.number %}
+
+          <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+
+          {% elif num > users.number|add:"-3" and num < users.number|add:"3" %}
+
+          <li class="page-item"><a class="page-link" href="?page={{ num }}{% if user_type %}&user_type={{ user_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ num }}</a></li>
+
+          {% endif %}
+
+          {% endfor %}
+
+
+
+          {% if users.has_next %}
+
+          <li class="page-item">
+
+            <a class="page-link" href="?page={{ users.next_page_number }}{% if user_type %}&user_type={{ user_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+
+              <span aria-hidden="true">&raquo;</span>
+
+            </a>
+
+          </li>
+
+          <li class="page-item">
+
+            <a class="page-link" href="?page={{ users.paginator.num_pages }}{% if user_type %}&user_type={{ user_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+
+              <span aria-hidden="true">&raquo;&raquo;</span>
+
+            </a>
+
+          </li>
+
+          {% else %}
+
+          <li class="page-item disabled">
+
+            <a class="page-link" href="#" aria-label="Next">
+
+              <span aria-hidden="true">&raquo;</span>
+
+            </a>
+
+          </li>
+
+          <li class="page-item disabled">
+
+            <a class="page-link" href="#" aria-label="Last">
+
+              <span aria-hidden="true">&raquo;&raquo;</span>
+
+            </a>
+
+          </li>
+
+          {% endif %}
+
+        </ul>
+
+      </nav>
+
+      {% endif %}
+
+
+
+      {% else %}
+
+      <div class="text-center py-5">
+
+        <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+
+        <p class="mt-3 text-muted">Aucun utilisateur trouvé</p>
+
+        {% if user_type or status_filter or search_query %}
+
+        <a href="{% url 'admin_users' %}" class="btn btn-outline-primary mt-2">Réinitialiser les filtres</a>
+
+        {% endif %}
+
+      </div>
+
+      {% endif %}
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- Modals for confirmation actions -->
+
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="statusModalLabel">Changer le statut</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      </div>
+
+      <div class="modal-body" id="status-modal-body">
+
+        Êtes-vous sûr de vouloir modifier le statut de cet utilisateur ?
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+
+        <a href="#" id="confirm-status-btn" class="btn btn-primary">Confirmer</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+
+  <div class="modal-dialog">
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h5 class="modal-title" id="deleteModalLabel">Confirmer la suppression</h5>
+
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+      </div>
+
+      <div class="modal-body">
+
+        Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.
+
+      </div>
+
+      <div class="modal-footer">
+
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+
+        <a href="#" id="confirm-delete-btn" class="btn btn-danger">Supprimer</a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script>
+
+  // Function to confirm toggling user status
+
+  function confirmToggleStatus(userId, makeActive) {
+
+    var statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+
+    var statusModalBody = document.getElementById('status-modal-body');
+
+    var confirmStatusBtn = document.getElementById('confirm-status-btn');
+
+    
+
+    statusModalBody.innerText = makeActive 
+
+      ? 'Êtes-vous sûr de vouloir activer cet utilisateur ?'
+
+      : 'Êtes-vous sûr de vouloir désactiver cet utilisateur ?';
+
+    
+
+    confirmStatusBtn.href = "{% url 'admin_toggle_user_status' user_id=0 %}".replace('0', userId);
+
+    statusModal.show();
+
+  }
+
+
+
+  // Function to confirm user deletion
+
+  function confirmDelete(userId) {
+
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+    var confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+    
+
+    confirmDeleteBtn.href = "{% url 'admin_delete_user' user_id=0 %}".replace('0', userId);
+
+    deleteModal.show();
+
+  }
+
+</script>
+
+{% endblock %}

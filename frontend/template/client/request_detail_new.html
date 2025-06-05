@@ -1,0 +1,485 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Demande #{{ demande.id }} - Client{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'custom_requests:dashboard' %}">Tableau de bord</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'custom_requests:request_list' %}">Mes demandes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Demande #{{ demande.id }}</li>
+  </ol>
+</nav>
+
+<div class="container-fluid px-0">
+  <div class="row">
+    <!-- Main content -->
+    <div class="col-md-8">
+      <!-- Request Information Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Informations de la demande</h5>
+          <span class="badge {% if demande.status == 'pending' %}bg-info{% elif demande.status == 'in_progress' %}bg-warning{% elif demande.status == 'completed' %}bg-success{% elif demande.status == 'cancelled' %}bg-danger{% endif %}">
+            {{ demande.get_status_display }}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Titre:</div>
+            <div class="col-md-8">{{ demande.title }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Service:</div>
+            <div class="col-md-8">{{ demande.service.name }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Catégorie:</div>
+            <div class="col-md-8">{{ demande.service.category.name }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Description:</div>
+            <div class="col-md-8">{{ demande.description|default:"Aucune description fournie." }}</div>
+          </div>
+          {% if demande.requirements %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Exigences:</div>
+            <div class="col-md-8">{{ demande.requirements }}</div>
+          </div>
+          {% endif %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Date de création:</div>
+            <div class="col-md-8">{{ demande.created_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Dernière mise à jour:</div>
+            <div class="col-md-8">{{ demande.updated_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          {% if demande.deadline %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Date limite:</div>
+            <div class="col-md-8">{{ demande.deadline|date:"d/m/Y" }}</div>
+          </div>
+          {% endif %}
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Budget:</div>
+            <div class="col-md-8">
+              {% if demande.budget %}
+                ${{ demande.budget }}
+              {% else %}
+                Non spécifié
+              {% endif %}
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Priorité:</div>
+            <div class="col-md-8">
+              <span class="badge {% if demande.priority == 'high' %}bg-danger{% elif demande.priority == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                {{ demande.get_priority_display }}
+              </span>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Localisation:</div>
+            <div class="col-md-8">{{ demande.location|default:"Non spécifiée" }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documents Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Documents</h5>
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+            <i class="bi bi-upload me-1"></i> Ajouter un document
+          </button>
+        </div>
+        <div class="card-body">
+          {% if demande.documents.exists %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Téléchargé par</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for document in demande.documents.all %}
+                    <tr>
+                      <td>{{ document.name|default:document.file.name }}</td>
+                      <td>{{ document.get_type_display }}</td>
+                      <td>{{ document.uploaded_by.first_name }} {{ document.uploaded_by.name }}</td>
+                      <td>{{ document.uploaded_at|date:"d/m/Y" }}</td>
+                      <td>
+                        <a href="{{ document.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ document.file.url }}" download class="btn btn-sm btn-outline-success">
+                          <i class="bi bi-download"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-2"></i> Aucun document n'a été téléchargé pour cette demande.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-chat-dots me-2"></i>Messages
+            {% if demande.status != 'pending' and demande.assigned_expert %}
+              <a href="{% url 'messaging:chat' demande.id %}" class="btn btn-sm btn-primary float-end">
+                <i class="bi bi-chat-text me-1"></i>Ouvrir le chat
+              </a>
+            {% endif %}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12">
+              {% if messages_list %}
+                <div class="messages-container" style="max-height: 300px; overflow-y: auto;">
+                  {% for message in messages_list %}
+                    <div class="message mb-3 p-3 {% if message.sender == request.user %}bg-light text-start{% else %}bg-primary text-white text-start{% endif %}" style="border-radius: 10px;">
+                      <div class="message-header d-flex justify-content-between mb-2">
+                        <span class="fw-bold">{{ message.sender.first_name }} {{ message.sender.name }}</span>
+                        <small>{{ message.sent_at|date:"d/m/Y H:i" }}</small>
+                      </div>
+                      <div class="message-content">
+                        {{ message.content }}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% elif not demande.assigned_expert %}
+                <div class="text-center py-4">
+                  <p class="text-muted">Votre demande n'a pas encore été assignée à un expert. Vous pourrez échanger des messages une fois qu'un expert sera assigné.</p>
+                </div>
+              {% else %}
+                <div class="text-center py-4">
+                  <p class="text-muted">Aucun message pour le moment. Démarrez la conversation avec l'expert assigné.</p>
+                  <a href="{% url 'messaging:chat' demande.id %}" class="btn btn-primary">
+                    <i class="bi bi-chat-text me-1"></i>Démarrer la conversation
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Appointments Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Rendez-vous</h5>
+        </div>
+        <div class="card-body">
+          {% if appointments %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Date et heure</th>
+                    <th>Durée</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for appointment in appointments %}
+                    <tr>
+                      <td>{{ appointment.date_time|date:"d/m/Y H:i" }}</td>
+                      <td>{{ appointment.duration }} minutes</td>
+                      <td>{{ appointment.get_type_display }}</td>
+                      <td>
+                        <span class="badge {% if appointment.status == 'scheduled' %}bg-info{% elif appointment.status == 'completed' %}bg-success{% elif appointment.status == 'cancelled' %}bg-danger{% endif %}">
+                          {{ appointment.get_status_display }}
+                        </span>
+                      </td>
+                      <td>
+                        <a href="{% url 'custom_requests:appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i> Voir
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-2"></i> Aucun rendez-vous n'a été planifié pour cette demande.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+      <!-- Actions Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Actions</h5>
+        </div>
+        <div class="card-body">
+          {% if demande.status != 'completed' and demande.status != 'cancelled' %}
+            <button class="btn btn-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#editModal">
+              <i class="bi bi-pencil-square me-1"></i> Modifier la demande
+            </button>
+          {% endif %}
+          
+          {% if demande.status == 'pending' %}
+            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              <i class="bi bi-x-circle me-1"></i> Annuler la demande
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Expert Information Card -->
+      {% if demande.assigned_expert %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Expert assigné</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <div class="avatar-circle me-3" style="background-color: #007bff;">
+              {% if demande.assigned_expert.profile_picture %}
+                <img src="{{ demande.assigned_expert.profile_picture.url }}" alt="{{ demande.assigned_expert.get_full_name }}" class="rounded-circle" style="width: 60px; height: 60px; object-fit: cover;">
+              {% else %}
+                <span class="initials">{{ demande.assigned_expert.first_name|first }}{{ demande.assigned_expert.name|first }}</span>
+              {% endif %}
+            </div>
+            <div>
+              <h5 class="mb-0">{{ demande.assigned_expert.first_name }} {{ demande.assigned_expert.name }}</h5>
+              <p class="text-muted mb-0">Expert</p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <strong><i class="bi bi-envelope me-2"></i> Email:</strong>
+            <p>{{ demande.assigned_expert.email }}</p>
+          </div>
+          {% if demande.assigned_expert.expert.specialization %}
+          <div class="mb-3">
+            <strong><i class="bi bi-briefcase me-2"></i> Spécialisation:</strong>
+            <p>{{ demande.assigned_expert.expert.specialization }}</p>
+          </div>
+          {% endif %}
+          {% if demande.assigned_expert.expert.years_of_experience %}
+          <div class="mb-3">
+            <strong><i class="bi bi-calendar-check me-2"></i> Expérience:</strong>
+            <p>{{ demande.assigned_expert.expert.years_of_experience }} ans</p>
+          </div>
+          {% endif %}
+          <a href="{% url 'messaging:chat' demande.id %}" class="btn btn-outline-primary w-100">
+            <i class="bi bi-chat-text me-1"></i> Contacter l'expert
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Timeline Card -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Chronologie</h5>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-primary rounded-pill me-2">1</span>
+                Demande créée
+              </div>
+              <small class="text-muted">{{ demande.created_at|date:"d/m/Y" }}</small>
+            </li>
+            
+            {% if demande.status != 'pending' and demande.assigned_expert %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-primary rounded-pill me-2">2</span>
+                Expert assigné
+              </div>
+              <small class="text-muted">{{ demande.expert_assigned_at|default:demande.updated_at|date:"d/m/Y" }}</small>
+            </li>
+            {% endif %}
+            
+            {% if demande.status == 'in_progress' %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-primary rounded-pill me-2">3</span>
+                En cours de traitement
+              </div>
+              <small class="text-muted">{{ demande.in_progress_at|default:demande.updated_at|date:"d/m/Y" }}</small>
+            </li>
+            {% endif %}
+            
+            {% if demande.status == 'completed' %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-success rounded-pill me-2">✓</span>
+                Demande complétée
+              </div>
+              <small class="text-muted">{{ demande.completed_at|date:"d/m/Y" }}</small>
+            </li>
+            {% endif %}
+            
+            {% if demande.status == 'cancelled' %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge bg-danger rounded-pill me-2">✗</span>
+                Demande annulée
+              </div>
+              <small class="text-muted">{{ demande.cancelled_at|date:"d/m/Y" }}</small>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Modifier la demande #{{ demande.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'custom_requests:edit_request' demande.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4">{{ demande.description }}</textarea>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="budget" class="form-label">Budget ($)</label>
+                <input type="number" class="form-control" id="budget" name="budget" value="{{ demande.budget }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="deadline" class="form-label">Date limite</label>
+                <input type="date" class="form-control" id="deadline" name="deadline" 
+                      value="{% if demande.deadline %}{{ demande.deadline|date:'Y-m-d' }}{% endif %}">
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priorité</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="low" {% if demande.priority == 'low' %}selected{% endif %}>Basse</option>
+              <option value="medium" {% if demande.priority == 'medium' %}selected{% endif %}>Moyenne</option>
+              <option value="high" {% if demande.priority == 'high' %}selected{% endif %}>Haute</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="location" class="form-label">Localisation</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ demande.location }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">Annuler la demande #{{ demande.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler cette demande ? Cette action ne peut pas être annulée.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Conserver la demande</button>
+        <form method="post" action="{% url 'custom_requests:cancel_request' demande.id %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Annuler la demande</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Document Modal -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadDocumentModalLabel">Télécharger un document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'custom_requests:upload_document' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="request_id" value="{{ demande.id }}">
+          <div class="mb-3">
+            <label for="document_name" class="form-label">Nom du document</label>
+            <input type="text" class="form-control" id="document_name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="document_type" class="form-label">Type de document</label>
+            <select class="form-select" id="document_type" name="type" required>
+              <option value="" disabled selected>Sélectionner un type</option>
+              <option value="identity">Pièce d'identité</option>
+              <option value="justification">Justificatif</option>
+              <option value="report">Rapport</option>
+              <option value="certificate">Certificat</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="document_file" class="form-label">Fichier</label>
+            <input type="file" class="form-control" id="document_file" name="file" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Télécharger</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Scroll to bottom of messages
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+  });
+</script>
+{% endblock %}

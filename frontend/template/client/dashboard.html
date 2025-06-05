@@ -1,0 +1,3117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Espace Client - MRE</title>
+  <meta name="description" content="Espace personnel client MRE">
+  <meta name="keywords" content="MRE, espace client, services">
+
+  <!-- Favicons -->
+  <link href="../../static/img/favicon.png" rel="icon">
+  <link href="../../static/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="../../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../static/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../../static/vendor/aos/aos.css" rel="stylesheet">
+  <link href="../../static/vendor/animate.css/animate.min.css" rel="stylesheet">
+  <link href="../../static/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="../../static/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  
+  <!-- Calendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="../../static/css/main.css" rel="stylesheet">
+
+  <!-- Dashboard specific CSS -->
+  <style>
+    /* Style temporaire pour l'affichage du formulaire uniquement */
+    body, .main-content, .dashboard-wrapper {
+      background-color: white !important;
+    }
+    
+    /* Assurer que la sidebar ait toujours le bon z-index pour apparaître au-dessus du formulaire */
+    .sidebar {
+      z-index: 1060 !important;
+    }
+    
+    @media (max-width: 992px) {
+      .dashboard-wrapper {
+        padding-left: 0;
+        transition: all 0.3s ease;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1060;
+        height: 100vh;
+        overflow-y: auto;
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+      }
+      
+      .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+        padding: 1rem;
+      }
+      
+      .mobile-menu-toggle {
+        display: block !important;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1050;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      }
+      
+      .stats-card {
+        margin-bottom: 15px;
+      }
+      
+      .dashboard-card {
+        margin-bottom: 20px;
+      }
+      
+      .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .profile-edit-form {
+        width: 100% !important;
+        padding: 0.5rem !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 1055 !important; /* Au-dessus du menu mobile */
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 1rem !important;
+      }
+      
+      .notification-dropdown {
+        position: fixed !important;
+        top: 80px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      
+      .notification-dropdown::before {
+        right: 20px !important;
+      }
+      
+      /* Assurer que le formulaire de profil reste accessible sur mobile */
+      body.profile-form-active .mobile-menu-toggle {
+        z-index: 1060 !important;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-menu-toggle {
+        display: none !important;
+      }
+    }
+    
+    :root {
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --primary-color: #2a2c39;
+      --secondary-color: #C49A5A;
+      --background-color: #f8f9fa;
+      --card-bg-color: #ffffff;
+      --card-border-color: #dee2e6;
+      --default-text-color: #495057;
+      --heading-text-color: #343a40;
+      --light-gray-bg: #f8f9fa;
+      --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    body {
+      background-color: var(--background-color);
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 350px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 10px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .notification-header {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background: #f8f9fa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    
+    .notification-header h6 {
+      margin: 0;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .notification-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: inherit;
+    }
+    
+    .notification-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .notification-item.unread {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+    }
+    
+    .notification-item.unread .unread-indicator {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: #007bff;
+      transition: opacity 0.5s ease;
+    }
+    
+    .notification-item.unread.read-transition .unread-indicator {
+      opacity: 0;
+    }
+    
+    .notification-item .service {
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .notification-item .message {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .notification-item .time {
+      color: #999;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .notification-item .time i {
+      font-size: 0.9rem;
+    }
+    
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-en_attente, .status-new, .status-pending_info { background: #fff3cd; color: #856404; }
+    .status-en_cours, .status-in_progress { background: #cce5ff; color: #004085; }
+    .status-termine, .status-completed { background: #d4edda; color: #155724; }
+    .status-annule, .status-cancelled, .status-rejected { background: #f8d7da; color: #721c24; }
+    
+    .notification-empty {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+    
+    .notification-empty i {
+      font-size: 2rem;
+      color: #ddd;
+      margin-bottom: 10px;
+    }
+    
+    .notification-bell {
+      position: relative;
+      margin-right: 20px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .notification-bell:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .notification-bell:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Notification Dropdown */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      width: 400px;
+      max-height: 380px;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+      margin-top: 10px;
+    }
+    
+    .notification-dropdown.show {
+      display: block !important;
+    }
+    
+    .notification-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: 10px;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid white;
+    }
+    
+    .notification-header {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background: var(--primary-color);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    
+    .notification-header h6 {
+      margin: 0;
+      font-weight: 600;
+      color: white;
+    }
+    
+    .notification-header .badge {
+      background-color: white !important;
+      color: var(--primary-color) !important;
+    }
+    
+    .notification-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: inherit;
+    }
+    
+    .notification-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .notification-item.unread {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+    }
+    
+    .notification-item.unread .unread-indicator {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: #007bff;
+      transition: opacity 0.5s ease;
+    }
+    
+    .notification-item.unread.read-transition .unread-indicator {
+      opacity: 0;
+    }
+    
+    .notification-item .service {
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .notification-item .message {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .notification-item .time {
+      color: #999;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .notification-item .time i {
+      font-size: 0.9rem;
+    }
+    
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-en_attente, .status-new, .status-pending_info { background: #fff3cd; color: #856404; }
+    .status-en_cours, .status-in_progress { background: #cce5ff; color: #004085; }
+    .status-termine, .status-completed { background: #d4edda; color: #155724; }
+    .status-annule, .status-cancelled, .status-rejected { background: #f8d7da; color: #721c24; }
+    
+    .notification-empty {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+    
+    .notification-empty i {
+      font-size: 2rem;
+      color: #ddd;
+      margin-bottom: 10px;
+    }
+    
+    .notification-bell {
+      position: relative;
+      margin-right: 20px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .notification-bell:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .notification-bell:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: white;
+      padding: 1.5rem 1rem;
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      scrollbar-width: thin; /* Pour Firefox */
+      scrollbar-color: rgba(255,255,255,0.3) transparent; /* Pour Firefox */
+    }
+    
+    /* Style de la barre de défilement pour Webkit (Chrome, Safari) */
+    .sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 10px;
+    }
+
+    .sidebar-header {
+      padding: 0.5rem 1rem 1.5rem;
+      text-align: center;
+    }
+
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      margin-bottom: 0.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.15);
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .profile-icon i {
+      font-size: 3rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .sidebar-profile h5 {
+      margin-top: 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+    
+    .sidebar-profile p {
+      margin-bottom: 0;
+    }
+
+    .sidebar-menu {
+      padding: 0.5rem 0;
+    }
+
+    .sidebar-menu a {
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: white;
+      text-decoration: none !important;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-menu a.active {
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-weight: 500;
+    }
+    
+    .sidebar-menu a i {
+      font-size: 1.4rem;
+      margin-right: 0.75rem;
+      width: 28px;
+      text-align: center;
+      opacity: 0.9;
+    }
+    
+    .sidebar-menu a.active i {
+      opacity: 1;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .dashboard-card {
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--card-border-color);
+      border-radius: 0.5rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card .card-body {
+      padding: 1.25rem;
+      background: white;
+    }
+
+    .dashboard-card .card-header {
+      background-color: var(--light-gray-bg);
+      color: var(--heading-text-color);
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--card-border-color);
+      border-top-left-radius: calc(0.5rem - 1px);
+      border-top-right-radius: calc(0.5rem - 1px);
+      display: flex;
+      align-items: center;
+    }
+
+    .dashboard-card .card-header i {
+      margin-right: 10px;
+      color: var(--secondary-color);
+    }
+
+    .dashboard-card .card-title {
+      font-family: "Raleway", sans-serif;
+      color: var(--heading-text-color);
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .status-active {
+      background-color: #e3fcef;
+      color: #00a854;
+    }
+
+    .status-pending {
+      background-color: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .document-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .document-icon {
+      font-size: 2rem;
+      margin-right: 1rem;
+      color: var(--primary-color);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+    }
+
+    /* Additional CSS for profile edit form */
+    .profile-edit-form {
+      background-color: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    
+    /* Make sure sidebar always stays visible */
+    @media (min-width: 993px) {
+      .main-content {
+        margin-left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+      }
+      
+      .profile-edit-form {
+        width: 100%;
+      }
+    }
+    
+    /* Success alert animation */
+    .alert.fade {
+      transition: opacity 0.15s linear;
+    }
+    
+    .alert.fade.show {
+      opacity: 1;
+    }
+    
+    /* Media query for responsiveness */
+    @media (max-width: 992px) {
+      .profile-edit-form {
+        width: 100% !important;
+        left: 0;
+      }
+    }
+    
+    /* Service card styles */
+    .service-card {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .service-card:active {
+      transform: scale(0.98);
+    }
+    
+    .service-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+    
+    .service-icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    
+    .service-card h3 {
+      margin-bottom: 0.75rem;
+      color: #333;
+      font-size: 1.5rem;
+    }
+    
+    .service-card p {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    /* Fix pour le dropdown de notifications */
+    .notification-dropdown-fix.dropdown-menu {
+      position: absolute !important;
+      top: 100% !important;
+      left: auto !important;
+      right: 0 !important;
+      transform: none !important;
+      margin-top: 10px !important;
+      z-index: 9999 !important;
+    }
+
+    /* Profile Edit Form Styles */
+    .profile-edit-form {
+      opacity: 0;
+      transition: all 0.3s ease;
+      transform: translateY(10px);
+      backdrop-filter: blur(5px);
+    }
+    
+    .profile-edit-form.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Overlay to hide main content when form is open */
+    .profile-edit-form::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(248, 249, 250, 0.97);
+      z-index: -1;
+    }
+    
+    /* Hide main content when profile form is shown */
+    .profile-edit-form.show + .main-content {
+      visibility: hidden;
+    }
+    
+    /* Style for form sections */
+    #userProfileForm h5 {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+      margin-top: 1rem;
+    }
+    
+    /* Input styles */
+    #userProfileForm .input-group-text {
+      background-color: #f8f9fa;
+      color: var(--primary-color);
+    }
+    
+    #userProfileForm .form-control:focus,
+    #userProfileForm .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(30, 60, 114, 0.15);
+    }
+    
+    /* Success alert styles */
+    .alert-container .alert {
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      border-left: 4px solid #198754;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .alert-container .alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    /* Bouton Menu pour le formulaire de profil */
+    .profile-menu-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1070;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-menu-btn:hover {
+      background-color: #b8904f;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-menu-btn i {
+      font-size: 1.1rem;
+    }
+    
+    /* Media query for responsiveness */
+    @media (max-width: 992px) {
+      
+      .profile-edit-form {
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        padding: 1rem 0.5rem !important;
+      }
+      
+      .profile-edit-form .container-fluid {
+        padding: 0 !important;
+      }
+      
+      .profile-edit-form .card {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 1.5rem 1rem !important;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .profile-edit-form {
+        padding: 0.5rem !important;
+      }
+      
+      .profile-edit-form .col-lg-11,
+      .profile-edit-form .col-xl-10 {
+        padding: 0 !important;
+      }
+      
+      .profile-edit-form .card-header {
+        padding: 1.5rem 1rem !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 1rem 0.75rem !important;
+      }
+      
+      /* Formulaire responsive */
+      #userProfileForm .row.g-3 {
+        margin: 0 !important;
+      }
+      
+      #userProfileForm .col-md-6,
+      #userProfileForm .col-md-8,
+      #userProfileForm .col-lg-7 {
+        padding: 0 0.5rem !important;
+        margin-bottom: 1rem !important;
+      }
+      
+      /* Input groups plus grands sur mobile */
+      #userProfileForm .input-group-lg .form-control,
+      #userProfileForm .input-group-lg .form-select {
+        font-size: 1rem !important;
+        padding: 0.75rem !important;
+      }
+      
+      #userProfileForm .input-group-lg .input-group-text {
+        font-size: 1rem !important;
+        padding: 0.75rem !important;
+      }
+      
+      /* Photo de profil responsive */
+      #userProfileForm .col-md-4 {
+        text-align: center !important;
+        margin-bottom: 1rem !important;
+      }
+      
+      #userProfileForm .rounded-circle {
+        width: 100px !important;
+        height: 100px !important;
+      }
+      
+      /* Boutons responsive */
+      #userProfileForm .col-md-8.col-lg-5 {
+        max-width: 100% !important;
+      }
+      
+      #userProfileForm .btn-lg {
+        font-size: 1.1rem !important;
+        padding: 0.875rem 1.5rem !important;
+      }
+      
+      /* Titres de section plus petits */
+      #userProfileForm h5 {
+        font-size: 1rem !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 1rem !important;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .profile-edit-form {
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+      
+      .profile-edit-form .card {
+        min-height: 100vh !important;
+        border: none !important;
+      }
+      
+      .profile-edit-form .card-header {
+        padding: 1rem 0.75rem !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 0.75rem !important;
+      }
+      
+      /* Tous les champs en pleine largeur */
+      #userProfileForm .col-md-6,
+      #userProfileForm .col-md-8,
+      #userProfileForm .col-lg-7 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        padding: 0 0.25rem !important;
+      }
+      
+      /* Espacement entre les champs */
+      #userProfileForm .mb-3 {
+        margin-bottom: 1.25rem !important;
+      }
+      
+      /* Labels et texte d'aide plus lisibles */
+      #userProfileForm .form-label {
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      #userProfileForm .form-text {
+        font-size: 0.85rem !important;
+      }
+      
+      /* Amélioration de la zone de sélection de pays */
+      #userProfileForm select.form-select {
+        font-size: 0.95rem !important;
+      }
+      
+      /* Photo de profil encore plus petite sur très petits écrans */
+      #userProfileForm .rounded-circle {
+        width: 80px !important;
+        height: 80px !important;
+      }
+      
+      /* Icône plus petite dans l'en-tête */
+      .profile-edit-form .card-header .fs-1 {
+        font-size: 2.5rem !important;
+      }
+    }
+
+    /* Main Content, Page Header, Cards, Buttons */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      width: calc(100% - var(--sidebar-width));
+      transition: all 0.3s;
+      background-color: var(--background-color); /* Ensure main content has the light background */
+    }
+    
+    .main-content.sidebar-collapsed {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--card-border-color);
+    }
+
+    .page-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--heading-text-color); /* Use heading text color */
+        font-family: "Raleway", sans-serif;
+    }
+    
+    .breadcrumb-item a {
+        color: var(--secondary-color); /* Accent color for breadcrumb links */
+    }
+    .breadcrumb-item.active {
+        color: var(--default-text-color);
+    }
+
+    .dashboard-card {
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--card-border-color);
+      border-radius: 0.5rem; /* Slightly more rounded corners */
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card .card-header {
+      background-color: var(--light-gray-bg); /* Subtle header for cards */
+      color: var(--heading-text-color);
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--card-border-color);
+      border-top-left-radius: calc(0.5rem - 1px);
+      border-top-right-radius: calc(0.5rem - 1px);
+      display: flex;
+      align-items: center;
+    }
+    
+    .dashboard-card .card-header i {
+        margin-right: 10px;
+        color: var(--secondary-color); /* Accent color for card header icons */
+    }
+
+    .dashboard-card .card-body {
+      padding: 1.25rem;
+    }
+    
+    .dashboard-card .card-title {
+        font-family: "Raleway", sans-serif;
+        color: var(--heading-text-color);
+        font-size: 1.25rem; /* Slightly larger card titles */
+        margin-bottom: 0.75rem;
+    }
+
+    .btn-primary {
+      background-color: var(--secondary-color) !important; /* Use accent color for primary buttons */
+      border-color: var(--secondary-color) !important;
+      color: #fff !important; /* Ensure text is white */
+    }
+
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important; /* Darken on hover */
+      border-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+    }
+    
+    .btn-outline-primary {
+        color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--secondary-color) !important;
+        color: #fff !important;
+    }
+
+    .table th {
+        font-family: "Raleway", sans-serif;
+        font-weight: 600;
+        color: var(--heading-text-color);
+    }
+    
+    .text-primary { /* To override bootstrap's default primary if used */
+        color: var(--secondary-color) !important;
+    }
+    a.text-primary:hover, a.text-primary:focus {
+        color: color-mix(in srgb, var(--secondary-color), #000000 20%) !important;
+    }
+    /* End Main Content, Page Header, Cards, Buttons */
+
+    .stats-card {
+      text-align: center; /* Original stats-card was text-align center */
+      /* padding: 20px; Already part of the duplicated .stats-card below, so removed here to avoid conflict */
+      /* background-color, border, border-radius, box-shadow, margin-bottom, transition are inherited from .dashboard-card if .stats-card also has .dashboard-card class */
+    }
+
+    .stats-card .icon {
+      font-size: 48px;
+      color: var(--secondary-color); /* Accent color for stat icons */
+      margin-bottom: 15px;
+    }
+
+    .stats-card h5 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--heading-text-color);
+      margin-bottom: 5px;
+    }
+
+    .stats-card p {
+      font-size: 14px;
+      color: var(--default-text-color);
+    }
+
+    /* Client Header specific styles */
+    .client-header {
+        background-color: #fff; /* White background for the top bar */
+        height: var(--header-height);
+        position: fixed;
+        top: 0;
+        left: 0; 
+        right: 0;
+        z-index: 1020; /* Ensure header is above sidebar */
+        display: flex;
+        align-items: center;
+        padding: 0 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%; 
+        transition: all 0.3s;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+    
+    #sidebarToggle {
+        font-size: 24px;
+        margin-right: 20px;
+        cursor: pointer;
+        color: var(--primary-color); /* Dark color for toggle icon, matching sidebar general scheme */
+    }
+     #sidebarToggle:hover {
+        color: var(--secondary-color); /* Accent on hover */
+     }
+
+    .header-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Notification Bell specific styles */
+    .notification-bell-wrapper .notification-bell {
+        /* General styling for bell icon itself if different from global .notification-bell */
+        /* Keeping original .notification-bell for dropdown part if it's separate */
+         color: var(--primary-color); /* Default color for the bell */
+    }
+    .notification-bell-wrapper .notification-bell:hover {
+        color: var(--secondary-color); /* Accent on hover for the bell in header */
+        background-color: transparent; /* Overriding other general hover if any */
+    }
+    .notification-bell-wrapper .notification-badge {
+        /* Styles for the badge on the bell in the header */
+        background: #dc3545; /* Default red badge */
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        color: var(--primary-color); /* Dark text for user profile */
+    }
+
+    .user-profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover; 
+        border: 2px solid var(--secondary-color); /* Accent border for profile image */
+    }
+    
+    .user-profile span {
+        font-weight: 500;
+    }
+
+    .dropdown-menu {
+        border: 1px solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        border-radius: 0.375rem; 
+    }
+    .dropdown-item {
+        color: var(--default-text-color);
+    }
+    .dropdown-item:hover, .dropdown-item:focus {
+        background-color: var(--light-gray-bg);
+        color: var(--secondary-color);
+    }
+    .dropdown-item i {
+        margin-right: 10px;
+        color: var(--secondary-color);
+    }
+
+    /* Calendar custom styling */
+    #calendar {
+      min-height: 500px;
+    }
+    
+    .fc-event {
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .fc-event-title {
+      white-space: normal;
+      overflow: visible;
+      font-weight: 500;
+    }
+    
+    /* Calendar tooltip styling */
+    .calendar-tooltip {
+      font-size: 0.85rem;
+      padding: 2px;
+    }
+    
+    .tooltip-title {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    
+    .tooltip-time, .tooltip-type, .tooltip-expert {
+      font-size: 0.8rem;
+      margin-bottom: 2px;
+    }
+    
+    /* Appointment details modal styling */
+    .appointment-details {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+    }
+    
+    .detail-icon {
+      background-color: rgba(13, 110, 253, 0.1);
+      color: var(--bs-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    
+    .detail-content {
+      flex: 1;
+    }
+    
+    .detail-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 3px;
+    }
+    
+    .detail-value {
+      font-weight: 500;
+      color: #212529;
+    }
+
+    /* Service Request Form Styles */
+    .service-request-form {
+      opacity: 0;
+      transition: all 0.3s ease;
+      transform: translateY(10px);
+      backdrop-filter: blur(5px);
+    }
+
+    .service-request-form.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Overlay to hide main content when form is open */
+    .service-request-form::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(248, 249, 250, 0.97);
+      z-index: -1;
+    }
+
+    /* Form styles */
+    #serviceRequestForm label {
+      font-weight: 500;
+      color: #444;
+    }
+
+    #serviceRequestForm .form-control:focus,
+    #serviceRequestForm .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(30, 60, 114, 0.1);
+    }
+
+    /* Media query for responsiveness */
+    @media (max-width: 992px) {
+      .service-request-form {
+        width: 100% !important;
+        left: 0;
+      }
+    }
+
+  /* Added CSS from demandes.html */
+  /* Service card and form styles */
+  .service-fields {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Styles for demande cards (if they were to be used on dashboard) */
+  /* .demande-card { ... } */ /* Commented out as it might not be needed for dashboard */
+  
+  .status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-block;
+  }
+  
+  /* Specific status colors - ensure these don't conflict with dashboard existing ones */
+  /* or are specific enough to the form if dashboard has its own status badges */
+  .status-en-attente {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .status-en-cours {
+    background-color: #cce5ff;
+    color: #004085;
+  }
+  
+  .status-termine {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  /* Success alert styles - for the new form */
+  .alert-container {
+    /* position, top, left, transform, z-index, width, max-width are set inline in HTML */
+    /* ensure it does not conflict with other alert containers if any */
+    display: none;
+  }
+  .alert-container .alert {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-left: 4px solid #198754; /* Specific success color */
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+  }
+  
+  .alert-container .alert.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* General alert fade (Bootstrap might handle this, but good to have for consistency) */
+  .alert.fade {
+    transition: opacity 0.15s linear;
+  }
+  
+  .alert.fade.show {
+    opacity: 1;
+  }
+  
+  /* Dropdown styles for service selection (if customizing beyond bootstrap) */
+  /* .dropdown-menu .service-item { ... } */ /* Commented out for now */
+  
+  /* Form styles from demandes.html - specific to #serviceRequestForm */
+  #serviceRequestForm label {
+    font-weight: 500;
+    color: #444; /* Form label color */
+  }
+  
+  #serviceRequestForm .form-control:focus,
+  #serviceRequestForm .form-select:focus {
+    border-color: var(--primary-color); /* Uses dashboard primary color */
+    box-shadow: 0 0 0 0.25rem rgba(30, 60, 114, 0.1); /* Softer focus shadow */
+  }
+  
+  /* Service Request Form Container - Copied from demandes.html and adjusted */
+  .service-request-form {
+    /* display, position, top, right, bottom, width, background-color, z-index, padding, overflow, box-shadow are set inline in HTML for #serviceRequestFullForm */
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .service-request-form.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Overlay for form - from demandes.html */
+  /* This was an ::before pseudo-element on .service-request-form in demandes.html */
+  /* If #serviceRequestFullForm is the main container, it might not need this if it covers the screen */
+  /* For example, if background-color: rgba(248, 249, 250, 0.97); is applied to #serviceRequestFullForm directly and it covers the view */
+  
+  /* Media query for responsiveness - from demandes.html */
+  @media (max-width: 992px) {
+    .service-request-form {
+      /* width and left are handled inline for #serviceRequestFullForm */
+      /* This rule might be redundant if inline styles cover it or !important is used inline */
+      width: 100% !important;
+      left: 0 !important;
+    }
+  }
+  /* End of Added CSS from demandes.html */
+
+  /* Stats Cards */
+  .dashboard-card {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .row.g-3 {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 1rem;
+    margin-right: calc(var(--bs-gutter-x) * -0.5);
+    margin-left: calc(var(--bs-gutter-x) * -0.5);
+  }
+
+  .row.g-3 > * {
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+    margin-top: var(--bs-gutter-y);
+  }
+
+  .col-md-3 {
+    width: 25%;
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+
+  /* Stats Card specific styles */
+  .stats-card {
+    text-align: center;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .stats-card .card-body {
+    width: 100%;
+    padding: 1.25rem;
+  }
+
+  .stats-card .d-flex {
+    width: 100%;
+  }
+
+  .stats-card {
+    height: 100%;
+    margin-bottom: 0;
+  }
+
+  .stats-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: var(--primary-color);
+    line-height: 1.2;
+  }
+
+  .stats-card i {
+    font-size: 2rem;
+    color: var(--secondary-color);
+    opacity: 0.9;
+  }
+
+  @media (max-width: 768px) {
+    .stats-card h3 {
+      font-size: 1.25rem;
+    }
+    .stats-card i {
+      font-size: 1.75rem !important;
+    }
+  }
+
+  .stats-card h6 {
+    font-size: 0.85rem;
+    color: var(--default-text-color);
+    margin-bottom: 0;
+    opacity: 0.8;
+  }
+
+  /* Service Cards */
+  .service-card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 100%;
+    min-height: 150px;
+    position: relative;
+    overflow: hidden;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid var(--card-border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Ajustement des colonnes pour une meilleure uniformité */
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -8px;
+    margin-left: -8px;
+  }
+
+  .col-md-3, .col-md-4, .col-6 {
+    padding: 0 6px 12px;
+    display: flex;
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  @media (min-width: 768px) {
+    .col-md-3, .col-md-4, .col-6 {
+      padding: 0 12px 16px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .col-md-3 {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+    .col-md-4 {
+      flex: 0 0 33.333333%;
+      max-width: 33.333333%;
+    }
+  }
+
+  /* Ajustement spécifique pour les cartes de service */
+  .service-card .service-icon {
+    font-size: 2.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .service-card h3 {
+    margin-bottom: 0.75rem;
+    color: var(--heading-text-color);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .service-card p {
+    color: var(--default-text-color);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    opacity: 0.8;
+    line-height: 1.4;
+  }
+
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+      <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+      </div>
+      <div class="sidebar-profile">
+        <img src="{{ user.get_profile_picture_url }}" alt="Photo de profil" class="rounded-circle border border-2 border-white" style="width: 80px; height: 80px; object-fit: cover;">
+        <h5 class="text-white">{{ user.name }} {{ user.first_name }}</h5>
+        <p class="text-white-50">Client</p>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="{% url 'client_dashboard' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i>
+          <span>Tableau de bord</span>
+        </a>
+        <a href="{% url 'client_demandes' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_demandes' %}active{% endif %}">
+          <i class="bi bi-file-text"></i>
+          <span>Mes demandes</span>
+        </a>
+        <a href="{% url 'client_documents' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_documents' %}active{% endif %}">
+          <i class="bi bi-folder"></i>
+          <span>Mes documents</span>
+        </a>
+        <a href="{% url 'client_rendezvous' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_rendezvous' %}active{% endif %}">
+          <i class="bi bi-calendar"></i>
+          <span>Rendez-vous</span>
+        </a>
+        <a href="{% url 'client_ressources' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_ressources' %}active{% endif %}">
+          <i class="bi bi-book"></i>
+          <span>Ressources</span>
+        </a>
+        <a href="{% url 'client_messages' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_messages' %}active{% endif %}">
+          <i class="bi bi-envelope"></i>
+          <span>Messages</span>
+        </a>
+        <a href="#" class="text-white text-decoration-none" id="editProfileBtn">
+          <i class="bi bi-person-gear"></i>
+          <span>Modifier Profil</span>
+        </a>
+        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="text-white text-decoration-none bg-transparent border-0 w-100 text-start d-flex align-items-center" style="background: none;">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+          </button>
+        </form>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Tableau de bord</h2>
+        <div class="d-flex align-items-center">
+          <div class="dropdown me-3">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="newRequestDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-plus-circle"></i> Nouvelle demande
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="newRequestDropdown">
+              {% for service in available_services %}
+                <li><a class="dropdown-item" href="#" data-service="{{ service.title }}">{{ service.title }}</a></li>
+              {% empty %}
+                <li><a class="dropdown-item" href="#" data-service="Service Administratif">Services Administratifs</a></li>
+                <li><a class="dropdown-item" href="#" data-service="Service Tourisme">Tourisme</a></li>
+                <li><a class="dropdown-item" href="#" data-service="Service Immobilier">Immobilier</a></li>
+                <li><a class="dropdown-item" href="#" data-service="Service Fiscal">Fiscalité</a></li>
+                <li><a class="dropdown-item" href="#" data-service="Service Investissement">Investissement</a></li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="dropdown d-inline-block position-relative">
+            <button class="btn btn-outline-primary position-relative rounded-circle p-2" id="notificationButton" type="button" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+              <i class="bi bi-bell-fill" style="font-size: 1.1rem;"></i>
+              {% if unread_notifications_count and unread_notifications_count > 0 %}
+              <span class="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger d-flex align-items-center justify-content-center" style="min-width: 18px; height: 18px; font-size: 0.6rem; padding: 0 0.25rem; border: 2px solid #fff;">
+                {{ unread_notifications_count }}
+              </span>
+              {% endif %}
+            </button>
+            
+            <!-- Notification Dropdown -->
+            <div class="position-absolute shadow-lg rounded-3" id="notificationDropdown" style="display: none; width: 380px; max-height: 450px; overflow-y: auto; z-index: 1050; right: 0; top: 100%; background-color: white; margin-top: 0.75rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;">
+              <!-- Arrow/pointer pointing to the button -->
+              <div style="position: absolute; top: -8px; right: 20px; width: 16px; height: 16px; transform: rotate(45deg); background-color: var(--bs-primary); box-shadow: -3px -3px 5px rgba(0,0,0,0.025);"></div>
+              
+              <div class="p-3 border-bottom bg-primary text-white" style="border-radius: 8px 8px 0 0;">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="m-0 fw-bold"><i class="bi bi-bell me-2"></i>Notifications</h6>
+                  <span class="badge bg-white text-primary px-3 py-1 rounded-pill">{{ unread_notifications_count|default:"0" }} non lue(s)</span>
+                </div>
+              </div>
+              
+              <div class="list-group list-group-flush">
+                {% if notifications %}
+                  {% for notification in notifications %}
+                    <a href="{% url 'custom_requests:mark_notification_read' notification.id %}?redirect_url={% if notification.type == 'SERVICE_REQUEST' %}{% url 'client_demandes' %}{% elif notification.type == 'APPOINTMENT' %}{% url 'client_rendezvous' %}{% elif notification.type == 'message' %}{% url 'client_messages' %}?contact={{ notification.related_message.sender.id }}{% else %}{% url 'client_dashboard' %}{% endif %}" 
+                       class="list-group-item list-group-item-action border-0 p-0">
+                      <div class="px-3 py-3 {% if not notification.is_read %}position-relative overflow-hidden{% endif %}" style="transition: all 0.2s ease;">
+                        {% if not notification.is_read %}
+                          <div class="position-absolute top-0 bottom-0 start-0 d-flex align-items-center">
+                            <div class="bg-primary" style="width: 4px; height: 60%; border-radius: 0 4px 4px 0;"></div>
+                          </div>
+                          <div class="position-absolute top-0 end-0">
+                            <span class="badge bg-primary rounded-0 rounded-bottom-start px-2 py-1 text-uppercase fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">Nouveau</span>
+                          </div>
+                        {% endif %}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-1 {% if not notification.is_read %}ps-3{% endif %}">
+                          <h6 class="mb-0 fw-bold">{{ notification.title }}</h6>
+                          <span class="badge {% if not notification.is_read %}bg-light text-primary{% else %}bg-light text-secondary{% endif %} rounded-pill" style="font-weight: 400; font-size: 0.7rem;">{{ notification.created_at|timesince }}</span>
+                        </div>
+                        
+                        <p class="mb-0 text-muted small {% if not notification.is_read %}ps-3{% endif %}">{{ notification.content }}</p>
+                      </div>
+                    </a>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-center p-5">
+                    <div class="mb-3 rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                      <i class="bi bi-bell-slash fs-3 text-muted"></i>
+                    </div>
+                    <p class="mb-0 text-muted">Aucune notification</p>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="row gx-2 gx-md-3">
+        <div class="col-6 col-md-3">
+          <div class="dashboard-card stats-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted">Services Terminés</h6>
+                  <h3>{{ completed_requests }}</h3>
+                </div>
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 2rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="dashboard-card stats-card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted">Demandes en cours</h6>
+                  <h3 class="mb-0">{{ active_requests }}</h3>
+                </div>
+                <i class="bi bi-clock-fill text-warning" style="font-size: 2rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="dashboard-card stats-card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted">Documents</h6>
+                  <h3 class="mb-0">{{ documents_count }}</h3>
+                </div>
+                <i class="bi bi-file-earmark-text-fill text-primary" style="font-size: 2rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="dashboard-card stats-card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="text-muted">Ressources</h6>
+                  <h3 class="mb-0">{{ resources_count }}</h3>
+                </div>
+                <i class="bi bi-book-fill text-info" style="font-size: 2rem;"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Service Cards -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h4 class="mb-3">Nos Services</h4>
+        </div>
+        {% if available_services %}
+          {% for service in available_services %}
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('{{ service.title }}')">
+              <i class="bi bi-{{ service.icon }} service-icon"></i>
+              <h3>{{ service.title }}</h3>
+              <p>{{ service.description|truncatewords:10 }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('Service Administratif')">
+              <i class="bi bi-file-earmark-text service-icon"></i>
+              <h3>Services Administratifs</h3>
+              <p>Gestion de vos démarches administratives</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('Service Tourisme')">
+              <i class="bi bi-airplane service-icon"></i>
+              <h3>Tourisme</h3>
+              <p>Organisation de vos voyages au Maroc</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('Service Immobilier')">
+              <i class="bi bi-house-door service-icon"></i>
+              <h3>Immobilier</h3>
+              <p>Gestion de vos biens immobiliers</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('Service Fiscal')">
+              <i class="bi bi-calculator service-icon"></i>
+              <h3>Fiscalité</h3>
+              <p>Conseils et gestion fiscale</p>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="service-card p-4 text-center" onclick="showServiceRequestForm('Service Investissement')">
+              <i class="bi bi-graph-up service-icon"></i>
+              <h3>Investissement</h3>
+              <p>Opportunités d'investissement au Maroc</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Services and Documents -->
+      <div class="row">
+        <div class="col-md-8">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="mb-0">Services Actifs</h5>
+              <a href="{% url 'client_demandes' %}" class="btn btn-sm btn-primary">Voir tout</a>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                {% if recent_requests %}
+                  {% for request in recent_requests %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                      <div>
+                        <h6 class="mb-1">{{ request.title }}</h6>
+                        <small class="text-muted">Dernière mise à jour: {{ request.updated_at|date:"d/m/Y" }}</small>
+                      </div>
+                      <span class="status-badge status-{{ request.status }}">
+                        {% if request.status == 'new' %}Nouveau
+                        {% elif request.status == 'in_progress' %}En Cours
+                        {% elif request.status == 'pending_info' %}En Attente
+                        {% elif request.status == 'completed' %}Terminé
+                        {% elif request.status == 'cancelled' %}Annulé
+                        {% elif request.status == 'rejected' %}Rejeté
+                        {% else %}{{ request.get_status_display }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="list-group-item text-center">
+                    <p class="mb-0">Aucune demande de service active.</p>
+                    <button class="btn btn-sm btn-primary mt-2" type="button" id="createRequestBtn" data-bs-toggle="dropdown" aria-expanded="false" data-bs-reference="#newRequestDropdown">
+                      Créer une nouvelle demande
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="createRequestBtn">
+                      <li><a class="dropdown-item" href="javascript:showServiceRequestForm('Service Administratif')">Services Administratifs</a></li>
+                      <li><a class="dropdown-item" href="javascript:showServiceRequestForm('Service Tourisme')">Tourisme</a></li>
+                      <li><a class="dropdown-item" href="javascript:showServiceRequestForm('Service Immobilier')">Immobilier</a></li>
+                      <li><a class="dropdown-item" href="javascript:showServiceRequestForm('Service Fiscal')">Fiscalité</a></li>
+                      <li><a class="dropdown-item" href="javascript:showServiceRequestForm('Service Investissement')">Investissement</a></li>
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="mb-0">Documents Récents</h5>
+              <a href="{% url 'client_documents' %}" class="btn btn-sm btn-primary">Voir tout</a>
+            </div>
+            <div class="card-body">
+              {% if recent_documents %}
+                {% for doc in recent_documents %}
+                  <div class="document-item">
+                    <i class="bi bi-file-{% if doc.mime_type == 'application/pdf' %}pdf{% elif doc.mime_type and 'image' in doc.mime_type %}image{% else %}earmark-text{% endif %} document-icon"></i>
+                    <div>
+                      <h6 class="mb-1">{{ doc.name }}</h6>
+                      <small class="text-muted">{{ doc.upload_date|date:"d/m/Y" }}</small>
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-center py-3">
+                  <i class="bi bi-file-earmark-x text-muted" style="font-size: 2rem;"></i>
+                  <p class="mt-2">Aucun document récent</p>
+                  <a href="{% url 'custom_requests:upload_document' %}" class="btn btn-sm btn-primary">Ajouter un document</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>      <!-- Calendar and Appointments -->
+      <div class="row">
+        <div class="col-md-8">
+          <!-- Calendrier supprimé -->
+        </div>
+        <div class="col-md-4">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="mb-0">Prochains Rendez-vous</h5>
+              <a href="{% url 'client_rendezvous' %}" class="btn btn-sm btn-primary">Voir tout</a>
+            </div>
+            <div class="card-body">
+              <div class="list-group">
+                {% if upcoming_appointments %}
+                  {% for appointment in upcoming_appointments %}
+                    <div class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">{{ appointment.consultation_type|title }}</h6>
+                        <small class="text-muted">{{ appointment.date_time|date:"d/m/Y H:i" }}</small>
+                      </div>
+                      <p class="mb-1">
+                        {% if appointment.service_request %}
+                          {{ appointment.service_request.title }}
+                        {% endif %} avec 
+                        {% if appointment.expert %}
+                          {{ appointment.expert.name }} {{ appointment.expert.first_name }}
+                        {% else %}
+                          un expert
+                        {% endif %}
+                      </p>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="text-center py-3">
+                    <i class="bi bi-calendar-x text-muted" style="font-size: 2rem;"></i>
+                    <p class="mt-2">Aucun rendez-vous à venir</p>
+                    <a href="{% url 'client_rendezvous' %}" class="btn btn-sm btn-primary">Planifier un rendez-vous</a>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Profile Edit Form (Visible) -->
+  <div class="profile-edit-form" id="profileEditForm" style="display: block; position: fixed; top: 0; right: 0; bottom: 0; width: calc(100% - var(--sidebar-width)); background-color: #f8f9fa; z-index: 1050; padding: 1rem; overflow-y: auto; overflow-x: hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.1);">
+    <div class="container-fluid py-2">
+      <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+          <div class="card shadow-lg border-0 rounded-3">
+            <!-- Bouton Menu (visible sur tous les écrans) -->
+            <button id="profileSidebarToggle" class="profile-menu-btn">
+              <i class="bi bi-list"></i> Menu
+            </button>
+            <div class="card-header bg-white text-center py-4 border-bottom">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-person-gear text-primary fs-1 mb-3"></i>
+                <h3 class="card-title mb-1">Modifier votre profil</h3>
+                <p class="text-muted small">Mettez à jour vos informations personnelles</p>
+              </div>
+            </div>
+            <div class="card-body p-4 p-xl-5">
+              <form id="userProfileForm" class="needs-validation" novalidate enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Photo de profil -->
+                <h5 class="mb-3 border-bottom pb-2">Photo de profil</h5>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-4 text-center">
+                    <img src="{{ user.get_profile_picture_url }}" alt="Photo de profil" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #eee;">
+                  </div>
+                  <div class="col-md-8">
+                    <label for="profile_picture" class="form-label">Changer ma photo</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-image"></i></span>
+                      <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                    </div>
+                    <div class="form-text text-muted">Formats acceptés: JPG, PNG. Taille maximale: 2MB.</div>
+                  </div>
+                </div>
+                
+                <!-- Informations personnelles -->
+                <h5 class="mb-3 border-bottom pb-2">Informations personnelles</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Nom -->
+                  <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Nom</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-person"></i></span>
+                      <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                    </div>
+                  </div>
+                  
+                  <!-- Prénom -->
+                  <div class="col-md-6 mb-3">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-person-plus"></i></span>
+                      <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Coordonnées -->
+                <h5 class="mb-3 border-bottom pb-2">Coordonnées</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Email -->
+                  <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                  </div>
+                  
+                  <!-- Téléphone -->
+                  <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label">Numéro de téléphone</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                      <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone|default:'' }}">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Localisation -->
+                <h5 class="mb-3 border-bottom pb-2">Localisation</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Pays de résidence -->
+                  <div class="col-md-8 col-lg-7 mb-3">
+                    <label for="residence_country" class="form-label">Pays de résidence</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                      <select class="form-select" id="residence_country" name="residence_country">
+                        <option value="AF">Afghanistan</option>
+                        <option value="ZA">Afrique du Sud</option>
+                        <option value="AL">Albanie</option>
+                        <option value="DZ">Algérie</option>
+                        <option value="DE">Allemagne</option>
+                        <option value="AD">Andorre</option>
+                        <option value="AO">Angola</option>
+                        <option value="AI">Anguilla</option>
+                        <option value="AQ">Antarctique</option>
+                        <option value="AG">Antigua-et-Barbuda</option>
+                        <option value="SA">Arabie saoudite</option>
+                        <option value="AR">Argentine</option>
+                        <option value="AM">Arménie</option>
+                        <option value="AW">Aruba</option>
+                        <option value="AU">Australie</option>
+                        <option value="AT">Autriche</option>
+                        <option value="AZ">Azerbaïdjan</option>
+                        <option value="BS">Bahamas</option>
+                        <option value="BH">Bahreïn</option>
+                        <option value="BD">Bangladesh</option>
+                        <option value="BB">Barbade</option>
+                        <option value="BY">Biélorussie</option>
+                        <option value="BE">Belgique</option>
+                        <option value="BZ">Belize</option>
+                        <option value="BJ">Bénin</option>
+                        <option value="BM">Bermudes</option>
+                        <option value="BT">Bhoutan</option>
+                        <option value="BO">Bolivie</option>
+                        <option value="BA">Bosnie-Herzégovine</option>
+                        <option value="BW">Botswana</option>
+                        <option value="BR">Brésil</option>
+                        <option value="BN">Brunei</option>
+                        <option value="BG">Bulgarie</option>
+                        <option value="BF">Burkina Faso</option>
+                        <option value="BI">Burundi</option>
+                        <option value="KH">Cambodge</option>
+                        <option value="CM">Cameroun</option>
+                        <option value="CA">Canada</option>
+                        <option value="CV">Cap-Vert</option>
+                        <option value="CF">République centrafricaine</option>
+                        <option value="CL">Chili</option>
+                        <option value="CN">Chine</option>
+                        <option value="CY">Chypre</option>
+                        <option value="CO">Colombie</option>
+                        <option value="KM">Comores</option>
+                        <option value="CG">Congo</option>
+                        <option value="CD">République démocratique du Congo</option>
+                        <option value="CK">Îles Cook</option>
+                        <option value="KR">Corée du Sud</option>
+                        <option value="KP">Corée du Nord</option>
+                        <option value="CR">Costa Rica</option>
+                        <option value="CI">Côte d'Ivoire</option>
+                        <option value="HR">Croatie</option>
+                        <option value="CU">Cuba</option>
+                        <option value="CW">Curaçao</option>
+                        <option value="DK">Danemark</option>
+                        <option value="DJ">Djibouti</option>
+                        <option value="DM">Dominique</option>
+                        <option value="EG">Égypte</option>
+                        <option value="AE">Émirats arabes unis</option>
+                        <option value="EC">Équateur</option>
+                        <option value="ER">Érythrée</option>
+                        <option value="ES">Espagne</option>
+                        <option value="EE">Estonie</option>
+                        <option value="US">États-Unis</option>
+                        <option value="ET">Éthiopie</option>
+                        <option value="FJ">Fidji</option>
+                        <option value="FI">Finlande</option>
+                        <option value="FR">France</option>
+                        <option value="GA">Gabon</option>
+                        <option value="GM">Gambie</option>
+                        <option value="GE">Géorgie</option>
+                        <option value="GS">Géorgie du Sud-et-les Îles Sandwich du Sud</option>
+                        <option value="GH">Ghana</option>
+                        <option value="GI">Gibraltar</option>
+                        <option value="GR">Grèce</option>
+                        <option value="GD">Grenade</option>
+                        <option value="GL">Groenland</option>
+                        <option value="GP">Guadeloupe</option>
+                        <option value="GU">Guam</option>
+                        <option value="GT">Guatemala</option>
+                        <option value="GG">Guernesey</option>
+                        <option value="GN">Guinée</option>
+                        <option value="GQ">Guinée équatoriale</option>
+                        <option value="GW">Guinée-Bissau</option>
+                        <option value="GY">Guyana</option>
+                        <option value="GF">Guyane française</option>
+                        <option value="HT">Haïti</option>
+                        <option value="HN">Honduras</option>
+                        <option value="HU">Hongrie</option>
+                        <option value="BV">Île Bouvet</option>
+                        <option value="IM">Île de Man</option>
+                        <option value="CX">Île Christmas</option>
+                        <option value="NF">Île Norfolk</option>
+                        <option value="AX">Îles Åland</option>
+                        <option value="KY">Îles Caïmans</option>
+                        <option value="CC">Îles Cocos</option>
+                        <option value="FO">Îles Féroé</option>
+                        <option value="HM">Îles Heard-et-MacDonald</option>
+                        <option value="FK">Îles Malouines</option>
+                        <option value="MP">Îles Mariannes du Nord</option>
+                        <option value="MH">Îles Marshall</option>
+                        <option value="UM">Îles mineures éloignées des États-Unis</option>
+                        <option value="PN">Îles Pitcairn</option>
+                        <option value="SB">Îles Salomon</option>
+                        <option value="TC">Îles Turques-et-Caïques</option>
+                        <option value="VI">Îles Vierges américaines</option>
+                        <option value="VG">Îles Vierges britanniques</option>
+                        <option value="IN">Inde</option>
+                        <option value="ID">Indonésie</option>
+                        <option value="IQ">Irak</option>
+                        <option value="IR">Iran</option>
+                        <option value="IE">Irlande</option>
+                        <option value="IS">Islande</option>
+                        <option value="IL">Israël</option>
+                        <option value="IT">Italie</option>
+                        <option value="JM">Jamaïque</option>
+                        <option value="JP">Japon</option>
+                        <option value="JE">Jersey</option>
+                        <option value="JO">Jordanie</option>
+                        <option value="KZ">Kazakhstan</option>
+                        <option value="KE">Kenya</option>
+                        <option value="KG">Kirghizistan</option>
+                        <option value="KI">Kiribati</option>
+                        <option value="KW">Koweït</option>
+                        <option value="LA">Laos</option>
+                        <option value="LS">Lesotho</option>
+                        <option value="LV">Lettonie</option>
+                        <option value="LB">Liban</option>
+                        <option value="LR">Libéria</option>
+                        <option value="LY">Libye</option>
+                        <option value="LI">Liechtenstein</option>
+                        <option value="LT">Lituanie</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="MK">Macédoine du Nord</option>
+                        <option value="MG">Madagascar</option>
+                        <option value="MY">Malaisie</option>
+                        <option value="MW">Malawi</option>
+                        <option value="MV">Maldives</option>
+                        <option value="ML">Mali</option>
+                        <option value="MT">Malte</option>
+                        <option value="MA">Maroc</option>
+                        <option value="MQ">Martinique</option>
+                        <option value="MU">Maurice</option>
+                        <option value="MR">Mauritanie</option>
+                        <option value="YT">Mayotte</option>
+                        <option value="MX">Mexique</option>
+                        <option value="FM">Micronésie</option>
+                        <option value="MD">Moldavie</option>
+                        <option value="MC">Monaco</option>
+                        <option value="MN">Mongolie</option>
+                        <option value="ME">Monténégro</option>
+                        <option value="MS">Montserrat</option>
+                        <option value="MZ">Mozambique</option>
+                        <option value="MM">Myanmar</option>
+                        <option value="NA">Namibie</option>
+                        <option value="NR">Nauru</option>
+                        <option value="NP">Népal</option>
+                        <option value="NI">Nicaragua</option>
+                        <option value="NE">Niger</option>
+                        <option value="NG">Nigeria</option>
+                        <option value="NU">Niue</option>
+                        <option value="NO">Norvège</option>
+                        <option value="NC">Nouvelle-Calédonie</option>
+                        <option value="NZ">Nouvelle-Zélande</option>
+                        <option value="OM">Oman</option>
+                        <option value="UG">Ouganda</option>
+                        <option value="UZ">Ouzbékistan</option>
+                        <option value="PK">Pakistan</option>
+                        <option value="PW">Palaos</option>
+                        <option value="PS">Palestine</option>
+                        <option value="PA">Panama</option>
+                        <option value="PG">Papouasie-Nouvelle-Guinée</option>
+                        <option value="PY">Paraguay</option>
+                        <option value="NL">Pays-Bas</option>
+                        <option value="PE">Pérou</option>
+                        <option value="PH">Philippines</option>
+                        <option value="PL">Pologne</option>
+                        <option value="PF">Polynésie française</option>
+                        <option value="PR">Porto Rico</option>
+                        <option value="PT">Portugal</option>
+                        <option value="QA">Qatar</option>
+                        <option value="HK">R.A.S. chinoise de Hong Kong</option>
+                        <option value="MO">R.A.S. chinoise de Macao</option>
+                        <option value="RE">Réunion</option>
+                        <option value="RO">Roumanie</option>
+                        <option value="GB">Royaume-Uni</option>
+                        <option value="RU">Russie</option>
+                        <option value="RW">Rwanda</option>
+                        <option value="EH">Sahara occidental</option>
+                        <option value="BL">Saint-Barthélemy</option>
+                        <option value="KN">Saint-Kitts-et-Nevis</option>
+                        <option value="SM">Saint-Marin</option>
+                        <option value="MF">Saint-Martin</option>
+                        <option value="PM">Saint-Pierre-et-Miquelon</option>
+                        <option value="VC">Saint-Vincent-et-les-Grenadines</option>
+                        <option value="SH">Sainte-Hélène</option>
+                        <option value="LC">Sainte-Lucie</option>
+                        <option value="WS">Samoa</option>
+                        <option value="AS">Samoa américaines</option>
+                        <option value="ST">Sao Tomé-et-Principe</option>
+                        <option value="SN">Sénégal</option>
+                        <option value="RS">Serbie</option>
+                        <option value="SC">Seychelles</option>
+                        <option value="SL">Sierra Leone</option>
+                        <option value="SG">Singapour</option>
+                        <option value="SX">Saint-Martin (partie néerlandaise)</option>
+                        <option value="SK">Slovaquie</option>
+                        <option value="SI">Slovénie</option>
+                        <option value="SO">Somalie</option>
+                        <option value="SD">Soudan</option>
+                        <option value="SS">Soudan du Sud</option>
+                        <option value="LK">Sri Lanka</option>
+                        <option value="SE">Suède</option>
+                        <option value="CH">Suisse</option>
+                        <option value="SR">Suriname</option>
+                        <option value="SJ">Svalbard et Île Jan Mayen</option>
+                        <option value="SZ">Swaziland</option>
+                        <option value="SY">Syrie</option>
+                        <option value="TJ">Tadjikistan</option>
+                        <option value="TW">Taïwan</option>
+                        <option value="TZ">Tanzanie</option>
+                        <option value="TD">Tchad</option>
+                        <option value="CZ">République tchèque</option>
+                        <option value="TF">Terres australes françaises</option>
+                        <option value="IO">Territoire britannique de l'océan Indien</option>
+                        <option value="TH">Thaïlande</option>
+                        <option value="TL">Timor oriental</option>
+                        <option value="TG">Togo</option>
+                        <option value="TK">Tokelau</option>
+                        <option value="TO">Tonga</option>
+                        <option value="TT">Trinité-et-Tobago</option>
+                        <option value="TN">Tunisie</option>
+                        <option value="TM">Turkménistan</option>
+                        <option value="TR">Turquie</option>
+                        <option value="TV">Tuvalu</option>
+                        <option value="UA">Ukraine</option>
+                        <option value="UY">Uruguay</option>
+                        <option value="VU">Vanuatu</option>
+                        <option value="VA">Vatican</option>
+                        <option value="VE">Venezuela</option>
+                        <option value="VN">Vietnam</option>
+                        <option value="WF">Wallis-et-Futuna</option>
+                        <option value="YE">Yémen</option>
+                        <option value="ZM">Zambie</option>
+                        <option value="ZW">Zimbabwe</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="row mt-5">
+                  <div class="col-md-8 col-lg-5 mx-auto">
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-lg py-3" style="background-color: var(--secondary-color); color: white;"><i class="bi bi-check-circle me-2"></i>Enregistrer</button>
+                      <button type="button" id="closeProfileForm" class="btn btn-outline-secondary py-2"><i class="bi bi-x-circle me-2"></i>Annuler</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Success Alert (Hidden by default) -->
+  <div class="alert-container" style="display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 1060; width: 90%; max-width: 500px;">
+    <div class="alert alert-success alert-dismissible fade shadow" role="alert" id="successAlert">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+        <div>
+          <strong>Demande soumise avec succès!</strong>
+          <p class="mb-0 small">Votre demande a été enregistrée. Nous la traiterons dans les plus brefs délais.</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Service Request Form (Hidden by default) -->
+  <div class="service-request-form" id="serviceRequestFullForm" style="display: none; position: fixed; top: 0; right: 0; bottom: 0; width: calc(100% - var(--sidebar-width)); background-color: #f8f9fa; z-index: 1050; padding: 1rem; overflow-y: auto; overflow-x: hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.1);">
+    <div class="container-fluid py-2">
+      <div class="row justify-content-center">
+        <div class="col-lg-11 col-xl-10">
+          <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-white text-center py-4 border-bottom">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Fermer"></button>
+                <i class="bi bi-file-earmark-text text-primary fs-1 mb-3"></i>
+                <h3 class="card-title mb-1" id="formServiceTitle">Nouvelle demande</h3>
+                <p class="text-muted small" id="formServiceDescription">Veuillez remplir le formulaire ci-dessous</p>
+              </div>
+            </div>
+            <div class="card-body p-4 p-xl-5">
+              <form id="serviceRequestForm" action="{% url 'custom_requests:ajax_create_request' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="serviceType" name="serviceType" value="">
+                
+                <!-- Common fields for all services -->
+                <div class="mb-4">
+                  <h5 class="mb-3 border-bottom pb-2">Informations générales</h5>
+                  <div class="mb-3">
+                    <label for="requestTitle" class="form-label">Titre de votre demande</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-type"></i></span>
+                      <input type="text" class="form-control" id="requestTitle" name="requestTitle" required>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service-specific fields - Administrative -->
+                <div id="adminFields" class="service-fields" style="display: none;">
+                  <h5 class="mb-3 border-bottom pb-2">Détails du service administratif</h5>
+                  <div class="mb-3">
+                    <label for="adminDocumentType" class="form-label">Type de document</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-file-earmark"></i></span>
+                      <select class="form-select" id="adminDocumentType" name="adminDocumentType">
+                        <option value="">Sélectionner un type de document</option>
+                        <option value="passeport">Passeport</option>
+                        <option value="carte_nationale">Carte Nationale d'Identité</option>
+                        <option value="acte_naissance">Acte de Naissance</option>
+                        <option value="certificat_residence">Certificat de Résidence</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="adminUrgency" class="form-label">Niveau d'urgence</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-exclamation-triangle"></i></span>
+                      <select class="form-select" id="adminUrgency" name="adminUrgency">
+                        <option value="normale">Normale</option>
+                        <option value="urgente">Urgente</option>
+                        <option value="tres_urgente">Très urgente</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service-specific fields - Tourism -->
+                <div id="tourismeFields" class="service-fields" style="display: none;">
+                  <h5 class="mb-3 border-bottom pb-2">Détails du service touristique</h5>
+                  <div class="mb-3">
+                    <label for="tourismType" class="form-label">Type de service touristique</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                      <select class="form-select" id="tourismType" name="tourismType">
+                        <option value="">Sélectionner un service</option>
+                        <option value="reservation_hotel">Réservation d'hôtel</option>
+                        <option value="circuit_touristique">Circuit touristique</option>
+                        <option value="location_voiture">Location de voitures</option>
+                        <option value="guide_touristique">Guide touristique</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="dateArrivee" class="form-label">Date d'arrivée</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-text"><i class="bi bi-calendar-check"></i></span>
+                          <input type="date" class="form-control" id="dateArrivee" name="dateArrivee">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="dateDepart" class="form-label">Date de départ</label>
+                        <div class="input-group input-group-lg">
+                          <span class="input-group-text"><i class="bi bi-calendar-x"></i></span>
+                          <input type="date" class="form-control" id="dateDepart" name="dateDepart">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service-specific fields - Real Estate -->
+                <div id="immobilierFields" class="service-fields" style="display: none;">
+                  <h5 class="mb-3 border-bottom pb-2">Détails du service immobilier</h5>
+                  <div class="mb-3">
+                    <label for="immobilierType" class="form-label">Type de service immobilier</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-house"></i></span>
+                      <select class="form-select" id="immobilierType" name="immobilierType">
+                        <option value="">Sélectionner un service</option>
+                        <option value="achat">Achat de bien</option>
+                        <option value="vente">Vente de bien</option>
+                        <option value="location">Location</option>
+                        <option value="gestion_bien">Gestion de bien</option>
+                        <option value="conseil">Conseil immobilier</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="propertyType" class="form-label">Type de bien</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-building"></i></span>
+                      <select class="form-select" id="propertyType" name="propertyType">
+                        <option value="">Sélectionner un type de bien</option>
+                        <option value="appartement">Appartement</option>
+                        <option value="maison">Maison</option>
+                        <option value="villa">Villa</option>
+                        <option value="terrain">Terrain</option>
+                        <option value="commerce">Local commercial</option>
+                        <option value="bureau">Bureau</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="propertyLocation" class="form-label">Ville</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                      <select class="form-select" id="propertyLocation" name="propertyLocation">
+                        <option value="">Sélectionner une ville</option>
+                        <option value="casablanca">Casablanca</option>
+                        <option value="rabat">Rabat</option>
+                        <option value="marrakech">Marrakech</option>
+                        <option value="tanger">Tanger</option>
+                        <option value="agadir">Agadir</option>
+                        <option value="fes">Fès</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service-specific fields - Fiscal -->
+                <div id="fiscalFields" class="service-fields" style="display: none;">
+                  <h5 class="mb-3 border-bottom pb-2">Détails du service fiscal</h5>
+                  <div class="mb-3">
+                    <label for="fiscalType" class="form-label">Type de service fiscal</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-cash-coin"></i></span>
+                      <select class="form-select" id="fiscalType" name="fiscalType">
+                        <option value="">Sélectionner un service</option>
+                        <option value="declaration_impots">Déclaration d'impôts</option>
+                        <option value="optimisation_fiscale">Optimisation fiscale</option>
+                        <option value="conseil_fiscal">Conseil fiscal</option>
+                        <option value="contentieux_fiscal">Contentieux fiscal</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="fiscalYear" class="form-label">Année fiscale concernée</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                      <select class="form-select" id="fiscalYear" name="fiscalYear">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service-specific fields - Investment -->
+                <div id="investissementFields" class="service-fields" style="display: none;">
+                  <h5 class="mb-3 border-bottom pb-2">Détails du service d'investissement</h5>
+                  <div class="mb-3">
+                    <label for="investType" class="form-label">Type d'investissement</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-graph-up"></i></span>
+                      <select class="form-select" id="investType" name="investType">
+                        <option value="">Sélectionner un type d'investissement</option>
+                        <option value="immobilier">Immobilier</option>
+                        <option value="commerce">Commerce</option>
+                        <option value="industrie">Industrie</option>
+                        <option value="agriculture">Agriculture</option>
+                        <option value="technologie">Technologie</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="investBudget" class="form-label">Budget approximatif (MAD)</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                      <select class="form-select" id="investBudget" name="investBudget">
+                        <option value="moins_500k">Moins de 500 000</option>
+                        <option value="500k_1m">500 000 - 1 000 000</option>
+                        <option value="1m_3m">1 000 000 - 3 000 000</option>
+                        <option value="3m_5m">3 000 000 - 5 000 000</option>
+                        <option value="plus_5m">Plus de 5 000 000</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Description field for all services -->
+                <div class="mb-4">
+                  <h5 class="mb-3 border-bottom pb-2">Description de votre demande</h5>
+                  <div class="mb-3">
+                    <label for="requestDescription" class="form-label">Description détaillée</label>
+                    <textarea class="form-control form-control-lg" id="requestDescription" name="requestDescription" rows="5" required></textarea>
+                    <div class="form-text">Décrivez votre besoin avec le plus de détails possible pour un traitement optimal.</div>
+                  </div>
+                </div>
+                
+                <!-- File upload field -->
+                <div class="mb-4">
+                  <h5 class="mb-3 border-bottom pb-2">Documents joints</h5>
+                  <div class="mb-3">
+                    <label for="requestFiles" class="form-label">Documents complémentaires (optionnel)</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-file-earmark-arrow-up"></i></span>
+                      <input class="form-control" type="file" id="requestFiles" name="requestFiles" multiple>
+                    </div>
+                    <div class="form-text">Vous pouvez joindre plusieurs documents (PDF, images, etc.)</div>
+                  </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                  <button type="button" class="btn btn-outline-secondary" onclick="document.querySelector('.service-request-form .btn-close').click()">
+                    <i class="bi bi-x-circle me-2"></i>Annuler
+                  </button>
+                  <button type="submit" class="btn btn-primary" id="submitServiceRequest">
+                    <i class="bi bi-check-circle me-2"></i>Soumettre la demande
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Success Alert (Hidden by default) -->
+  <div class="alert-container" style="display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 1060; width: 90%; max-width: 500px;">
+    <div class="alert alert-success alert-dismissible fade shadow" role="alert" id="successAlert">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+        <div>
+          <strong>Demande soumise avec succès!</strong>
+          <p class="mb-0 small">Votre demande a été enregistrée. Nous la traiterons dans les plus brefs délais.</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+
+    </main>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Custom JS -->
+<script>
+  // ... (rest of the code remains unchanged)
+</script>
+
+{% block extra_js %}
+<script>
+  // Déclaration des fonctions globales
+  window.showServiceRequestModal = function(serviceType) {
+    console.log('showServiceRequestModal appelé avec:', serviceType);
+    showServiceRequestForm(serviceType);
+  };
+
+  // Fonction pour ouvrir le formulaire de demande de service à pleine page
+  function showServiceRequestForm(serviceType) {
+    console.log('Affichage du formulaire pour le service:', serviceType);
+    
+    const serviceRequestForm = document.getElementById('serviceRequestFullForm');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (!serviceRequestForm) {
+      console.error('Formulaire de service non trouvé!');
+      return;
+    }
+    
+    // Réinitialiser le formulaire
+    const form = document.getElementById('serviceRequestForm');
+    if (form) {
+      form.reset();
+    }
+    
+    // Cacher tous les champs spécifiques
+    document.querySelectorAll('.service-fields').forEach(field => {
+      field.style.display = 'none';
+    });
+    
+    // Définir le type de service et mettre à jour le formulaire
+    const serviceTypeInput = document.getElementById('serviceType');
+    const formTitle = document.getElementById('formServiceTitle');
+    if (serviceTypeInput) serviceTypeInput.value = serviceType;
+    if (formTitle) formTitle.textContent = serviceType;
+    
+    // Afficher les champs spécifiques en fonction du type
+    let fieldsToShow = '';
+    let serviceDescription = '';
+    
+    // Normaliser le type de service pour la correspondance
+    const normalizedServiceType = serviceType.toLowerCase()
+      .replace(/^service\s+/i, '')
+      .replace(/\s+service$/i, '')
+      .replace(/\s+basic$/i, '')
+      .replace(/\s+premium$/i, '')
+      .trim();
+    
+    console.log('Type de service normalisé:', normalizedServiceType);
+    
+    switch(normalizedServiceType) {
+      case 'administratif':
+      case 'services administratifs':
+      case 'administrative':
+        fieldsToShow = 'adminFields';
+        serviceDescription = 'Demandez des documents officiels, des attestations ou tout autre service administratif.';
+        break;
+      case 'tourisme':
+      case 'tourism':
+        fieldsToShow = 'tourismeFields';
+        serviceDescription = 'Réservations d\'hôtels, circuits touristiques, location de voitures et autres services touristiques.';
+        break;
+      case 'immobilier':
+      case 'real estate':
+      case 'property':
+        fieldsToShow = 'immobilierFields';
+        serviceDescription = 'Services d\'achat, vente, location ou gestion de biens immobiliers.';
+        break;
+      case 'fiscal':
+      case 'fiscalité':
+      case 'tax':
+        fieldsToShow = 'fiscalFields';
+        serviceDescription = 'Déclarations fiscales, optimisation fiscale, conseils et assistance pour vos impôts.';
+        break;
+      case 'investissement':
+      case 'investment':
+        fieldsToShow = 'investissementFields';
+        serviceDescription = 'Conseils et accompagnement pour vos projets d\'investissement au Maroc.';
+        break;
+      default:
+        console.warn('Type de service non reconnu:', serviceType, '(normalisé:', normalizedServiceType, ')');
+        serviceDescription = 'Veuillez spécifier les détails de votre demande dans la description.';
+    }
+    
+    // Afficher les champs pertinents
+    if (fieldsToShow) {
+      const fieldsElement = document.getElementById(fieldsToShow);
+      if (fieldsElement) {
+        fieldsElement.style.display = 'block';
+        console.log('Affichage des champs pour:', fieldsToShow);
+      } else {
+        console.error('Élément', fieldsToShow, 'non trouvé!');
+      }
+    }
+    
+    // Définir la description du service
+    const formDescription = document.getElementById('formServiceDescription');
+    if (formDescription) {
+      formDescription.textContent = serviceDescription;
+    }
+    
+    // Cacher le contenu principal
+    if (mainContent) {
+      mainContent.style.visibility = 'hidden';
+    }
+    
+    // Afficher le formulaire avec animation
+    serviceRequestForm.style.display = 'block';
+    setTimeout(() => {
+      serviceRequestForm.style.opacity = '1';
+      serviceRequestForm.style.transform = 'translateY(0)';
+    }, 10);
+  }
+  
+  // Initialisation des gestionnaires d'événements
+  function initializeEventHandlers() {
+    console.log('Initialisation des gestionnaires d\'événements pour dashboard...');
+    
+    const dropdownItems = document.querySelectorAll('#newRequestDropdown + .dropdown-menu .dropdown-item[data-service]');
+    console.log('Nombre d\'éléments dropdown trouvés dans le dashboard:', dropdownItems.length);
+    
+    dropdownItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const serviceType = this.getAttribute('data-service');
+        console.log('Option de service cliquée sur dashboard:', serviceType);
+        showServiceRequestForm(serviceType);
+        var dropdown = bootstrap.Dropdown.getInstance(this.closest('.dropdown-toggle'));
+        if (dropdown) {
+            dropdown.hide();
+        }
+      });
+    });
+    
+    const closeButton = document.querySelector('#serviceRequestFullForm .btn-close');
+    if (closeButton) {
+      console.log('Bouton de fermeture du formulaire trouvé sur dashboard');
+      closeButton.addEventListener('click', function() {
+        console.log('Fermeture du formulaire sur dashboard');
+        const serviceRequestForm = document.getElementById('serviceRequestFullForm');
+        const mainContent = document.querySelector('.main-content');
+        
+        if (serviceRequestForm) {
+          serviceRequestForm.style.opacity = '0';
+          serviceRequestForm.style.transform = 'translateY(10px)';
+          setTimeout(() => {
+            serviceRequestForm.style.display = 'none';
+          }, 300);
+        }
+        
+        if (mainContent) {
+          mainContent.style.visibility = 'visible';
+        }
+      });
+    } else {
+      console.error('Bouton de fermeture du formulaire non trouvé sur dashboard (#serviceRequestFullForm .btn-close)');
+    }
+
+    const serviceForm = document.getElementById('serviceRequestForm');
+    if (serviceForm) {
+        serviceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Formulaire de demande soumis sur dashboard');
+            const formData = new FormData(this);
+            
+            // Ajouter le type de service au formData
+            const serviceType = document.getElementById('serviceType').value;
+            formData.append('serviceType', serviceType);
+            
+            // Envoyer les données au serveur
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (closeButton) closeButton.click();
+                    const successAlert = document.getElementById('successAlert');
+                    const alertContainer = document.querySelector('.alert-container');
+                    if (successAlert && alertContainer) {
+                        alertContainer.style.display = 'block';
+                        successAlert.classList.add('show');
+                        setTimeout(() => {
+                            successAlert.classList.remove('show');
+                            setTimeout(() => {
+                                alertContainer.style.display = 'none';
+                                // Rediriger vers la page des demandes après le succès
+                                window.location.href = '{% url "client_demandes" %}';
+                            }, 150);
+                        }, 2000);
+                    }
+                } else {
+                    // Afficher une erreur si la soumission a échoué
+                    alert(data.message || 'Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer.');
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de la soumission:', error);
+                alert('Une erreur est survenue lors de la soumission de votre demande. Veuillez réessayer.');
+            });
+        });
+    }
+  }
+
+  // Gestionnaire pour les notifications
+  function initializeNotificationHandlers() {
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    
+    if (notificationButton && notificationDropdown) {
+      // Afficher/masquer le menu déroulant des notifications
+      notificationButton.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isHidden = notificationDropdown.style.display === 'none';
+        
+        // Fermer tous les autres menus déroulants
+        document.querySelectorAll('.dropdown-menu.show, [id$="Dropdown"].show').forEach(el => {
+          if (el !== notificationDropdown) {
+            el.classList.remove('show');
+            el.style.display = 'none';
+          }
+        });
+        
+        // Basculer l'affichage du menu de notification
+        notificationDropdown.style.display = isHidden ? 'block' : 'none';
+        
+        if (isHidden) {
+          // Marquer les notifications comme lues lors de l'ouverture
+          markNotificationsAsRead();
+        }
+      });
+      
+      // Fermer le menu déroulant lors d'un clic en dehors
+      document.addEventListener('click', function(e) {
+        if (!notificationButton.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.style.display = 'none';
+        }
+      });
+      
+      // Empêcher la fermeture lors d'un clic dans le menu
+      notificationDropdown.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
+  }
+  
+  // Fonction pour marquer les notifications comme lues
+  function markNotificationsAsRead() {
+    fetch('{% url "custom_requests:mark_all_notifications_read" %}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Mettre à jour le compteur de notifications non lues
+        const badge = document.querySelector('#notificationButton .badge');
+        if (badge) {
+          badge.textContent = '0';
+          badge.classList.remove('bg-danger');
+          badge.classList.add('bg-secondary');
+        }
+        
+        // Mettre à jour le compteur dans l'en-tête
+        const headerBadge = document.querySelector('#notificationDropdown .badge');
+        if (headerBadge) {
+          headerBadge.textContent = '0 non lue(s)';
+        }
+        
+        // Supprimer les marqueurs "Nouveau"
+        document.querySelectorAll('.notification-new-badge').forEach(el => el.remove());
+        document.querySelectorAll('.notification-unread').forEach(el => {
+          el.classList.remove('notification-unread');
+        });
+      }
+    })
+    .catch(error => console.error('Erreur lors du marquage des notifications comme lues:', error));
+  }
+  
+  // Gestionnaire pour le bouton Modifier le profil
+  function initializeProfileButton() {
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const profileEditForm = document.getElementById('profileEditForm');
+    const closeProfileForm = document.getElementById('closeProfileForm');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (editProfileBtn && profileEditForm) {
+      editProfileBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Afficher le formulaire avec animation
+        profileEditForm.style.display = 'block';
+        setTimeout(() => {
+          profileEditForm.style.opacity = '1';
+          profileEditForm.style.transform = 'translateY(0)';
+        }, 10);
+        
+        // Masquer le contenu principal
+        if (mainContent) {
+          mainContent.style.visibility = 'hidden';
+        }
+      });
+    }
+    
+    // Gestionnaire pour le bouton de fermeture du formulaire
+    if (closeProfileForm) {
+      closeProfileForm.addEventListener('click', function() {
+        // Masquer le formulaire avec animation
+        profileEditForm.style.opacity = '0';
+        profileEditForm.style.transform = 'translateY(10px)';
+        
+        // Afficher le contenu principal après l'animation
+        setTimeout(() => {
+          profileEditForm.style.display = 'none';
+          if (mainContent) {
+            mainContent.style.visibility = 'visible';
+          }
+        }, 300);
+      });
+    }
+  }
+  
+  // Gestion du menu mobile
+  document.addEventListener('DOMContentLoaded', function() {
+    // Menu mobile toggle
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (mobileMenuToggle && sidebar) {
+      mobileMenuToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        sidebar.classList.toggle('show');
+      });
+      
+      // Fermer le menu en cliquant à l'extérieur
+      document.addEventListener('click', function(e) {
+        const profileMenuToggle = document.getElementById('profileSidebarToggle');
+        const isClickInsideProfileToggle = profileMenuToggle && profileMenuToggle.contains(e.target);
+        
+        if (window.innerWidth <= 992 && sidebar.classList.contains('show') && 
+            !sidebar.contains(e.target) && e.target !== mobileMenuToggle && !isClickInsideProfileToggle) {
+          sidebar.classList.remove('show');
+        }
+      });
+    }
+    
+    // Fonctionnalité du bouton menu du formulaire de profil
+    const profileSidebarToggle = document.getElementById('profileSidebarToggle');
+    if (profileSidebarToggle) {
+      profileSidebarToggle.addEventListener('click', function() {
+        if (sidebar) {
+          sidebar.classList.toggle('show');
+        }
+      });
+    }
+    
+    console.log('DOM dashboard chargé, initialisation des gestionnaires...');
+    initializeEventHandlers();
+    initializeNotificationHandlers();
+    initializeProfileButton();
+    
+    const mainContent = document.querySelector('.main-content');
+    if (mainContent) {
+      mainContent.style.visibility = 'visible';
+    }
+    
+    const serviceRequestForm = document.getElementById('serviceRequestFullForm');
+    if (serviceRequestForm) {
+      serviceRequestForm.style.display = 'none';
+      serviceRequestForm.style.opacity = '0';
+    }
+    
+    // Masquer le formulaire de profil au chargement
+    const profileEditForm = document.getElementById('profileEditForm');
+    if (profileEditForm) {
+      profileEditForm.style.display = 'none';
+      profileEditForm.style.opacity = '0';
+      profileEditForm.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      profileEditForm.style.transform = 'translateY(10px)';
+    }
+  });
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    console.log('DOM dashboard déjà chargé, tentative d\'initialisation...');
+    // initializeEventHandlers(); // To prevent double calls if DOMContentLoaded also fires.
+  }
+</script>
+{% endblock %}
+
+<!-- FullCalendar JS (v5.10.0 for compatibility with CSS) -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.0/main.min.js"></script>
+<!-- Calendar Initialization -->
+<script src="{% static 'js/calendar-init.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,1908 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>{% block title %}MRE{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
+
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/animate.css/animate.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <!-- Dashboard specific CSS -->
+  <style>
+    :root {
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --primary-color: #2a2c39; /* Consistent primary color */
+      --secondary-color: #C49A5A; /* Consistent secondary color */
+      --background-color: #f8f9fa; /* Light background for content area */
+      --card-bg-color: #ffffff; /* White background for cards */
+      --card-border-color: #dee2e6; /* Standard border color */
+      --default-text-color: #495057; /* Default text color */
+      --heading-text-color: #343a40; /* Darker text for headings */
+      --light-gray-bg: #f8f9fa; /* Light gray for subtle backgrounds */
+      --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow for cards */
+    }
+
+    body {
+      background-color: var(--background-color); /* Use the new background color variable */
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif; /* Consistent font */
+    }
+
+    html {
+      height: 100%;
+    }
+    
+    /* Notification Styles (Copied from dashboard.html) */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 350px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin-bottom: 10px;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .notification-header {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background: var(--primary-color); /* Use primary color for header */
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    
+    .notification-header h6 {
+      margin: 0;
+      font-weight: 600;
+      color: white; /* White text on primary background */
+    }
+     .notification-header .badge {
+      background-color: white !important;
+      color: var(--primary-color) !important;
+    }
+    
+    .notification-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: inherit;
+    }
+    
+    .notification-item:hover {
+      background: #f8f9fa;
+    }
+    
+    .notification-item.unread {
+      background: #f8f9fa; /* Slightly different background for unread items */
+      border-left: 4px solid var(--secondary-color); /* Use secondary color for unread indicator */
+    }
+        
+    .notification-item .service {
+      font-weight: 600;
+      color: var(--heading-text-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .notification-item .message {
+      color: var(--default-text-color);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    
+    .notification-item .time {
+      color: #999;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .notification-item .time i {
+      font-size: 0.9rem;
+    }
+    
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-en_attente, .status-new, .status-pending_info { background: #fff3cd; color: #856404; }
+    .status-en_cours, .status-in_progress { background: #cce5ff; color: #004085; }
+    .status-termine, .status-completed { background: #d4edda; color: #155724; }
+    .status-annule, .status-cancelled, .status-rejected { background: #f8d7da; color: #721c24; }
+    
+    .notification-empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--default-text-color);
+    }
+    
+    .notification-empty i {
+      font-size: 2rem;
+      color: #ddd;
+      margin-bottom: 10px;
+    }
+    
+    /* Notification Bell in Header */
+    .client-header .notification-bell-wrapper .notification-bell {
+        color: var(--primary-color); /* Default color for the bell in header */
+        background-color: transparent;
+        box-shadow: none;
+        width: 40px; /* Standardized size */
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .client-header .notification-bell-wrapper .notification-bell:hover {
+        color: var(--secondary-color); /* Accent on hover */
+        background-color: rgba(0,0,0,0.05); /* Subtle hover background */
+    }
+    .client-header .notification-bell-wrapper .notification-badge {
+        background: #dc3545; /* Default red badge */
+        border: 2px solid var(--card-bg-color); /* Border to make it pop from the icon */
+    }
+
+    /* Notification Dropdown */
+    .notification-dropdown {
+      position: absolute;
+      top: 100%; /* Position below the bell */
+      right: 0;
+      background: var(--card-bg-color);
+      border-radius: 0.375rem; /* Consistent border radius */
+      box-shadow: var(--card-shadow); /* Consistent shadow */
+      width: 400px;
+      max-height: 380px;
+      overflow-y: auto;
+      z-index: 9999;
+      display: none;
+      margin-top: 0.75rem; /* Space from the bell */
+      border: 1px solid var(--card-border-color);
+    }
+    
+    .notification-dropdown.show {
+      display: block !important;
+    }
+    
+    .notification-dropdown::before { /* Arrow pointing to the bell */
+      content: '';
+      position: absolute;
+      top: -8px; /* Adjust to align with border */
+      right: 20px; /* Align with bell position */
+      width: 16px;
+      height: 16px;
+      transform: rotate(45deg);
+      background-color: var(--card-bg-color);
+      border-left: 1px solid var(--card-border-color);
+      border-top: 1px solid var(--card-border-color);
+    }
+
+    .dashboard-wrapper {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      width: 100%;
+    }    /* Sidebar Styles (Adapted from dashboard.html, but using variables from base.html) */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%); /* Updated gradient to match dashboard.html */
+      color: white;
+      padding: 1.5rem 1rem; /* Maintained padding */
+      position: fixed;
+      height: 100vh;
+      left: 0;
+      top: 0;
+      z-index: 1060; /* Higher than profile form to appear above it */
+      transition: all 0.3s ease;
+      overflow-y: auto;
+      scrollbar-width: thin; 
+      scrollbar-color: rgba(255,255,255,0.3) transparent; 
+    }
+    
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background-color: rgba(255,255,255,0.3); border-radius: 10px; }
+
+    .sidebar-header {
+      padding: 0.5rem 1rem 1.5rem; /* Adjusted padding */
+      text-align: center;
+      border-bottom: none; /* Removed line as per request, to match dashboard.html implicit style */
+      margin-bottom: 0; /* Removed space to position profile photo higher, matching dashboard.html */
+    }
+
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 1.5rem; /* Adjusted margin */
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Consistent border */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .sidebar-profile img { /* Specific styling for profile image in sidebar */
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid rgba(255,255,255,0.3);
+        margin-bottom: 0.75rem;
+    }
+    
+    .sidebar-profile h5 {
+      margin-top: 0.5rem;
+      margin-bottom: 0.3rem;
+      font-size: 1.1rem; /* Adjusted font size */
+      font-weight: 500;
+    }
+    
+    .sidebar-profile p {
+      margin-bottom: 0;
+      font-size: 0.9rem; /* Adjusted font size */
+      color: rgba(255,255,255,0.7); /* Lighter text for role */
+    }
+
+    .sidebar-menu {
+      padding: 0; /* Removed extra padding as items have their own */
+    }
+
+    .sidebar-menu a {
+      border-radius: 0.375rem; /* Standardized border radius */
+      margin-bottom: 0.5rem; /* Reduced margin */
+      transition: all 0.2s ease; /* Slightly faster transition */
+      display: flex;
+      align-items: center;
+      padding: 0.85rem 1rem; /* Adjusted padding */
+      font-size: 1rem; /* Standardized font size */
+      font-weight: 400;
+      color: rgba(255,255,255,0.9); /* Slightly less bright white for text */
+      text-decoration: none !important;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white; /* Ensure text is fully white on hover */
+    }
+    
+    .sidebar-menu a.active {
+      background-color: rgba(255, 255, 255, 0.25); /* Match dashboard.html active background */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Match dashboard.html active shadow */
+      font-weight: 500;
+      color: white; /* Ensure text is fully white for active */
+    }
+    
+    .sidebar-menu a i {
+      font-size: 1.3rem; /* Adjusted icon size */
+      margin-right: 0.85rem; /* Adjusted margin */
+      width: 24px; /* Fixed width for icon alignment */
+      text-align: center;
+      opacity: 0.8; /* Slightly transparent icons */
+    }
+    
+    .sidebar-menu a.active i,
+    .sidebar-menu a:hover i {
+      opacity: 1; /* Full opacity for active/hover icons */
+    }
+
+    /* Main Content Styles (to be used by pages extending this base) */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: var(--header-height) 30px 30px 30px; /* Top padding to account for fixed header */
+      width: calc(100% - var(--sidebar-width));
+      transition: all 0.3s ease;
+      overflow-y: auto; /* Allow scrolling for main content only if needed */
+      height: 100vh; /* Ensure it takes full viewport height */
+      box-sizing: border-box;
+    }
+    
+    body.sidebar-collapsed .main-content { /* When sidebar is collapsed for mobile */
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--card-border-color);
+    }
+
+    .page-header h1, .page-header h2, .page-header h3 { /* Consistent page titles */
+        font-size: 24px; /* Adjusted size */
+        font-weight: 600; /* Adjusted weight */
+        color: var(--heading-text-color); 
+        font-family: "Raleway", sans-serif;
+        margin:0;
+    }
+    
+    .breadcrumb-item a {
+        color: var(--secondary-color); 
+    }
+    .breadcrumb-item.active {
+        color: var(--default-text-color);
+    }
+
+    /* Dashboard Card (General card styling) */
+    .dashboard-card {
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--card-border-color);
+      border-radius: 0.5rem; 
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px; /* Standard margin */
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Slightly more pronounced hover shadow */
+    }
+
+    .dashboard-card .card-header { /* Styling for card headers */
+      background-color: var(--light-gray-bg); 
+      color: var(--heading-text-color);
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--card-border-color);
+      border-top-left-radius: calc(0.5rem - 1px); /* Adjust for border */
+      border-top-right-radius: calc(0.5rem - 1px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* For title and buttons like "Voir tout" */
+    }
+    
+    .dashboard-card .card-header i { /* Icons in card headers */
+        margin-right: 10px;
+        color: var(--secondary-color); 
+    }
+     .dashboard-card .card-header .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .dashboard-card .card-body {
+      padding: 1.25rem;
+    }
+    
+    .dashboard-card .card-title {
+        font-family: "Raleway", sans-serif;
+        color: var(--heading-text-color);
+        font-size: 1.15rem; /* Adjusted card title size */
+        margin-bottom: 0.75rem;
+    }
+
+    /* Button Styles */
+    .btn {
+        border-radius: 0.375rem; /* Consistent border radius for buttons */
+        font-weight: 500;
+        padding: 0.5rem 1rem; /* Default padding */
+    }
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-primary {
+      background-color: var(--secondary-color) !important; 
+      border-color: var(--secondary-color) !important;
+      color: #fff !important; 
+    }
+
+    .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+      background-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important; 
+      border-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+      box-shadow: 0 0 0 0.25rem rgba(var(--secondary-color), 0.5);
+    }
+    
+    .btn-outline-primary {
+        color: var(--secondary-color) !important;
+        border-color: var(--secondary-color) !important;
+    }
+    .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active  {
+        background-color: var(--secondary-color) !important;
+        color: #fff !important;
+        box-shadow: 0 0 0 0.25rem rgba(var(--secondary-color), 0.5);
+    }
+
+    .btn-secondary { /* Standard secondary button */
+        background-color: #6c757d !important;
+        border-color: #6c757d !important;
+        color: #fff !important;
+    }
+    .btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
+        background-color: #5a6268 !important;
+        border-color: #545b62 !important;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+    .btn-outline-secondary:hover, .btn-outline-secondary:focus, .btn-outline-secondary:active {
+        background-color: #6c757d !important;
+        color: #fff !important;
+    }
+
+
+    .table th {
+        font-family: "Raleway", sans-serif;
+        font-weight: 600;
+        color: var(--heading-text-color);
+        background-color: var(--light-gray-bg); /* Subtle background for table headers */
+    }
+    .table td {
+        color: var(--default-text-color);
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,0.03); /* Subtle hover for table rows */
+    }
+    
+    .text-primary { 
+        color: var(--secondary-color) !important;
+    }
+    a.text-primary:hover, a.text-primary:focus {
+        color: color-mix(in srgb, var(--secondary-color), #000000 20%) !important;
+    }
+
+    /* Stats Card (Specific styling for statistic display cards) */
+    .stats-card {
+      text-align: left; /* Align text to left for better readability */
+    }
+    .stats-card .card-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem; /* Reduced padding */
+    }
+    .stats-card .icon {
+      font-size: 2.5rem; /* Reduced icon size */
+      opacity: 0.7;
+    }
+    .stats-card h3 { /* For the number/statistic */
+      font-size: 1.75rem; /* Adjusted size */
+      font-weight: 700;
+      color: var(--heading-text-color);
+      margin-bottom: 0.1rem;
+    }
+    .stats-card h6 { /* For the label like "Services Terminés" */
+      font-size: 0.85rem; /* Adjusted size */
+      color: var(--default-text-color);
+      margin-bottom: 0;
+      font-weight: 400;
+    }
+
+    /* Client Header specific styles (Fixed top bar) */
+    .client-header {
+        background-color: var(--card-bg-color); 
+        height: var(--header-height);
+        position: fixed;
+        top: 0;
+        left: 0; 
+        right: 0;
+        z-index: 1030; /* Higher than sidebar */
+        display: flex;
+        align-items: center;
+        padding: 0 20px 0 var(--sidebar-width); /* Padding left to align with content, adjusted when sidebar collapses */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+        width: 100%; 
+        transition: padding-left 0.3s ease; /* Transition for padding */
+    }
+    body.sidebar-collapsed .client-header {
+        padding-left: 20px; /* Adjust padding when sidebar is hidden */
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+    
+    #sidebarToggle { /* Mobile toggle button */
+        font-size: 22px; /* Adjusted size */
+        margin-right: 15px;
+        cursor: pointer;
+        color: var(--primary-color); 
+        background: none;
+        border: none;
+        padding: 0.5rem; /* Clickable area */
+        display: none; /* Hidden by default, shown in media query */
+    }     #sidebarToggle:hover {
+        color: var(--secondary-color); 
+     }
+
+    /* Bouton Menu pour le formulaire de profil - Style beige comme l'image */
+    .profile-menu-btn {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background-color: var(--secondary-color) !important; /* Couleur beige */
+        border: 1px solid var(--secondary-color) !important;
+        color: white !important;
+        padding: 0.5rem 1rem;
+        border-radius: 0.375rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        z-index: 1060;
+        display: none; /* Caché par défaut, affiché seulement en responsive */
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .profile-menu-btn:hover {
+        background-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+        border-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+    }
+    
+    .profile-menu-btn i {
+        font-size: 1rem;
+    }
+
+    .header-right {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 1rem; /* Spacing between items in header right */
+    }
+    
+    .user-profile-dropdown .dropdown-toggle { /* User profile dropdown */
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--default-text-color);
+    }
+     .user-profile-dropdown .dropdown-toggle::after { /* Remove default bootstrap caret */
+        display: none;
+    }
+
+    .user-profile-dropdown img {
+        width: 36px; /* Adjusted size */
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        object-fit: cover; 
+        border: 2px solid var(--secondary-color); 
+    }
+    
+    .user-profile-dropdown span { /* User name */
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    .user-profile-dropdown .dropdown-menu {
+        border: 1px solid var(--card-border-color);
+        box-shadow: var(--card-shadow);
+        border-radius: 0.375rem; 
+        margin-top: 0.5rem !important; /* Ensure it's below the header */
+    }
+    .user-profile-dropdown .dropdown-item {
+        color: var(--default-text-color);
+        font-size: 0.95rem;
+        padding: 0.5rem 1rem;
+    }
+    .user-profile-dropdown .dropdown-item:hover, .user-profile-dropdown .dropdown-item:focus {
+        background-color: var(--light-gray-bg);
+        color: var(--secondary-color);
+    }
+    .user-profile-dropdown .dropdown-item i {
+        margin-right: 0.75rem; /* Space for icon */
+        color: var(--secondary-color);
+        width: 16px; /* Align icons */
+        text-align: center;
+    }
+    
+    /* Calendar custom styling */
+    #calendarContainer .fc-event { /* Ensure calendar styles are scoped if needed */
+      background-color: var(--secondary-color) !important;
+      border-color: var(--secondary-color) !important;
+      color: white !important;
+    }
+    #calendarContainer .fc-event-main {
+        color: white !important;
+    }
+    #calendarContainer .fc th { 
+        background-color: var(--light-gray-bg);
+        color: var(--heading-text-color);
+        font-family: "Raleway", sans-serif;
+    }
+    #calendarContainer .fc-toolbar-title {
+        font-family: "Raleway", sans-serif;
+        color: var(--heading-text-color);
+        font-size: 1.25rem; /* Adjusted title size */
+    }
+    #calendarContainer .fc-button-primary { 
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: white !important;
+        font-size: 0.9rem; /* Adjusted button font size */
+        padding: 0.4rem 0.8rem; /* Adjusted padding */
+    }
+    #calendarContainer .fc-button-primary:hover {
+        background-color: color-mix(in srgb, var(--primary-color), #000000 10%) !important;
+        border-color: color-mix(in srgb, var(--primary-color), #000000 10%) !important;
+    }
+    #calendarContainer .fc-button-primary:not(:disabled).fc-button-active, 
+    #calendarContainer .fc-button-primary:not(:disabled):active {
+        background-color: var(--secondary-color) !important; 
+        border-color: var(--secondary-color) !important;
+    }
+    
+    /* Modal Styles */
+    .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-bottom: none; /* Cleaner look */
+    }
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%); /* Make close button white */
+    }
+    .modal-title {
+        font-family: "Raleway", sans-serif;
+        font-weight: 500;
+    }
+    .modal-content {
+        border-radius: 0.5rem; /* Consistent border radius */
+        border: none; /* Remove default modal border if header provides enough distinction */
+        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15); /* More prominent shadow for modals */
+    }
+    .modal-footer {
+        border-top: 1px solid var(--card-border-color);
+        background-color: var(--light-gray-bg); /* Subtle footer background */
+    }
+
+    /* Tabs */
+    .nav-tabs .nav-link {
+        color: var(--default-text-color);
+        border-bottom-color: transparent; 
+        border-radius: 0.375rem 0.375rem 0 0; /* Rounded top corners */
+        margin-right: 0.25rem;
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--secondary-color);
+        border-color: var(--card-border-color) var(--card-border-color) var(--card-bg-color); /* Connect with tab content area */
+        border-bottom-width: 2px; /* Thicker active border */
+        font-weight: 600;
+        background-color: var(--card-bg-color); /* Match content area */
+    }
+    .nav-tabs .nav-link:hover:not(.active) {
+        border-color: var(--light-gray-bg) var(--light-gray-bg) var(--card-border-color); /* Hover for non-active tabs */
+        background-color: var(--light-gray-bg);
+    }
+    .tab-content {
+        padding: 1.25rem;
+        border: 1px solid var(--card-border-color);
+        border-top: none; /* Tabs provide top border */
+        border-radius: 0 0 0.5rem 0.5rem; /* Rounded bottom corners */
+        background-color: var(--card-bg-color);
+    }    /* Responsive adjustments */
+    @media (max-width: 991.98px) { /* Tablet and mobile */
+      .sidebar {
+        transform: translateX(-100%); /* Hide sidebar off-screen */
+        z-index: 1060; /* Ensure sidebar is above profile form and all other content */
+      }
+      .sidebar.active { /* When mobile menu is toggled */
+          transform: translateX(0);
+          box-shadow: 5px 0px 15px rgba(0,0,0,0.1); /* Add shadow when open on mobile */
+      }
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: calc(var(--header-height) + 20px); /* Ensure content starts below fixed header */
+      }
+      .client-header { /* Header adjustments for mobile */
+        padding: 0 15px; /* Reduce padding */
+        z-index: 1035; /* Ensure header toggle is accessible */
+      }      #sidebarToggle { /* Show mobile toggle button */
+          display: block; 
+          position: fixed; /* Fix toggle to viewport if header moves */
+          left: 15px;
+          top: calc((var(--header-height) - 38px) / 2); /* Center vertically in header */
+          z-index: 1045; /* Above sidebar */
+      }
+      
+      /* Afficher le bouton menu dans le formulaire de profil sur mobile/tablette */
+      .profile-menu-btn {
+          display: flex !important;
+      }
+      body.sidebar-active .main-content { /* When sidebar is open on mobile, content should not shift */
+           margin-left: 0; 
+           width: 100%;
+       }
+      body.sidebar-active .client-header {
+           padding-left: 15px; /* Keep padding consistent */
+      }
+       /* Overlay for when mobile menu is open */
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1039; /* Below sidebar, above content */
+        display: none; /* Hidden by default */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      body.sidebar-active .sidebar-overlay {
+        display: block;
+        opacity: 1;
+      }
+    }
+     @media (min-width: 992px) { /* Desktop */
+        body.sidebar-collapsed .sidebar {
+             transform: translateX(calc(-1 * var(--sidebar-width) + 70px)); /* Keep a small part visible */
+        }
+        body.sidebar-collapsed .main-content {
+            margin-left: 70px; 
+            width: calc(100% - 70px);
+        }
+         body.sidebar-collapsed .client-header {
+            padding-left: 70px;
+        }
+         body.sidebar-collapsed .sidebar .sidebar-menu span,
+         body.sidebar-collapsed .sidebar .sidebar-profile h5,
+         body.sidebar-collapsed .sidebar .sidebar-profile p,
+         body.sidebar-collapsed .sidebar .sidebar-header /* Consider hiding or minimizing header content */
+         {
+             /* Styles to hide or minimize text when sidebar is collapsed on desktop */
+             /* This part needs careful implementation based on desired collapsed look */
+         }
+    }
+
+    /* Profile Edit Form Styles (from base.html, now part of the main styles) */
+    .profile-edit-form-container { /* Renamed to avoid conflict if a class .profile-edit-form is used for the form itself */
+      display: none; /* Hidden by default, shown by JS */
+      position: fixed; 
+      top: 0; 
+      right: 0; 
+      bottom: 0; 
+      width: calc(100% - var(--sidebar-width)); /* Full width minus sidebar */
+      background-color: rgba(var(--background-color), 0.95); /* Slightly transparent background */
+      backdrop-filter: blur(5px);
+      z-index: 1050; /* High z-index */
+      padding: 2rem; 
+      overflow-y: auto; 
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(20px); /* Initial off-screen position for animation */
+    }
+    
+    .profile-edit-form-container.show {
+      display:block; /* Ensure it's block for layout */
+      opacity: 1;
+      transform: translateX(0); /* Animate in */
+    }
+    
+    /* Hide main content's scrollbar when profile form is shown, and prevent interaction */
+    body.profile-form-active .main-content {
+      visibility: hidden; /* Or pointer-events: none; and filter: blur(2px); for a different effect */
+    }    body.profile-form-active .client-header {
+      /* Optionally adjust header if needed when form is open */
+      z-index: 1040;
+    }
+
+    @media (max-width: 991.98px) {
+      .profile-edit-form-container {
+        width: 100% !important; /* Full width on mobile */
+        left: 0;
+        padding: 1rem; /* Adjust padding for smaller screens */
+      }
+    }
+    
+    /* Styles specific for the "Modifier Profil" button in sidebar */
+    /*
+    #editProfileBtn.active, #editProfileBtn:focus {
+      background-color: var(--secondary-color); 
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      font-weight: 500;
+      color: white;
+    }
+    */
+    
+    /* Ensure focus is visually clear, especially when form is open */
+    /*
+    body.profile-form-active #editProfileBtn {
+      background-color: var(--secondary-color);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+      color: white;
+    }
+     body.profile-form-active #editProfileBtn:focus {
+         outline: 2px solid white; 
+         outline-offset: 2px;
+     }
+    */
+
+    /* Success Alert Styles (from base.html, now part of main styles) */
+    .alert-container { /* For positioning the alert */
+      position: fixed; 
+      top: calc(var(--header-height) + 20px); /* Below header */
+      left: 50%; 
+      transform: translateX(-50%); 
+      z-index: 1060; /* Very high z-index */
+      width: 90%; 
+      max-width: 500px;
+      pointer-events: none; /* Allow clicks through container */
+    }
+    
+    .alert-container .alert { /* Actual alert styling */
+      pointer-events: auto; /* Allow clicks on alert itself */
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      border-left-width: 4px;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .alert-container .alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .alert-success {
+        border-left-color: #198754; /* Green for success */
+    }
+     .alert-danger {
+        border-left-color: #dc3545; /* Red for error/danger */
+    }
+    .alert-warning {
+        border-left-color: #ffc107; /* Yellow for warning */
+    }
+     .alert-info {
+        border-left-color: #0dcaf0; /* Blue for info */
+    }
+
+    /* Service Request Form (Full Page Style) */
+    .service-request-form-container { /* Renamed for clarity */
+      display: none; /* Hidden by default */
+      position: fixed; 
+      top: 0; 
+      right: 0; 
+      bottom: 0; 
+      width: calc(100% - var(--sidebar-width)); 
+      background-color: rgba(var(--background-color), 0.98);
+      backdrop-filter: blur(3px);
+      z-index: 1050; 
+      padding: 2rem; 
+      overflow-y: auto; 
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(20px);
+    }
+    .service-request-form-container.show {
+      display:block;
+      opacity: 1;
+      transform: translateX(0);
+    }
+     body.service-form-active .main-content,
+     body.service-form-active .client-header { /* Similar to profile form active state */
+        visibility: hidden;
+     }
+
+    @media (max-width: 991.98px) {
+      .service-request-form-container {
+        width: 100% !important;
+        left: 0;
+        padding: 1rem;
+      }
+    }
+     /* Input group styling inside forms */
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-color); /* Use secondary for focus */
+        box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--secondary-color) 25%, transparent);
+    }
+    .input-group-text {
+        background-color: var(--light-gray-bg);
+        border-color: var(--card-border-color);
+        color: var(--primary-color);
+    }
+    label.form-label {
+        font-weight: 500;
+        color: var(--heading-text-color);
+    }
+     form h5 { /* Section titles in forms */
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--card-border-color);
+    }    form .form-text {
+        font-size: 0.85rem;
+    }
+
+    /* Styles responsifs pour le formulaire de profil - Identiques à dashboard.html */
+    
+    /* Additional CSS for profile edit form */
+    .profile-edit-form {
+      background-color: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    
+    /* Make sure sidebar always stays visible */
+    @media (min-width: 993px) {
+      .main-content {
+        margin-left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+      }
+      
+      .profile-edit-form {
+        width: 100%;
+      }
+    }
+    
+    /* Media queries pour la responsivité du formulaire de profil */
+    @media (max-width: 992px) {
+      .profile-edit-form {
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        padding: 1rem 0.5rem !important;
+        z-index: 1055;
+      }
+      
+      .profile-edit-form .container-fluid {
+        padding: 0 !important;
+      }
+      
+      .profile-edit-form .card {
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 1rem !important;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .profile-edit-form {
+        padding: 0.5rem !important;
+      }
+      
+      .profile-edit-form .col-lg-11,
+      .profile-edit-form .col-xl-10 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+      }
+      
+      .profile-edit-form .card-header {
+        padding: 0.75rem !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 0.75rem !important;
+      }
+      
+      /* Responsive columns pour tous les champs */
+      .profile-edit-form .col-md-6,
+      .profile-edit-form .col-md-8,
+      .profile-edit-form .col-lg-7 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 1rem !important;
+      }
+      
+      /* Photo de profil plus petite sur mobile */
+      .profile-edit-form .profile-photo {
+        width: 100px !important;
+        height: 100px !important;
+      }
+      
+      /* Input groups adaptés */
+      .profile-edit-form .input-group-text {
+        font-size: 0.9rem !important;
+        padding: 0.5rem !important;
+      }
+      
+      .profile-edit-form .form-control {
+        font-size: 0.9rem !important;
+        padding: 0.5rem !important;
+      }
+      
+      /* Boutons empilés sur mobile */
+      .profile-edit-form .d-flex.gap-2 {
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+      }
+      
+      .profile-edit-form .btn {
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .profile-edit-form {
+        width: 100% !important;
+        left: 0 !important;
+        right: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        z-index: 1055;
+      }
+      
+      .profile-edit-form .card {
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      
+      .profile-edit-form .card-header {
+        padding: 1rem !important;
+        background: var(--primary-color) !important;
+        color: white !important;
+        border-radius: 0 !important;
+      }
+      
+      .profile-edit-form .card-header h4 {
+        color: white !important;
+        font-size: 1.1rem !important;
+      }
+      
+      .profile-edit-form .card-body {
+        padding: 1rem 0.75rem !important;
+      }
+      
+      /* Photo de profil encore plus petite */
+      .profile-edit-form .profile-photo {
+        width: 80px !important;
+        height: 80px !important;
+      }
+      
+      /* Tous les champs en pleine largeur */
+      .profile-edit-form .col-md-6,
+      .profile-edit-form .col-md-8,
+      .profile-edit-form .col-lg-7,
+      .profile-edit-form .col-12 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-bottom: 1rem !important;
+        padding: 0 !important;
+      }
+      
+      /* Labels et inputs optimisés */
+      .profile-edit-form .form-label {
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      .profile-edit-form .input-group-text {
+        font-size: 0.85rem !important;
+        padding: 0.75rem 0.5rem !important;
+      }
+      
+      .profile-edit-form .form-control {
+        font-size: 0.9rem !important;
+        padding: 0.75rem !important;
+      }
+      
+      /* Titres de section plus compacts */
+      .profile-edit-form h5 {
+        font-size: 1rem !important;
+        margin-bottom: 0.75rem !important;
+        margin-top: 1.5rem !important;
+      }
+      
+      /* Boutons optimisés pour mobile */
+      .profile-edit-form .btn {
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+        width: 100% !important;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      .profile-edit-form .btn-primary {
+        background: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+      }
+        /* Espacement optimisé */
+      .profile-edit-form .mb-3 {
+        margin-bottom: 1rem !important;
+      }
+    }
+
+    /* Bouton Menu du Formulaire de Profil */
+    .profile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 1050;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .profile-menu-btn:hover {
+      background-color: #b8904f;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .profile-menu-btn i {
+      font-size: 1.1rem;
+    }
+
+    /* Affichage du bouton en mode responsive */
+    @media (max-width: 991.98px) {
+      .profile-menu-btn {
+        display: flex !important;
+      }
+      
+      .card {
+        position: relative;
+      }
+    }
+
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="dashboard-page">
+  <div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+      </div>
+      <div class="sidebar-profile">
+        <img src="{{ user.get_profile_picture_url }}" alt="Photo de profil" class="rounded-circle border border-2 border-white" style="width: 80px; height: 80px; object-fit: cover;">
+        <h5 class="text-white">{{ user.name }} {{ user.first_name }}</h5>
+        <p class="text-white-50">Client</p>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="{% url 'client_dashboard' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i>
+          <span>Tableau de bord</span>
+        </a>
+        <a href="{% url 'client_demandes' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_demandes' %}active{% endif %}">
+          <i class="bi bi-file-text"></i>
+          <span>Mes demandes</span>
+        </a>
+        <a href="{% url 'client_documents' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_documents' %}active{% endif %}">
+          <i class="bi bi-folder"></i>
+          <span>Mes documents</span>
+        </a>
+        <a href="{% url 'custom_requests:client_appointments' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_appointments' %}active{% endif %}">
+          <i class="bi bi-calendar"></i>
+          <span>Rendez-vous</span>
+        </a>
+        <a href="{% url 'client_ressources' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_ressources' %}active{% endif %}">
+          <i class="bi bi-book"></i>
+          <span>Ressources</span>
+        </a>
+        <a href="{% url 'client_messages' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'client_messages' %}active{% endif %}">
+          <i class="bi bi-envelope"></i>
+          <span>Messages</span>
+        </a>
+        <a href="#" class="text-white text-decoration-none" id="editProfileBtn" data-active="false">
+          <i class="bi bi-person-gear"></i>
+          <span>Modifier Profil</span>
+        </a>        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="text-white text-decoration-none bg-transparent border-0 w-100 text-start d-flex align-items-center" style="background: none;">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+          </button>
+        </form>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Mobile sidebar toggle button -->
+      <button id="sidebarToggle" class="d-lg-none btn btn-sm btn-primary mb-3">
+        <i class="bi bi-list"></i> Menu
+      </button>
+      
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <!-- Profile Edit Form (Hidden by default) -->
+  <div class="profile-edit-form" id="profileEditForm" style="display: none; position: fixed; top: 0; right: 0; bottom: 0; width: calc(100% - var(--sidebar-width)); background-color: #f8f9fa; z-index: 1050; padding: 1rem; overflow-y: auto; overflow-x: hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.1);">
+    <!-- Bouton Menu pour mobile/tablette uniquement -->
+    <button id="profileSidebarToggle" class="profile-menu-btn d-lg-none">
+      <i class="bi bi-list"></i> Menu
+    </button>
+    
+    <div class="container-fluid py-2">
+      <div class="row justify-content-center">        <div class="col-lg-11 col-xl-10">
+          <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-white text-center py-4 border-bottom">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <i class="bi bi-person-gear text-primary fs-1 mb-3"></i>
+                <h3 class="card-title mb-1">Modifier votre profil</h3>
+                <p class="text-muted small">Mettez à jour vos informations personnelles</p>
+              </div>
+            </div>
+            <div class="card-body p-4 p-xl-5">
+              <form id="userProfileForm" class="needs-validation" novalidate enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Photo de profil -->
+                <h5 class="mb-3 border-bottom pb-2">Photo de profil</h5>
+                <div class="row g-3 mb-4">
+                  <div class="col-md-4 text-center">
+                    <img src="{{ user.get_profile_picture_url }}" alt="Photo de profil" class="rounded-circle mb-3" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #eee;">
+                  </div>
+                  <div class="col-md-8">
+                    <label for="profile_picture" class="form-label">Changer ma photo</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-image"></i></span>
+                      <input type="file" class="form-control" id="profile_picture" name="profile_picture" accept="image/*">
+                    </div>
+                    <div class="form-text text-muted">Formats acceptés: JPG, PNG. Taille maximale: 2MB.</div>
+                  </div>
+                </div>
+                
+                <!-- Informations personnelles -->
+                <h5 class="mb-3 border-bottom pb-2">Informations personnelles</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Nom -->
+                  <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Nom</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-person"></i></span>
+                      <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                    </div>
+                  </div>
+                  
+                  <!-- Prénom -->
+                  <div class="col-md-6 mb-3">
+                    <label for="first_name" class="form-label">Prénom</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-person-plus"></i></span>
+                      <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Coordonnées -->
+                <h5 class="mb-3 border-bottom pb-2">Coordonnées</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Email -->
+                  <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                      <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                  </div>
+                  
+                  <!-- Téléphone -->
+                  <div class="col-md-6 mb-3">
+                    <label for="phone" class="form-label">Numéro de téléphone</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                      <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone|default:'' }}">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Localisation -->
+                <h5 class="mb-3 border-bottom pb-2">Localisation</h5>
+                
+                <div class="row g-3 mb-4">
+                  <!-- Pays de résidence -->
+                  <div class="col-md-8 col-lg-7 mb-3">
+                    <label for="residence_country" class="form-label">Pays de résidence</label>
+                    <div class="input-group input-group-lg">
+                      <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                      <select class="form-select" id="residence_country" name="residence_country">
+                        <option value="AF">Afghanistan</option>
+                        <option value="ZA">Afrique du Sud</option>
+                        <option value="AL">Albanie</option>
+                        <option value="DZ">Algérie</option>
+                        <option value="DE">Allemagne</option>
+                        <option value="AD">Andorre</option>
+                        <option value="AO">Angola</option>
+                        <option value="AI">Anguilla</option>
+                        <option value="AQ">Antarctique</option>
+                        <option value="AG">Antigua-et-Barbuda</option>
+                        <option value="SA">Arabie saoudite</option>
+                        <option value="AR">Argentine</option>
+                        <option value="AM">Arménie</option>
+                        <option value="AW">Aruba</option>
+                        <option value="AU">Australie</option>
+                        <option value="AT">Autriche</option>
+                        <option value="AZ">Azerbaïdjan</option>
+                        <option value="BS">Bahamas</option>
+                        <option value="BH">Bahreïn</option>
+                        <option value="BD">Bangladesh</option>
+                        <option value="BB">Barbade</option>
+                        <option value="BY">Biélorussie</option>
+                        <option value="BE">Belgique</option>
+                        <option value="BZ">Belize</option>
+                        <option value="BJ">Bénin</option>
+                        <option value="BM">Bermudes</option>
+                        <option value="BT">Bhoutan</option>
+                        <option value="BO">Bolivie</option>
+                        <option value="BA">Bosnie-Herzégovine</option>
+                        <option value="BW">Botswana</option>
+                        <option value="BR">Brésil</option>
+                        <option value="BN">Brunei</option>
+                        <option value="BG">Bulgarie</option>
+                        <option value="BF">Burkina Faso</option>
+                        <option value="BI">Burundi</option>
+                        <option value="KH">Cambodge</option>
+                        <option value="CM">Cameroun</option>
+                        <option value="CA">Canada</option>
+                        <option value="CV">Cap-Vert</option>
+                        <option value="CF">République centrafricaine</option>
+                        <option value="CL">Chili</option>
+                        <option value="CN">Chine</option>
+                        <option value="CY">Chypre</option>
+                        <option value="CO">Colombie</option>
+                        <option value="KM">Comores</option>
+                        <option value="CG">Congo</option>
+                        <option value="CD">République démocratique du Congo</option>
+                        <option value="CK">Îles Cook</option>
+                        <option value="KR">Corée du Sud</option>
+                        <option value="KP">Corée du Nord</option>
+                        <option value="CR">Costa Rica</option>
+                        <option value="CI">Côte d'Ivoire</option>
+                        <option value="HR">Croatie</option>
+                        <option value="CU">Cuba</option>
+                        <option value="CW">Curaçao</option>
+                        <option value="DK">Danemark</option>
+                        <option value="DJ">Djibouti</option>
+                        <option value="DM">Dominique</option>
+                        <option value="EG">Égypte</option>
+                        <option value="AE">Émirats arabes unis</option>
+                        <option value="EC">Équateur</option>
+                        <option value="ER">Érythrée</option>
+                        <option value="ES">Espagne</option>
+                        <option value="EE">Estonie</option>
+                        <option value="US">États-Unis</option>
+                        <option value="ET">Éthiopie</option>
+                        <option value="FJ">Fidji</option>
+                        <option value="FI">Finlande</option>
+                        <option value="FR">France</option>
+                        <option value="GA">Gabon</option>
+                        <option value="GM">Gambie</option>
+                        <option value="GE">Géorgie</option>
+                        <option value="GS">Géorgie du Sud-et-les Îles Sandwich du Sud</option>
+                        <option value="GH">Ghana</option>
+                        <option value="GI">Gibraltar</option>
+                        <option value="GR">Grèce</option>
+                        <option value="GD">Grenade</option>
+                        <option value="GL">Groenland</option>
+                        <option value="GP">Guadeloupe</option>
+                        <option value="GU">Guam</option>
+                        <option value="GT">Guatemala</option>
+                        <option value="GG">Guernesey</option>
+                        <option value="GN">Guinée</option>
+                        <option value="GQ">Guinée équatoriale</option>
+                        <option value="GW">Guinée-Bissau</option>
+                        <option value="GY">Guyana</option>
+                        <option value="GF">Guyane française</option>
+                        <option value="HT">Haïti</option>
+                        <option value="HN">Honduras</option>
+                        <option value="HU">Hongrie</option>
+                        <option value="BV">Île Bouvet</option>
+                        <option value="IM">Île de Man</option>
+                        <option value="CX">Île Christmas</option>
+                        <option value="NF">Île Norfolk</option>
+                        <option value="AX">Îles Åland</option>
+                        <option value="KY">Îles Caïmans</option>
+                        <option value="CC">Îles Cocos</option>
+                        <option value="FO">Îles Féroé</option>
+                        <option value="HM">Îles Heard-et-MacDonald</option>
+                        <option value="FK">Îles Malouines</option>
+                        <option value="MP">Îles Mariannes du Nord</option>
+                        <option value="MH">Îles Marshall</option>
+                        <option value="UM">Îles mineures éloignées des États-Unis</option>
+                        <option value="PN">Îles Pitcairn</option>
+                        <option value="SB">Îles Salomon</option>
+                        <option value="TC">Îles Turques-et-Caïques</option>
+                        <option value="VI">Îles Vierges américaines</option>
+                        <option value="VG">Îles Vierges britanniques</option>
+                        <option value="IN">Inde</option>
+                        <option value="ID">Indonésie</option>
+                        <option value="IQ">Irak</option>
+                        <option value="IR">Iran</option>
+                        <option value="IE">Irlande</option>
+                        <option value="IS">Islande</option>
+                        <option value="IL">Israël</option>
+                        <option value="IT">Italie</option>
+                        <option value="JM">Jamaïque</option>
+                        <option value="JP">Japon</option>
+                        <option value="JE">Jersey</option>
+                        <option value="JO">Jordanie</option>
+                        <option value="KZ">Kazakhstan</option>
+                        <option value="KE">Kenya</option>
+                        <option value="KG">Kirghizistan</option>
+                        <option value="KI">Kiribati</option>
+                        <option value="KW">Koweït</option>
+                        <option value="LA">Laos</option>
+                        <option value="LS">Lesotho</option>
+                        <option value="LV">Lettonie</option>
+                        <option value="LB">Liban</option>
+                        <option value="LR">Libéria</option>
+                        <option value="LY">Libye</option>
+                        <option value="LI">Liechtenstein</option>
+                        <option value="LT">Lituanie</option>
+                        <option value="LU">Luxembourg</option>
+                        <option value="MK">Macédoine du Nord</option>
+                        <option value="MG">Madagascar</option>
+                        <option value="MY">Malaisie</option>
+                        <option value="MW">Malawi</option>
+                        <option value="MV">Maldives</option>
+                        <option value="ML">Mali</option>
+                        <option value="MT">Malte</option>
+                        <option value="MA">Maroc</option>
+                        <option value="MQ">Martinique</option>
+                        <option value="MU">Maurice</option>
+                        <option value="MR">Mauritanie</option>
+                        <option value="YT">Mayotte</option>
+                        <option value="MX">Mexique</option>
+                        <option value="FM">Micronésie</option>
+                        <option value="MD">Moldavie</option>
+                        <option value="MC">Monaco</option>
+                        <option value="MN">Mongolie</option>
+                        <option value="ME">Monténégro</option>
+                        <option value="MS">Montserrat</option>
+                        <option value="MZ">Mozambique</option>
+                        <option value="MM">Myanmar</option>
+                        <option value="NA">Namibie</option>
+                        <option value="NR">Nauru</option>
+                        <option value="NP">Népal</option>
+                        <option value="NI">Nicaragua</option>
+                        <option value="NE">Niger</option>
+                        <option value="NG">Nigeria</option>
+                        <option value="NU">Niue</option>
+                        <option value="NO">Norvège</option>
+                        <option value="NC">Nouvelle-Calédonie</option>
+                        <option value="NZ">Nouvelle-Zélande</option>
+                        <option value="OM">Oman</option>
+                        <option value="UG">Ouganda</option>
+                        <option value="UZ">Ouzbékistan</option>
+                        <option value="PK">Pakistan</option>
+                        <option value="PW">Palaos</option>
+                        <option value="PS">Palestine</option>
+                        <option value="PA">Panama</option>
+                        <option value="PG">Papouasie-Nouvelle-Guinée</option>
+                        <option value="PY">Paraguay</option>
+                        <option value="NL">Pays-Bas</option>
+                        <option value="PE">Pérou</option>
+                        <option value="PH">Philippines</option>
+                        <option value="PL">Pologne</option>
+                        <option value="PF">Polynésie française</option>
+                        <option value="PR">Porto Rico</option>
+                        <option value="PT">Portugal</option>
+                        <option value="QA">Qatar</option>
+                        <option value="HK">R.A.S. chinoise de Hong Kong</option>
+                        <option value="MO">R.A.S. chinoise de Macao</option>
+                        <option value="RE">Réunion</option>
+                        <option value="RO">Roumanie</option>
+                        <option value="GB">Royaume-Uni</option>
+                        <option value="RU">Russie</option>
+                        <option value="RW">Rwanda</option>
+                        <option value="EH">Sahara occidental</option>
+                        <option value="BL">Saint-Barthélemy</option>
+                        <option value="KN">Saint-Kitts-et-Nevis</option>
+                        <option value="SM">Saint-Marin</option>
+                        <option value="MF">Saint-Martin</option>
+                        <option value="PM">Saint-Pierre-et-Miquelon</option>
+                        <option value="VC">Saint-Vincent-et-les-Grenadines</option>
+                        <option value="SH">Sainte-Hélène</option>
+                        <option value="LC">Sainte-Lucie</option>
+                        <option value="WS">Samoa</option>
+                        <option value="AS">Samoa américaines</option>
+                        <option value="ST">Sao Tomé-et-Principe</option>
+                        <option value="SN">Sénégal</option>
+                        <option value="RS">Serbie</option>
+                        <option value="SC">Seychelles</option>
+                        <option value="SL">Sierra Leone</option>
+                        <option value="SG">Singapour</option>
+                        <option value="SX">Saint-Martin (partie néerlandaise)</option>
+                        <option value="SK">Slovaquie</option>
+                        <option value="SI">Slovénie</option>
+                        <option value="SO">Somalie</option>
+                        <option value="SD">Soudan</option>
+                        <option value="SS">Soudan du Sud</option>
+                        <option value="LK">Sri Lanka</option>
+                        <option value="SE">Suède</option>
+                        <option value="CH">Suisse</option>
+                        <option value="SR">Suriname</option>
+                        <option value="SJ">Svalbard et Île Jan Mayen</option>
+                        <option value="SZ">Swaziland</option>
+                        <option value="SY">Syrie</option>
+                        <option value="TJ">Tadjikistan</option>
+                        <option value="TW">Taïwan</option>
+                        <option value="TZ">Tanzanie</option>
+                        <option value="TD">Tchad</option>
+                        <option value="CZ">République tchèque</option>
+                        <option value="TF">Terres australes françaises</option>
+                        <option value="IO">Territoire britannique de l'océan Indien</option>
+                        <option value="TH">Thaïlande</option>
+                        <option value="TL">Timor oriental</option>
+                        <option value="TG">Togo</option>
+                        <option value="TK">Tokelau</option>
+                        <option value="TO">Tonga</option>
+                        <option value="TT">Trinité-et-Tobago</option>
+                        <option value="TN">Tunisie</option>
+                        <option value="TM">Turkménistan</option>
+                        <option value="TR">Turquie</option>
+                        <option value="TV">Tuvalu</option>
+                        <option value="UA">Ukraine</option>
+                        <option value="UY">Uruguay</option>
+                        <option value="VU">Vanuatu</option>
+                        <option value="VA">Vatican</option>
+                        <option value="VE">Venezuela</option>
+                        <option value="VN">Vietnam</option>
+                        <option value="WF">Wallis-et-Futuna</option>
+                        <option value="YE">Yémen</option>
+                        <option value="ZM">Zambie</option>
+                        <option value="ZW">Zimbabwe</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="row mt-5">
+                  <div class="col-md-8 col-lg-5 mx-auto">
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-primary btn-lg py-3"><i class="bi bi-check-circle me-2"></i>Enregistrer</button>
+                      <button type="button" id="closeProfileForm" class="btn btn-outline-secondary py-2"><i class="bi bi-x-circle me-2"></i>Annuler</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Alert (Hidden by default) -->
+  <div class="alert-container" style="display: none; position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 1060; width: 90%; max-width: 500px;">
+    <div class="alert alert-success alert-dismissible fade shadow" role="alert" id="successAlert">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-check-circle-fill fs-4 me-2"></i>
+        <div>
+          <strong>Profil mis à jour avec succès!</strong>
+          <p class="mb-0 small">Vos informations personnelles ont été actualisées.</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'js/main.js' %}"></script>
+  
+  <script>
+    // Function to redirect to the appropriate service request page
+    function redirectToCreateRequest(serviceType) {
+      // Map service types to URLs with correct paths including the /requests/ prefix
+      const serviceUrls = {
+        'admin': '/requests/client/create/administrative/',
+        'administrative': '/requests/client/create/administrative/',
+        'tourisme': '/requests/client/create/tourism/',
+        'tourism': '/requests/client/create/tourism/',
+        'immobilier': '/requests/client/create/real_estate/',
+        'real_estate': '/requests/client/create/real_estate/',
+        'fiscal': '/requests/client/create/fiscal/',
+        'tax': '/requests/client/create/fiscal/',
+        'investissement': '/requests/client/create/investment/',
+        'investment': '/requests/client/create/investment/',
+        'service': '/requests/client/create/administrative/'
+      };
+      
+      // Use the mapped URL or default to the base URL
+      const redirectUrl = serviceUrls[serviceType] || '/requests/client/create/administrative/';
+      window.location.href = redirectUrl;
+    }
+    
+    // Sidebar toggle functionality for mobile devices
+    document.addEventListener("DOMContentLoaded", function() {
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebar = document.querySelector('.sidebar');
+      
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('active');
+        });
+      }        // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', function(event) {
+        const isClickInsideSidebar = sidebar.contains(event.target);
+        const isClickInsideToggle = sidebarToggle && sidebarToggle.contains(event.target);
+        const profileMenuToggle = document.getElementById('profileSidebarToggle');
+        const isClickInsideProfileToggle = profileMenuToggle && profileMenuToggle.contains(event.target);
+        
+        if (!isClickInsideSidebar && !isClickInsideToggle && !isClickInsideProfileToggle && window.innerWidth <= 992 && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+        }
+      });
+    });
+    
+    // Profile edit functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const editProfileBtn = document.getElementById('editProfileBtn');      const profileEditForm = document.getElementById('profileEditForm');
+      const closeProfileForm = document.getElementById('closeProfileForm');
+      const userProfileForm = document.getElementById('userProfileForm');
+      const successAlert = document.getElementById('successAlert');
+      const alertContainer = document.querySelector('.alert-container');
+      const mainContent = document.querySelector('.main-content');
+      
+      // Show profile edit form when clicking the button
+      if (editProfileBtn) {
+        // Fonction pour maintenir le focus sur le bouton "Modifier Profil"
+        function maintainEditProfileFocus() {
+          if (editProfileBtn && editProfileBtn.getAttribute('data-active') === 'true') {
+            editProfileBtn.focus();
+          }
+        }
+        
+        // Intercepter tout changement de focus potentiel
+        document.addEventListener('focusin', function(e) {
+          if (editProfileBtn && editProfileBtn.getAttribute('data-active') === 'true') {
+            // Si le formulaire de profil est ouvert, maintenir l'aspect visuel actif
+            editProfileBtn.classList.add('active');
+          }
+        });
+
+        editProfileBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Add active class to the button and remove from others that aren't dynamic
+          const allMenuItems = document.querySelectorAll('.sidebar-menu a');
+          allMenuItems.forEach(item => {
+            if (item !== this && !item.id) {
+              item.classList.remove('active');
+            }
+          });
+          
+          // Add special class to body
+          document.body.classList.add('edit-profile-active');
+          
+          this.classList.add('active');
+          this.setAttribute('data-active', 'true');
+          this.focus(); // Assure que le focus est bien sur ce bouton
+          
+          // Hide any potential overflow content from main content
+          if (mainContent) {
+            mainContent.style.visibility = 'hidden';
+          }
+          
+          // Show the form with animation
+          profileEditForm.style.display = 'block';
+          setTimeout(() => {
+            profileEditForm.classList.add('show');
+          }, 50);
+        });
+      }
+      
+      // Close profile edit form
+      if (closeProfileForm) {
+        closeProfileForm.addEventListener('click', function() {
+          profileEditForm.classList.remove('show');
+          
+          // Keep the active class on the edit profile button
+          if (editProfileBtn) {
+            editProfileBtn.classList.add('active');
+            editProfileBtn.setAttribute('data-active', 'true');
+            // Refocus the button
+            setTimeout(() => {
+              editProfileBtn.focus();
+            }, 10);
+          }
+          
+          // Remove special class from body
+          document.body.classList.remove('edit-profile-active');
+          
+          setTimeout(() => {
+            profileEditForm.style.display = 'none';
+            // Restore main content visibility
+            if (mainContent) {
+              mainContent.style.visibility = 'visible';
+            }
+          }, 300);
+        });
+      }
+      
+      // Form validation
+      if (userProfileForm) {
+        userProfileForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          // Check form validity
+          if (!this.checkValidity()) {
+            e.stopPropagation();
+            this.classList.add('was-validated');
+            return;
+          }
+          
+          // Get form data
+          const formData = new FormData(userProfileForm);
+          
+          // Create an object with the form data
+          const profileData = {
+            name: formData.get('name'),
+            first_name: formData.get('first_name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            residence_country: formData.get('residence_country'),
+            // Si le type de compte est CLIENT, ajoutez les données du profil client
+            profile: {
+              preferred_language: 'fr' // Valeur par défaut
+            }
+          };
+          
+          // Show loading state on button
+          const submitButton = userProfileForm.querySelector('button[type="submit"]');
+          const originalButtonText = submitButton.innerHTML;
+          submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enregistrement...';
+          submitButton.disabled = true;
+          
+          // Function to get CSRF token from cookies
+          function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            return cookieValue;
+          }
+          
+          // Send the data to the server using fetch API with FormData
+          fetch('/accounts/api/update_profile/', {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': getCookie('csrftoken')
+              // Ne pas définir Content-Type pour permettre au navigateur de gérer le multipart/form-data
+            },
+            body: formData // Utiliser directement formData au lieu de JSON.stringify
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Return button to normal state
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            
+            if (data.success) {
+              // Mettre à jour les informations dans la sidebar avant le rechargement
+              const sidebarName = document.querySelector('.sidebar-profile h5');
+              if (sidebarName) {
+                sidebarName.textContent = profileData.name + ' ' + profileData.first_name;
+              }
+              
+              // Afficher un message de succès temporaire
+              alertContainer.style.display = 'block';
+              successAlert.classList.add('show');
+              
+              // Attendre un court instant pour que l'utilisateur voie le message
+              setTimeout(function() {
+                // Recharger complètement la page pour refléter les modifications partout
+                window.location.reload();
+              }, 1500);
+            } else {
+              // Show error message
+              alert('Une erreur est survenue: ' + (data.message || 'Erreur inconnue'));
+            }
+          })
+          .catch(error => {
+            // Handle error
+            submitButton.innerHTML = originalButtonText;
+            submitButton.disabled = false;
+            alert('Erreur de connexion: ' + error.message);
+          });
+          
+          this.classList.remove('was-validated');        });
+      }
+      
+      // Fonctionnalité du bouton menu du formulaire de profil
+      const profileSidebarToggle = document.getElementById('profileSidebarToggle');
+      if (profileSidebarToggle) {
+        profileSidebarToggle.addEventListener('click', function() {
+          const sidebar = document.querySelector('.sidebar');
+          if (sidebar) {
+            sidebar.classList.toggle('active');
+          }
+        });
+      }
+      
+      // Keep focus when tabbing in the form
+      profileEditForm.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+          // Prevent the tab key from removing focus from the form
+          e.stopPropagation();
+        }
+      });
+    });
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+
+</html>

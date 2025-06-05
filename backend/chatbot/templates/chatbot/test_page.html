@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .content {
+            min-height: 500px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+    {% load static %}
+    {% if chatbot_enabled %}
+        <link rel="stylesheet" href="{% static 'chatbot/chatbot-mre.css' %}">
+    {% endif %}
+</head>
+<body>
+    <div class="debug-info">
+        <h2>Chatbot Test Page</h2>
+        <div class="status {% if chatbot_enabled %}success{% else %}error{% endif %}">
+            <strong>Chatbot Enabled:</strong> {{ chatbot_enabled|yesno:"Yes,No" }}
+        </div>
+        {% if user_is_client %}
+            <div class="status success">
+                <strong>User Authenticated:</strong> Yes
+            </div>
+        {% else %}
+            <div class="status error">
+                <strong>User Authenticated:</strong> No
+            </div>
+        {% endif %}
+        <div class="status">
+            <strong>Config:</strong> {{ chatbot_config }}
+        </div>
+    </div>
+
+    <div class="content">
+        <h1>Welcome to ServicesBladi</h1>
+        <p>This is a test page to check if the chatbot widget appears correctly.</p>
+        <p>The chatbot should appear as a floating widget in the bottom-right corner of the page.</p>
+        <p>Scroll down to see more content...</p>
+        
+        <div style="height: 800px;">
+            <h3>More content to test scrolling</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+    </div>
+
+    <!-- Include chatbot widget -->
+    {% if chatbot_enabled %}
+        {% include 'chatbot/widget.html' %}
+        <script src="{% static 'chatbot/chatbot-mre.js' %}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Initializing MRE Chatbot...');
+                console.log('Chatbot enabled:', {{ chatbot_enabled|yesno:"true,false" }});
+                console.log('User is client:', {{ user_is_client|yesno:"true,false" }});
+                
+                if (typeof ChatbotMRE !== 'undefined') {
+                    const chatbot = new ChatbotMRE();
+                    console.log('Chatbot initialized successfully');
+                } else {
+                    console.error('ChatbotMRE class not found');
+                }
+            });
+        </script>
+    {% endif %}
+</body>
+</html>

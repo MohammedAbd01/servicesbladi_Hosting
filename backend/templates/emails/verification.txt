@@ -1,0 +1,23 @@
+Bienvenue sur Services Bladi !
+
+Bonjour {{ user_name }},
+
+Merci de vous être inscrit sur Services Bladi. Pour activer votre compte et commencer à utiliser nos services, veuillez vérifier votre adresse email en cliquant sur le lien ci-dessous :
+
+{{ verification_url }}
+
+Informations importantes :
+- Ce lien de vérification expire dans 24 heures
+- Si vous n'avez pas créé de compte, ignorez cet email
+- Pour votre sécurité, ne partagez jamais ce lien
+
+Une fois votre email vérifié, vous pourrez :
+- Accéder à votre tableau de bord personnalisé
+- Utiliser tous nos services
+- Recevoir des notifications importantes
+
+Besoin d'aide ? Contactez notre équipe support à support@servicesbladi.com
+
+Cordialement,
+L'équipe Services Bladi
+{{ site_url }}

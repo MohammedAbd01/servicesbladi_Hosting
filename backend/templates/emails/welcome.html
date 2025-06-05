@@ -1,0 +1,80 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Bienvenue sur Services Bladi{% endblock %}
+
+{% block header_title %}Bienvenue sur Services Bladi{% endblock %}
+{% block header_subtitle %}Votre compte a été créé avec succès{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    🎉 <strong>Bienvenue {{ user_name }} !</strong> Votre compte <strong>{{ user_type }}</strong> a été créé avec succès sur Services Bladi.
+</div>
+
+<div class="highlight-box" style="background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); border-left-color: #28a745;">
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 15px;">🇲🇦</div>
+        <div style="font-size: 18px; font-weight: 600; color: #155724;">
+            Votre partenaire pour toutes vos démarches administratives
+        </div>
+        <div style="font-size: 14px; color: #155724; margin-top: 10px;">
+            Services dédiés aux Marocains résidant à l'étranger
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <strong>🚀 Découvrez nos services:</strong>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li><strong>📋 Démarches administratives</strong> - Cartes d'identité, passeports, actes d'état civil</li>
+        <li><strong>🏠 Services immobiliers</strong> - Achat, vente, location de biens au Maroc</li>
+        <li><strong>💼 Services financiers</strong> - Ouverture de comptes, investissements</li>
+        <li><strong>⚖️ Services juridiques</strong> - Conseils et assistance juridique</li>
+        <li><strong>🎓 Services éducatifs</strong> - Inscriptions scolaires et universitaires</li>
+    </ul>
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">👤 Type de compte:</div>
+        <div class="info-value">{{ user_type }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">📅 Date d'inscription:</div>
+        <div class="info-value">{{ "now"|date:"d/m/Y" }}</div>    </div>
+</div>
+
+{% if is_admin_created and password %}
+<div class="highlight-box" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-left-color: #ffc107; margin: 20px 0;">
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 24px; margin-bottom: 15px;">🔐</div>
+        <div style="font-size: 18px; font-weight: 600; color: #856404;">
+            Vos informations de connexion
+        </div>
+        <div style="font-size: 14px; color: #856404; margin-top: 10px; background-color: rgba(255,255,255,0.8); padding: 15px; border-radius: 8px; margin-top: 15px;">
+            <strong>Email:</strong> {{ user.email }}<br>
+            <strong>Mot de passe temporaire:</strong> {{ password }}
+        </div>
+        <div style="font-size: 12px; color: #856404; margin-top: 10px; font-style: italic;">
+            ⚠️ Veuillez changer votre mot de passe lors de votre première connexion
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div style="text-align: center; margin: 30px 0;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        🏠 Accéder à mon espace
+    </a>
+</div>
+
+<div class="content" style="background-color: #e3f2fd; padding: 15px; border-radius: 8px; border-left: 4px solid #2196f3;">
+    <strong>💡 Besoin d'aide?</strong> Notre équipe d'experts est là pour vous accompagner. N'hésitez pas à nous contacter!
+</div>
+
+<div class="content" style="margin-top: 25px;">
+    <strong>📞 Nos coordonnées:</strong><br>
+    🇲🇦 Maroc: +212 5 22 86 34 36 | +212 6 66 67 97 79<br>
+    🇫🇷 France: +33 783 187 890<br>
+    ✉️ Email: contact@servicesbladi.com
+</div>
+{% endblock %}

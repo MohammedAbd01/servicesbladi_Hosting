@@ -1,0 +1,28 @@
+Services Bladi - Nouvelle demande assignée
+
+Bonjour {{ expert_name }},
+
+Une nouvelle demande vous a été assignée. Le client {{ client_name }} a besoin de votre expertise.
+
+Demande: {{ request_title }}
+{% if request_description %}Description: {{ request_description }}{% endif %}
+
+Client: {{ client_name }}
+Date d'assignation: {{ "now"|date:"d/m/Y à H:i" }}
+
+Prochaines étapes:
+- Examinez attentivement la demande du client
+- Contactez le client si vous avez besoin de clarifications  
+- Commencez le traitement de la demande
+- Mettez à jour le statut régulièrement
+
+Pour examiner la demande:
+{{ site_url }}/accounts/dashboard/
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

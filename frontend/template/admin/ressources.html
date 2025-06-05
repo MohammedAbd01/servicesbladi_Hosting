@@ -1,0 +1,623 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Ressources | Administration{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Gestion des Ressources</h1>
+    <div class="d-flex">
+      <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+        <i class="bi bi-plus-circle me-2"></i>Ajouter une ressource
+      </a>
+    </div>
+  </div>
+
+  <!-- Statistics Row -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="stats-card">
+        <div class="icon text-primary">
+          <i class="bi bi-journal-text"></i>
+        </div>
+        <div class="count">{{ stats.total }}</div>
+        <div class="title">Total Ressources</div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="stats-card">
+        <div class="icon text-success">
+          <i class="bi bi-unlock"></i>
+        </div>
+        <div class="count">{{ stats.public }}</div>
+        <div class="title">Ressources Publiques</div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <div class="stats-card">
+        <div class="icon text-warning">
+          <i class="bi bi-lock"></i>
+        </div>
+        <div class="count">{{ stats.private }}</div>
+        <div class="title">Ressources Privées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section mb-4">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label for="category" class="form-label">Catégorie</label>
+        <select id="category" name="category" class="form-select">
+          <option value="">Toutes les catégories</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="visibility" class="form-label">Visibilité</label>
+        <select id="visibility" name="visibility" class="form-select">
+          <option value="">Tous</option>
+          <option value="public" {% if visibility == 'public' %}selected{% endif %}>Publique</option>
+          <option value="private" {% if visibility == 'private' %}selected{% endif %}>Privée</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="search" class="form-label">Recherche</label>
+        <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}">
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-filter"></i> Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resources List -->
+  <div class="row">
+    {% for resource in resources %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        {% if resource.image %}
+        <img src="{{ resource.image.url }}" class="card-img-top resource-image" alt="{{ resource.title }}">
+        {% else %}
+        <div class="resource-no-image d-flex justify-content-center align-items-center bg-light">
+          <i class="bi bi-file-earmark-text fs-1 text-muted"></i>
+        </div>
+        {% endif %}
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0">{{ resource.title }}</h5>
+            <div class="d-flex align-items-center">
+              {% if resource.is_active %}
+              <i class="bi bi-unlock text-success me-1"></i>
+              <span class="badge bg-success">Public</span>
+              {% else %}
+              <i class="bi bi-lock text-warning me-1"></i>
+              <span class="badge bg-warning">Privé</span>
+              {% endif %}
+            </div>
+          </div>
+          <p class="card-text text-muted small mb-2">Catégorie: {{ resource.category }}</p>
+          <p class="card-text">{{ resource.description|truncatechars:100 }}</p>
+        </div>
+        <div class="card-footer bg-white border-top-0">
+          <div class="d-flex justify-content-between">
+            <small class="text-muted">{{ resource.created_at|date:"d/m/Y" }}</small>
+            <div class="btn-group">
+              <a href="{% url 'admin_edit_resource' resource.id %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <a href="{% url 'admin_toggle_resource_visibility' resource.id %}" class="btn btn-sm btn-outline-warning">
+                <i class="bi bi-{% if resource.is_active %}unlock{% else %}lock{% endif %}"></i>
+              </a>
+              <a href="{% url 'admin_delete_resource' resource.id %}" class="btn btn-sm btn-outline-danger"
+                 onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ressource?');">
+                <i class="bi bi-trash"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle me-2"></i>
+        Aucune ressource trouvée
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  
+  <!-- Pagination -->
+  {% if resources.paginator.num_pages > 1 %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+      {% if resources.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page=1{% if category %}&category={{ category }}{% endif %}{% if visibility %}&visibility={{ visibility }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ resources.previous_page_number }}{% if category %}&category={{ category }}{% endif %}{% if visibility %}&visibility={{ visibility }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&laquo;&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link">&laquo;</span>
+        </li>
+      {% endif %}
+      
+      {% for i in resources.paginator.page_range %}
+        {% if resources.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% elif i > resources.number|add:'-3' and i < resources.number|add:'3' %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ i }}{% if category %}&category={{ category }}{% endif %}{% if visibility %}&visibility={{ visibility }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+      
+      {% if resources.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ resources.next_page_number }}{% if category %}&category={{ category }}{% endif %}{% if visibility %}&visibility={{ visibility }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link" href="?page={{ resources.paginator.num_pages }}{% if category %}&category={{ category }}{% endif %}{% if visibility %}&visibility={{ visibility }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">&raquo;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link">&raquo;&raquo;</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<!-- Add Resource Modal -->
+<div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form action="{% url 'admin_add_resource' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addResourceModalLabel">Ajouter une nouvelle ressource</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="title" class="form-label">Titre</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="category" class="form-label">Catégorie</label>
+                <select class="form-select" id="category" name="category" required>
+                  <option value="">Sélectionner une catégorie</option>
+                  <option value="administratif">Administratif</option>
+                  <option value="fiscal">Fiscal</option>
+                  <option value="investissement">Investissement</option>
+                  <option value="tourisme">Tourisme</option>
+                  <option value="immobilier">Immobilier</option>
+                  <option value="social">Social</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="file" class="form-label">Fichier PDF</label>
+            <input type="file" class="form-control" id="file" name="file" accept=".pdf">
+            <small class="form-text text-muted">Le fichier sera accessible par les utilisateurs qui ont accès à cette ressource.</small>
+          </div>
+          
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" checked>
+            <label class="form-check-label" for="is_active">Ressource publique</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Resource Modal -->
+<div class="modal fade" id="editResourceModal" tabindex="-1" aria-labelledby="editResourceModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="editResourceForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="editResourceModalLabel">Modifier la ressource</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <div class="mb-3">
+                <label for="edit_title" class="form-label">Titre</label>
+                <input type="text" class="form-control" id="edit_title" name="title" required>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label for="edit_category" class="form-label">Catégorie</label>
+                <select class="form-select" id="edit_category" name="category" required>
+                  <option value="">Sélectionner une catégorie</option>
+                  <option value="administrative">Administrative</option>
+                  <option value="fiscal">Fiscal</option>
+                  <option value="tourism">Tourisme</option>
+                  <option value="investment">Investissement</option>
+                  <option value="real_estate">Immobilier</option>
+                  <option value="legal">Juridique</option>
+                  <option value="social">Social</option>
+                  <option value="embassy">Ambassade/Consulat</option>
+                  <option value="guide">Guide</option>
+                  <option value="other">Autre</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="edit_description" class="form-label">Description</label>
+            <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label for="edit_file" class="form-label">Fichier</label>
+            <input type="file" class="form-control" id="edit_file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
+            <small class="form-text text-muted">Laissez vide pour conserver le fichier actuel.</small>
+          </div>
+          
+          <div class="mb-3">
+            <label for="edit_available_formats" class="form-label">Formats disponibles</label>
+            <select class="form-select" id="edit_available_formats" name="available_formats">
+              <option value="pdf">PDF</option>
+              <option value="doc">DOC/DOCX</option>
+              <option value="xls">XLS/XLSX</option>
+              <option value="ppt">PPT/PPTX</option>
+              <option value="image">Image</option>
+              <option value="video">Vidéo</option>
+              <option value="link">Lien externe</option>
+              <option value="text">Texte</option>
+            </select>
+          </div>
+          
+          <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="edit_is_public" name="is_public">
+            <label class="form-check-label" for="edit_is_public">Ressource publique</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Gestionnaire pour le bouton d'édition
+  document.querySelectorAll('.btn-outline-primary').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Récupérer l'ID de la ressource depuis l'URL du bouton
+      const href = this.getAttribute('href');
+      const resourceId = href.match(/\/admin\/ressources\/(\d+)\/edit\//)?.[1];
+      
+      if (!resourceId) {
+        console.error('Impossible de récupérer l\'ID de la ressource');
+        return;
+      }
+
+      const resourceTitle = this.closest('.card').querySelector('.card-title').textContent;
+      const resourceCategory = this.closest('.card').querySelector('.text-muted').textContent.split(': ')[1];
+      const resourceDescription = this.closest('.card').querySelector('.card-text').textContent;
+      const isPublic = this.closest('.card').querySelector('.badge').textContent.trim() === 'Public';
+
+      // Remplir le formulaire d'édition
+      document.getElementById('edit_title').value = resourceTitle;
+      document.getElementById('edit_category').value = resourceCategory;
+      document.getElementById('edit_description').value = resourceDescription;
+      document.getElementById('edit_is_public').checked = isPublic;
+      
+      // Mettre à jour l'action du formulaire avec l'URL correcte
+      const form = document.getElementById('editResourceForm');
+      form.action = `/admin/ressources/${resourceId}/edit/`;
+
+      // Afficher le modal
+      new bootstrap.Modal(document.getElementById('editResourceModal')).show();
+    });
+  });
+});
+</script>
+{% endblock %}
+
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .resource-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .resource-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .resource-category {
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+    }
+
+    .category-guide {
+      background-color: #e6f7ff;
+      color: #1890ff;
+    }
+
+    .category-form {
+      background-color: #f6ffed;
+      color: #52c41a;
+    }
+
+    .category-info {
+      background-color: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .resource-status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+    }
+
+    .status-published {
+      background-color: #f6ffed;
+      color: #52c41a;
+    }
+
+    .status-draft {
+      background-color: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .status-archived {
+      background-color: #f5f5f5;
+      color: #8c8c8c;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-wrapper">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header p-3">
+        <h3>MRE</h3>
+      </div>
+      <div class="sidebar-profile text-center p-3">
+        <img src="../../static/img/profile-placeholder.jpg" alt="Profile" class="rounded-circle" width="80">
+        <h5 class="mt-3 text-white">Admin</h5>
+        <p class="text-white-50">Administrateur</p>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="../admin-dashboard.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-speedometer2 me-2"></i>Tableau de bord
+        </a>
+        <a href="users.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-people me-2"></i>Utilisateurs
+        </a>
+        <a href="demandes.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-file-text me-2"></i>Demandes
+        </a>
+        <a href="documents.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-folder me-2"></i>Documents
+        </a>
+        <a href="rendezvous.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-calendar me-2"></i>Rendez-vous
+        </a>
+        <a href="ressources.html" class="d-block p-3 text-white text-decoration-none active">
+          <i class="bi bi-book me-2"></i>Ressources
+        </a>
+        <a href="../index.html" class="d-block p-3 text-white text-decoration-none">
+          <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="container-fluid">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2>Gestion des Ressources</h2>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">
+              <i class="bi bi-plus-lg me-2"></i>Nouvelle ressource
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <select class="form-select">
+                  <option value="">Toutes les catégories</option>
+                  <option value="guide">Guides</option>
+                  <option value="form">Formulaires</option>
+                  <option value="info">Informations</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <select class="form-select">
+                  <option value="">Tous les statuts</option>
+                  <option value="published">Publié</option>
+                  <option value="draft">Brouillon</option>
+                  <option value="archived">Archivé</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <input type="text" class="form-control" placeholder="Rechercher une ressource...">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100">Filtrer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Liste des ressources -->
+        <div class="resource-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0 me-3">Guide de démarches administratives</h5>
+                <span class="resource-category category-guide">Guide</span>
+              </div>
+              <p class="text-muted mb-1">Description: Guide complet des démarches administratives pour les MRE</p>
+              <p class="text-muted mb-0">Dernière mise à jour: 15/03/2024</p>
+            </div>
+            <div class="text-end">
+              <span class="resource-status status-published">Publié</span>
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-primary me-2">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success me-2">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="resource-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0 me-3">Formulaire de demande de visa</h5>
+                <span class="resource-category category-form">Formulaire</span>
+              </div>
+              <p class="text-muted mb-1">Description: Formulaire de demande de visa pour les MRE</p>
+              <p class="text-muted mb-0">Dernière mise à jour: 14/03/2024</p>
+            </div>
+            <div class="text-end">
+              <span class="resource-status status-draft">Brouillon</span>
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-primary me-2">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success me-2">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="resource-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-flex align-items-center mb-2">
+                <h5 class="mb-0 me-3">Informations sur les services consulaires</h5>
+                <span class="resource-category category-info">Information</span>
+              </div>
+              <p class="text-muted mb-1">Description: Informations sur les services consulaires disponibles</p>
+              <p class="text-muted mb-0">Dernière mise à jour: 10/03/2024</p>
+            </div>
+            <div class="text-end">
+              <span class="resource-status status-archived">Archivé</span>
+              <div class="mt-2">
+                <button class="btn btn-sm btn-outline-primary me-2">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success me-2">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="../../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../static/vendor/aos/aos.js"></script>
+  <script src="../../static/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="../../static/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="../../static/js/main.js"></script>
+</body>
+
+</html> 

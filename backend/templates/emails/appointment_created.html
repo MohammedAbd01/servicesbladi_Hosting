@@ -1,0 +1,59 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Rendez-vous confirmé - Services Bladi{% endblock %}
+
+{% block header_title %}Rendez-vous Confirmé{% endblock %}
+{% block header_subtitle %}Votre rendez-vous a été confirmé{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    🎉 Votre rendez-vous avec <strong>{{ expert_name }}</strong> a été confirmé avec succès!
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">📅 Détails du rendez-vous:</div>
+    <div style="margin-top: 15px;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px; margin-right: 10px;">📅</span>
+            <div>
+                <strong>{{ appointment_date }}</strong> à <strong>{{ appointment_time }}</strong>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px; margin-right: 10px;">💻</span>
+            <div>{{ appointment_type }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">👨‍💼 Expert:</div>
+        <div class="info-value">{{ expert_name }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">👤 Client:</div>
+        <div class="info-value">{{ client_name }}</div>
+    </div>
+</div>
+
+<div class="content">
+    <strong>📝 Préparez votre rendez-vous:</strong>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>Préparez vos documents nécessaires</li>
+        <li>Notez vos questions importantes</li>
+        <li>Assurez-vous d'avoir une connexion internet stable (pour les rendez-vous en ligne)</li>
+        <li>Arrivez 5 minutes avant l'heure prévue</li>
+    </ul>
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        📋 Voir mes rendez-vous
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>⏰ Rappel:</strong> Vous recevrez un rappel par email 24h avant votre rendez-vous.
+</div>
+{% endblock %}

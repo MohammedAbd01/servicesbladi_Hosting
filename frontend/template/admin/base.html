@@ -1,0 +1,491 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{% if LANGUAGE_CODE %}{{ LANGUAGE_CODE }}{% else %}fr{% endif %}">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Admin Dashboard | Services BLADI{% endblock %}</title>
+  <meta name="description" content="Panel d'administration ServicesBLADI">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<style>
+  :root {
+    --sidebar-width: 280px;
+    --header-height: 70px;
+    --primary-color: #2a2c39; /* Expert's primary color */
+    --secondary-color: #C49A5A; /* Expert's secondary color */
+    --background-color: #f8f9fa;
+    --card-bg-color: #ffffff;
+    --card-border-color: #dee2e6;
+    --default-text-color: #495057;
+    --heading-text-color: #343a40;
+    --light-gray-bg: #f8f9fa;
+    --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    
+    /* Retaining admin's original primary if needed, or deciding which one to use. For now, expert's will take precedence. */
+    /* --admin-primary-color: #0ea2bd; */ 
+  }
+
+  body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+  }
+
+
+  
+  .dashboard-wrapper {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar-profile {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-image {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .sidebar-profile h5 {
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 1.1rem;
+  }
+
+  .sidebar-profile p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .sidebar {
+    width: var(--sidebar-width);
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: #fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto !important;
+    z-index: 100;
+    transition: all 0.3s;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.3) transparent;
+    padding: 1.5rem 1rem;
+    height: 100vh !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .sidebar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255,255,255,0.3);
+    border-radius: 10px;
+  }
+
+  .sidebar .sidebar-menu a {
+    color: white;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-weight: 400;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    text-decoration: none !important;
+  }
+
+  .sidebar .sidebar-menu a:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .sidebar .sidebar-menu a.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.25);
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar .sidebar-menu a i {
+    margin-right: 0.75rem;
+    width: 28px;
+    text-align: center;
+    font-size: 1.4rem;
+    opacity: 0.9;
+  }
+  
+  .sidebar .sidebar-menu a.active i {
+    opacity: 1;
+  }
+
+  .main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    padding: 20px;
+    transition: all 0.3s;
+    overflow-y: auto !important;
+    min-height: 100vh !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
+
+  .card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 20px;
+  }
+
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+  }
+
+  .card-title {
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+
+  .stats-card {
+    border-left: 4px solid;
+    border-radius: 4px;
+  }
+
+  .stats-card.primary {
+    border-left-color: #0ea2bd;
+  }
+
+  .stats-card.success {
+    border-left-color: #28a745;
+  }
+
+  .stats-card.warning {
+    border-left-color: #ffc107;
+  }
+
+  .stats-card.danger {
+    border-left-color: #dc3545;
+  }
+
+  .stats-card .card-body {
+    padding: 1rem;
+  }
+
+  .stats-card .icon {
+    font-size: 2rem;
+    opacity: 0.7;
+  }
+
+  .stats-card .count {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .stats-card .title {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+
+  /* Styles for dashboard cards, adapted from expert/base.html */
+  .dashboard-card {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+  .dashboard-card .card-header {
+    background-color: var(--light-gray-bg);
+    color: var(--heading-text-color);
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--card-border-color);
+    border-top-left-radius: calc(0.5rem - 1px);
+    border-top-right-radius: calc(0.5rem - 1px);
+    display: flex;
+    align-items: center;
+  }
+
+  .dashboard-card .card-header i {
+    margin-right: 10px;
+    color: var(--secondary-color); /* Expert's secondary color for icons */
+  }
+
+  .dashboard-card .card-body {
+    padding: 1.25rem;
+  }
+
+  .dashboard-card .card-title {
+    font-family: "Raleway", sans-serif;
+    color: var(--heading-text-color);
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Button Styles from expert/base.html */
+  .btn-primary {
+    background-color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+    color: #fff !important;
+  }
+
+  .btn-primary:hover {
+    background-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+    border-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+  }
+
+  .btn-outline-primary {
+    color: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: var(--secondary-color) !important;
+    color: #fff !important;
+  }
+  
+  /* Headings from expert/base.html */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-text-color);
+    font-family: "Raleway", sans-serif;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      width: var(--sidebar-width);
+      position: fixed;
+      top: 0;
+      left: -100vw;
+      transform: none;
+      transition: left 0.3s;
+      z-index: 1040;
+      overflow: hidden;
+    }
+    .sidebar.expanded {
+      left: 0;
+      box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+    }
+    .main-content,
+    .dashboard-wrapper {
+      margin-left: 0 !important;
+      width: 100% !important;
+      max-width: 100vw !important;
+    }
+    .mobile-menu-toggle {
+      display: block !important;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1050;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+  }
+</style>
+
+  <!-- Admin specific styles -->
+  <style>
+    .main-content {
+      margin-left: var(--sidebar-width);
+      width: calc(100% - var(--sidebar-width));
+      padding: 20px;
+    }
+    
+    .top-bar {
+      background-color: #fff;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 60px;
+        transform: translateX(0);
+      }
+      
+      .sidebar .sidebar-menu a span {
+        display: none;
+      }
+      
+      .sidebar .sidebar-menu a i {
+        margin-right: 0;
+      }
+      
+      .main-content {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+      }
+      
+      .sidebar.expanded {
+        width: var(--sidebar-width);
+      }
+      
+      .sidebar.expanded .sidebar-menu a span {
+        display: inline;
+      }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="admin-page">
+<!-- Bouton menu mobile -->
+<button id="menu-toggle" class="mobile-menu-toggle" style="display:none;">
+  <i class="bi bi-list" style="font-size:2rem;"></i>
+</button>
+<div class="dashboard-wrapper">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <nav class="sidebar-menu d-flex flex-column h-100">
+      <div class="sidebar-profile">
+        {% if request.user.profile_picture %}
+          <img src="{{ request.user.profile_picture.url }}" alt="Admin Profile" class="profile-image">
+        {% else %}
+          <div class="profile-image" style="display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.1);">
+            <i class="bi bi-person-fill" style="font-size: 2.5rem; color: white;"></i>
+          </div>
+        {% endif %}
+        <h5>{{ request.user.name }} {{ request.user.first_name }}</h5>
+        <p>Administrateur</p>
+      </div>
+      <a href="{% url 'admin_dashboard' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_dashboard' %} active{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Tableau de bord</span>
+      </a>
+      
+      <a href="{% url 'admin_users' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_users' %} active{% endif %}">
+        <i class="bi bi-people"></i>
+        <span>Utilisateurs</span>
+      </a>
+      <a href="{% url 'admin_demandes' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_demandes' %} active{% endif %}">
+        <i class="bi bi-clipboard-check"></i>
+        <span>Demandes</span>
+      </a>
+      <a href="{% url 'admin_rendezvous' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_rendezvous' %} active{% endif %}">
+        <i class="bi bi-calendar-event"></i>
+        <span>Rendez-vous</span>
+      </a>
+      <a href="{% url 'admin_documents' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_documents' %} active{% endif %}">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Documents</span>
+      </a>
+      <a href="{% url 'admin_ressources' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_ressources' %} active{% endif %}">
+        <i class="bi bi-folder"></i>
+        <span>Ressources</span>
+      </a>
+      <a href="{% url 'admin_messages' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_messages' %} active{% endif %}">
+        <i class="bi bi-chat-left-text"></i>
+        <span>Messages</span>
+      </a>
+      
+      <div class="mt-auto">
+        <a href="{% url 'admin_add_expert' %}" class="text-white text-decoration-none{% if request.resolver_match.url_name == 'admin_add_expert' %} active{% endif %}">
+          <i class="bi bi-person-plus"></i>
+          <span>Ajouter Expert</span>
+        </a>
+        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="text-white text-decoration-none bg-transparent border-0 w-100 text-start d-flex align-items-center" style="background: none;">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+          </button>
+        </form>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    {% block admin_content %}
+    <!-- Admin content will go here -->
+    {% endblock %}
+  </div>
+</div>
+
+<!-- Vendor JS Files -->
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/aos/aos.js' %}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle sidebar on mobile
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (menuToggle) {
+      menuToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('expanded');
+      });
+    }
+    
+    // Initialize AOS animation
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  });
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

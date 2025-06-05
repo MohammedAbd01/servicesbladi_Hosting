@@ -1,0 +1,226 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block title %}ServicesBladi - Services Fiscaux{% endblock %}
+{% block meta_description %}Services fiscaux pour les Marocains Résidant à l'Étranger{% endblock %}
+{% block meta_keywords %}fiscal, Maroc, MRE, impôts, comptabilité{% endblock %}
+
+{% block extra_css %}
+<style>
+  .service-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .service-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+  .modal-content {
+    border-radius: 15px;
+    border: none;
+  }
+  .modal-header {
+    border-bottom: none;
+    padding: 20px 30px;
+  }
+  .modal-body {
+    padding: 20px 30px;
+  }
+  .modal-footer {
+    border-top: none;
+    padding: 20px 30px;
+  }
+  .service-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .service-list {
+    list-style: none;
+    padding: 0;
+  }
+  .service-list li {
+    margin-bottom: 10px;
+    padding-left: 30px;
+    position: relative;
+  }
+  .service-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #28a745;
+  }
+  #hero {
+    height: 9cm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}index-page{% endblock %}
+
+{% block content %}
+<section id="hero" class="hero section dark-background">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1 class="text-center">Services Fiscaux</h1>
+        <p class="text-center">Optimisez votre fiscalité entre la France et le Maroc</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services" class="services section">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="service-item position-relative" data-bs-toggle="modal" data-bs-target="#optimisationModal">
+          <div class="icon">
+            <i class="bi bi-calculator" style="color: #f3268c;"></i>
+          </div>
+          <h3>Optimisation Fiscale</h3>
+          <p>Nos experts-comptables vous conseillent pour optimiser votre fiscalité entre la France et le Maroc, en tenant compte des réglementations des deux pays.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+        <div class="service-item position-relative" data-bs-toggle="modal" data-bs-target="#declarationModal">
+          <div class="icon">
+            <i class="bi bi-file-earmark-text" style="color: #f3268c;"></i>
+          </div>
+          <h3>Déclarations Fiscales</h3>
+          <p>Nous vous accompagnons dans la préparation et le dépôt de vos déclarations fiscales dans les deux pays.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+        <div class="service-item position-relative" data-bs-toggle="modal" data-bs-target="#conventionModal">
+          <div class="icon">
+            <i class="bi bi-file-earmark-check" style="color: #f3268c;"></i>
+          </div>
+          <h3>Conventions Fiscales</h3>
+          <p>Nous vous aidons à comprendre et à appliquer les conventions fiscales entre la France et le Maroc.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h2 class="text-center">Contactez-nous</h2>
+        <p class="text-center">Pour plus d'informations sur nos services fiscaux</p>
+        <div class="text-center mt-4">
+          <a href="{% url 'contact' %}" class="btn btn-primary">Nous contacter</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal Optimisation Fiscale -->
+<div class="modal fade" id="optimisationModal" tabindex="-1" aria-labelledby="optimisationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="service-icon">
+          <i class="bi bi-calculator" style="color: #f3268c; font-size: 48px;"></i>
+        </div>
+        <h5 class="modal-title" id="optimisationModalLabel">Optimisation Fiscale</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="service-list">
+          <li>Analyse de votre situation fiscale</li>
+          <li>Conseils personnalisés pour réduire votre imposition</li>
+          <li>Optimisation des investissements transfrontaliers</li>
+          <li>Gestion des revenus et patrimoine</li>
+          <li>Planification fiscale à long terme</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Prendre rendez-vous</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Déclarations Fiscales -->
+<div class="modal fade" id="declarationModal" tabindex="-1" aria-labelledby="declarationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="service-icon">
+          <i class="bi bi-file-earmark-text" style="color: #f3268c; font-size: 48px;"></i>
+        </div>
+        <h5 class="modal-title" id="declarationModalLabel">Déclarations Fiscales</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="service-list">
+          <li>Préparation des déclarations d'impôts</li>
+          <li>Déclarations de revenus transfrontaliers</li>
+          <li>Déclarations de patrimoine</li>
+          <li>Assistance pour les contrôles fiscaux</li>
+          <li>Suivi des obligations déclaratives</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Déposer une déclaration</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Conventions Fiscales -->
+<div class="modal fade" id="conventionModal" tabindex="-1" aria-labelledby="conventionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="service-icon">
+          <i class="bi bi-file-earmark-check" style="color: #f3268c; font-size: 48px;"></i>
+        </div>
+        <h5 class="modal-title" id="conventionModalLabel">Conventions Fiscales</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="service-list">
+          <li>Application des conventions fiscales internationales</li>
+          <li>Éviter la double imposition</li>
+          <li>Résolution des litiges fiscaux</li>
+          <li>Conseils sur les transferts transfrontaliers</li>
+          <li>Assistance pour les procédures de remboursement</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">Consulter un expert</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Animation au survol des cartes de service
+  document.querySelectorAll('.service-item').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-10px)';
+      this.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = '0 5px 30px 0 rgba(0, 0, 0, 0.1)';
+    });
+  });
+</script>
+{% endblock %}

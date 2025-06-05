@@ -1,0 +1,306 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block title %}ServicesBladi - Inscription{% endblock %}
+{% block meta_description %}Inscription sur ServicesBladi - Services pour les Marocains résidant à l'étranger{% endblock %}
+{% block meta_keywords %}register, inscription, MRE, services, compte, marocains, étranger{% endblock %}
+
+{% block body_class %}register-page{% endblock %}
+
+{% block extra_css %}
+<style>
+  body.register-page {
+    background: url('{% static "img/background_login_image.png" %}') no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  .register-section {
+    min-height: 100vh;
+    padding-top: 120px;
+    padding-bottom: 40px;
+  }
+
+  .register-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .register-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .register-header img {
+    max-height: 100px;
+    margin-bottom: 15px;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-control {
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+  }
+
+  .user-type-selector {
+    display: flex;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+  }
+
+  .user-type-option {
+    flex: 1;
+    text-align: center;
+    padding: 12px 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .user-type-option.selected {
+    background-color: #0ea2bd;
+    color: white;
+  }
+
+  .expert-fields, .client-fields {
+    display: none;
+  }
+
+  .btn-register {
+    width: 100%;
+    padding: 12px;
+    background-color: #0ea2bd;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-top: 20px;
+    transition: all 0.3s;
+  }
+
+  .btn-register:hover {
+    background-color: #0c8a9e;
+    transform: translateY(-2px);
+  }
+
+  .social-register {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .social-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .social-btn:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-2px);
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .login-link a {
+    color: #0ea2bd;
+    text-decoration: none;
+  }
+
+  .login-link a:hover,
+  .expert-register-link a:hover {
+    text-decoration: underline;
+  }
+  
+  .expert-register-link a {
+    color: #0ea2bd;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .register-container {
+      margin: 0 15px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <section class="register-section">
+    <div class="container">
+      <div class="register-container">
+        <div class="register-header">
+          <img src="{% static 'img/logo_principale.png' %}" alt="ServicesBladi Logo">
+          <h3 class="mt-3">Créer un compte</h3>
+        </div>
+
+        {% if form.errors %}
+        <div class="error-message">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if messages %}
+        <div class="{% if messages.tags == 'error' %}error-message{% else %}alert alert-success{% endif %}">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <form action="{% url 'accounts:register' %}" method="post">
+          {% csrf_token %}
+          
+          <input type="hidden" name="user_type" id="user_type" value="client">
+
+          <!-- Personal information -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="first_name" class="form-label">Prénom</label>
+              <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Votre prénom" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="last_name" class="form-label">Nom</label>
+              <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Votre nom" required>
+            </div>
+          </div>
+
+          <!-- Contact information -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Votre email" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="phone" class="form-label">Téléphone</label>
+              <input type="tel" class="form-control" id="phone" name="phone" placeholder="Votre numéro de téléphone" required>
+            </div>
+          </div>
+
+          <!-- Password fields -->
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="password" class="form-label">Mot de passe</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Votre mot de passe" required>
+              <small class="text-muted">Au moins 8 caractères, incluant lettres, chiffres et caractères spéciaux</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="password_confirm" class="form-label">Confirmer le mot de passe</label>
+              <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirmer votre mot de passe" required>
+            </div>
+          </div>
+
+          <!-- Country of residence -->
+          <div class="mb-3">
+            <label for="residence_country" class="form-label">Pays de résidence</label>
+            <select class="form-select form-control" id="residence_country" name="residence_country" required>
+              <option value="" selected disabled>Sélectionnez votre pays de résidence</option>
+              {% for code, name in countries %}
+                <option value="{{ code }}">{{ name }}</option>
+              {% endfor %}
+              {% if not countries %}
+                <option value="FR">France</option>
+                <option value="BE">Belgique</option>
+                <option value="ES">Espagne</option>
+                <option value="IT">Italie</option>
+                <option value="DE">Allemagne</option>
+                <option value="NL">Pays-Bas</option>
+                <option value="MA">Maroc</option>
+                <option value="CA">Canada</option>
+                <option value="US">États-Unis</option>
+                <option value="GB">Royaume-Uni</option>
+              {% endif %}
+            </select>
+          </div>
+
+
+          <!-- Client last visit to Morocco -->
+          <div class="mb-3">
+            <label for="last_visit" class="form-label">Date de dernière visite au Maroc</label>
+            <input type="date" class="form-control" id="last_visit" name="last_visit">
+          </div>
+
+          <!-- Terms and conditions -->
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+              <label class="form-check-label" for="terms">
+                J'accepte les <a href="#">conditions générales d'utilisation</a> et la <a href="#">politique de confidentialité</a>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-register">S'inscrire</button>
+
+          <div class="social-register">
+            <p class="text-muted mb-3">Ou inscrivez-vous avec</p>
+            <div class="d-flex justify-content-center">
+              <button type="button" class="social-btn me-2"><i class="bi bi-google"></i> Google</button>
+              <button type="button" class="social-btn"><i class="bi bi-facebook"></i> Facebook</button>
+            </div>
+          </div>
+
+          <div class="login-link">
+            Vous avez déjà un compte ? <a href="{% url 'accounts:login' %}">Connectez-vous</a>
+          </div>
+          <div class="expert-register-link text-center mt-3">
+            Vous êtes un expert ? <a href="{% url 'accounts:register_expert' %}">Inscrivez-vous en tant qu'expert</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Initialize AOS animation
+  AOS.init({
+    duration: 1000,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false
+  });
+
+  // Toggle expert/client fields based on account type
+  document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: true
+    });
+  });
+</script>
+{% endblock %}

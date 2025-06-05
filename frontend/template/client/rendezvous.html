@@ -1,0 +1,271 @@
+{% extends 'client/base.html' %}
+
+{% block title %}Rendez-vous - MRE{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Style pour les cartes de rendez-vous */
+  .rdv-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border-left: 4px solid #C49A5A;
+  }
+  
+  .rdv-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .status-confirme {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+  }
+  
+  .status-en-attente {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+  }
+  
+  .status-annule {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+  }
+  
+  .status-termine {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+  }
+</style>
+{% endblock %}
+{% block meta_description %}Gestion des rendez-vous client MRE{% endblock %}
+{% block meta_keywords %}MRE, rendez-vous, services{% endblock %}
+
+{% block content %}
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Mes Rendez-vous</h2>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newRdvModal">
+        <i class="bi bi-plus-lg me-2"></i>Nouveau rendez-vous
+      </button>
+    </div>
+
+    <!-- Filtres -->
+    <form method="get" action="{% url 'custom_requests:client_appointments' %}">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <select class="form-select" name="status">
+                <option value="">Tous les statuts</option>
+                <option value="scheduled" {% if request.GET.status == 'scheduled' %}selected{% endif %}>En attente</option>
+                <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmé</option>
+                <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Annulé</option>
+                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Terminé</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="date" class="form-control" name="date" value="{{ request.GET.date|default:'' }}">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" name="search" placeholder="Rechercher un rendez-vous..." value="{{ request.GET.search|default:'' }}">
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-outline-primary w-100">Filtrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Liste des rendez-vous -->
+    {% if appointments %}
+      {% for appointment in appointments %}
+        <div class="rdv-card p-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="w-75">
+              <div class="d-flex align-items-center mb-2">
+                {% if appointment.consultation_type == 'in_person' %}
+                  <i class="bi bi-person-video3 text-primary me-2 fs-4"></i>
+                {% elif appointment.consultation_type == 'video' %}
+                  <i class="bi bi-camera-video text-primary me-2 fs-4"></i>
+                {% elif appointment.consultation_type == 'phone' %}
+                  <i class="bi bi-telephone text-primary me-2 fs-4"></i>
+                {% else %}
+                  <i class="bi bi-calendar-event text-primary me-2 fs-4"></i>
+                {% endif %}
+                <h5 class="mb-0">
+                  {% if appointment.consultation_type == 'in_person' %}
+                    Consultation en personne
+                  {% elif appointment.consultation_type == 'video' %}
+                    Consultation par vidéo
+                  {% elif appointment.consultation_type == 'phone' %}
+                    Consultation téléphonique
+                  {% else %}
+                    {{ appointment.get_consultation_type_display }}
+                  {% endif %}
+                </h5>
+              </div>
+              
+              <div class="ms-4">
+                <p class="text-muted mb-1">
+                  <i class="bi bi-calendar-event me-2"></i>{{ appointment.date_time|date:"d F Y - H:i" }}
+                </p>
+                <p class="text-muted mb-1">
+                  <i class="bi bi-person me-2"></i>Expert: {{ appointment.expert.name }} {{ appointment.expert.first_name }}
+                </p>
+                {% if appointment.service_request %}
+                  <p class="text-muted mb-1">
+                    <i class="bi bi-link-45deg me-2"></i>Demande: {{ appointment.service_request.title|truncatechars:40 }}
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+            <div class="text-end">
+              {% if appointment.status == 'scheduled' %}
+                <span class="status-badge status-en-attente">En attente</span>
+              {% elif appointment.status == 'confirmed' %}
+                <span class="status-badge status-confirme">Confirmé</span>
+              {% elif appointment.status == 'completed' %}
+                <span class="status-badge status-termine">Terminé</span>
+              {% elif appointment.status == 'cancelled' %}
+                <span class="status-badge status-annule">Annulé</span>
+              {% else %}
+                <span class="status-badge">{{ appointment.get_status_display }}</span>
+              {% endif %}
+              
+              <div class="mt-3">
+                <a href="{% url 'custom_requests:appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="Voir les détails">
+                  <i class="bi bi-eye"></i>
+                </a>
+                {% if appointment.status == 'scheduled' or appointment.status == 'confirmed' %}
+                  <button class="btn btn-sm btn-outline-danger cancel-appointment-btn" 
+                          data-appointment-id="{{ appointment.id }}" 
+                          title="Annuler le rendez-vous">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-info">
+        <p>Vous n'avez pas encore de rendez-vous. Planifiez votre premier rendez-vous en cliquant sur "Nouveau rendez-vous".</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal Nouveau Rendez-vous -->
+  <div class="modal fade" id="newRdvModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nouveau Rendez-vous</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'custom_requests:create_appointment' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Type de consultation</label>
+              <select class="form-select" name="consultation_type" required>
+                <option value="in_person">En personne</option>
+                <option value="video">Appel vidéo</option>
+                <option value="phone">Appel téléphonique</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Service</label>
+              <select class="form-select" name="service_id" required>
+                {% for service in services %}
+                  <option value="{{ service.id }}">{{ service.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Expert</label>
+              <select class="form-select" name="expert_id" required>
+                {% for expert in experts %}
+                  <option value="{{ expert.user.id }}">{{ expert.user.name }} {{ expert.user.first_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Date</label>
+              <input type="date" class="form-control" name="date" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Heure</label>
+              <input type="time" class="form-control" name="time" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Lier à une demande existante (optionnel)</label>
+              <select class="form-select" name="demande_id">
+                <option value="">Aucune</option>
+                {% for request in service_requests %}
+                  <option value="{{ request.id }}">{{ request.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Notes (optionnel)</label>
+              <textarea class="form-control" name="notes" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Planifier</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Initialisation des tooltips Bootstrap
+  document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Gestion du clic sur le bouton d'annulation
+    document.querySelectorAll('.cancel-appointment-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const appointmentId = this.getAttribute('data-appointment-id');
+        if (confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
+          // Créer un formulaire dynamiquement
+          const form = document.createElement('form');
+          form.method = 'post';
+          form.action = `/requests/appointments/cancel/${appointmentId}/`;
+          
+          // Ajouter le jeton CSRF
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrfmiddlewaretoken';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+          
+          // Ajouter le formulaire à la page et le soumettre
+          document.body.appendChild(form);
+          form.submit();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

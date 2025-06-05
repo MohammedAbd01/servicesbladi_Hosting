@@ -1,0 +1,498 @@
+{% extends 'client/base.html' %}
+
+{% block title %}Détails du Rendez-vous - MRE{% endblock %}
+{% block meta_description %}Détails du rendez-vous client MRE{% endblock %}
+{% block meta_keywords %}MRE, rendez-vous, détails{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Appointment detail page styling that complements the base template design */
+  .appointment-detail-container {
+    background: var(--card-bg-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--card-border-color);
+    transition: all 0.3s ease;
+  }
+  
+  .appointment-title {
+    color: var(--heading-text-color);
+    font-weight: 600;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+    font-family: "Raleway", sans-serif;
+  }
+  
+  .appointment-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .appointment-status {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .status-pending, .status-scheduled {
+    background-color: #fff7e6;
+    color: #fa8c16;
+  }
+  
+  .status-confirmed {
+    background-color: #e3fcef;
+    color: #00a854;
+  }
+  
+  .status-completed {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+  
+  .status-cancelled, .status-missed {
+    background-color: #fff1f0;
+    color: #f5222d;
+  }
+  
+  .appointment-info-section {
+    background-color: var(--card-bg-color);
+    border: 1px solid var(--card-border-color);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+  }
+  
+  .section-title {
+    color: var(--heading-text-color);
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: "Raleway", sans-serif;
+  }
+  
+  .section-title i {
+    color: var(--secondary-color);
+  }
+  
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .info-item {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+  }
+  
+  .info-item:last-child {
+    margin-bottom: 0;
+  }
+  
+  .info-label {
+    font-weight: 500;
+    color: var(--default-text-color);
+    width: 140px;
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .info-label i {
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+  }
+  
+  .info-value {
+    flex: 1;
+    font-weight: 400;
+    color: var(--heading-text-color);
+  }
+  
+  .info-card {
+    background-color: var(--light-gray-bg);
+    border-left: 3px solid var(--secondary-color);
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin: 0.5rem 0;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .date-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--light-gray-bg);
+    color: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+    gap: 0.5rem;
+    border: 1px solid var(--card-border-color);
+  }
+  
+  .note-section {
+    background-color: var(--light-gray-bg);
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .note-section p {
+    color: var(--default-text-color);
+    margin-bottom: 0;
+  }
+  
+  .expert-profile {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .expert-avatar {
+    width: 60px;
+    height: 60px;
+    background-color: var(--light-gray-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--secondary-color);
+    font-size: 1.5rem;
+  }
+  
+  .expert-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--heading-text-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .expert-specialty {
+    color: var(--default-text-color);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .appointment-detail-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+  <div class="appointment-detail-container">
+    <div class="mb-4">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'client_dashboard' %}">Tableau de bord</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'custom_requests:client_appointments' %}">Mes Rendez-vous</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Détails</li>
+        </ol>
+      </nav>
+    </div>
+    <a href="{% url 'custom_requests:client_appointments' %}" class="btn btn-outline-primary mb-4">
+      <i class="bi bi-arrow-left me-2"></i>Retour aux rendez-vous
+    </a>
+  
+    <div class="appointment-detail-header">
+      <div>
+        <h2 class="appointment-title">
+          {% if appointment.consultation_type == 'in_person' %}
+            Rendez-vous en personne
+          {% elif appointment.consultation_type == 'video' %}
+            Rendez-vous par vidéo
+          {% elif appointment.consultation_type == 'phone' %}
+            Rendez-vous téléphonique
+          {% else %}
+            Rendez-vous {{ appointment.consultation_type|default:"" }}
+          {% endif %}
+        </h2>
+        <div class="date-badge">
+          <i class="bi bi-calendar-check"></i>
+          {{ appointment.date_time|date:"d/m/Y à H:i" }}
+        </div>
+      </div>
+      <div>
+        {% if appointment.status == 'scheduled' %}
+          <span class="appointment-status status-scheduled">
+            <i class="bi bi-clock"></i> Planifié
+          </span>
+        {% elif appointment.status == 'confirmed' %}
+          <span class="appointment-status status-confirmed">
+            <i class="bi bi-check-circle"></i> Confirmé
+          </span>
+        {% elif appointment.status == 'completed' %}
+          <span class="appointment-status status-completed">
+            <i class="bi bi-trophy"></i> Terminé
+          </span>
+        {% elif appointment.status == 'cancelled' %}
+          <span class="appointment-status status-cancelled">
+            <i class="bi bi-x-circle"></i> Annulé
+          </span>
+        {% elif appointment.status == 'missed' %}
+          <span class="appointment-status status-missed">
+            <i class="bi bi-exclamation-circle"></i> Manqué
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- Détails du rendez-vous -->
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-info-circle"></i> Informations sur le rendez-vous</h3>
+          <ul class="info-list">
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-tag"></i> Type :</span>
+              <span class="info-value">
+                {% if appointment.consultation_type == 'in_person' %}
+                  En personne
+                {% elif appointment.consultation_type == 'video' %}
+                  Vidéoconférence
+                {% elif appointment.consultation_type == 'phone' %}
+                  Téléphone
+                {% else %}
+                  {{ appointment.consultation_type|default:"Non spécifié" }}
+                {% endif %}
+              </span>
+            </li>
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-calendar-date"></i> Date :</span>
+              <span class="info-value">{{ appointment.date_time|date:"d/m/Y" }}</span>
+            </li>
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-clock"></i> Heure :</span>
+              <span class="info-value">{{ appointment.date_time|date:"H:i" }}</span>
+            </li>
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-hourglass-split"></i> Durée :</span>
+              <span class="info-value">{{ appointment.duration|default:"60" }} minutes</span>
+            </li>
+            {% if appointment.location %}
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-geo-alt"></i> Lieu :</span>
+              <span class="info-value">{{ appointment.location }}</span>
+            </li>
+            {% endif %}
+            {% if appointment.meeting_link %}
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-camera-video"></i> Lien :</span>
+              <span class="info-value">
+                <a href="{{ appointment.meeting_link }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-box-arrow-up-right me-1"></i> Rejoindre la réunion
+                </a>
+              </span>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+        
+        <!-- Détails de la demande -->
+        {% if appointment.service_request %}
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-file-earmark-text"></i> Demande associée</h3>
+          <ul class="info-list">
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-file-earmark"></i> Demande :</span>
+              <span class="info-value">
+                <a href="{% url 'custom_requests:request_detail' appointment.service_request.id %}">{{ appointment.service_request.title }}</a>
+              </span>
+            </li>
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-chat-text"></i> Description :</span>
+              <div class="info-value info-card">
+                {{ appointment.service_request.description|linebreaks }}
+              </div>
+            </li>
+          </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Service associé -->
+        {% if appointment.service %}
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-briefcase"></i> Service</h3>
+          <ul class="info-list">
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-briefcase"></i> Service :</span>
+              <span class="info-value">{{ appointment.service.title }}</span>
+            </li>
+            {% if appointment.service.description %}
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-info-circle"></i> Description :</span>
+              <div class="info-value info-card">
+                {{ appointment.service.description|linebreaks }}
+              </div>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Notes -->
+        {% if appointment.notes %}
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-journal-text"></i> Notes</h3>
+          <div class="note-section">
+            <p>{{ appointment.notes|linebreaks }}</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="col-lg-4">
+        <!-- Informations sur l'expert -->
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-person"></i> Expert</h3>
+          {% if appointment.expert %}
+          <div class="expert-profile">
+            <div class="expert-avatar">
+              <i class="bi bi-person-badge"></i>
+            </div>
+            <h4 class="expert-name">{{ appointment.expert.name|default:'' }} {{ appointment.expert.first_name|default:'' }}</h4>
+          </div>
+          <ul class="info-list">
+            {% if appointment.expert.email %}
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-envelope"></i> Email :</span>
+              <span class="info-value">{{ appointment.expert.email }}</span>
+            </li>
+            {% endif %}
+            {% if appointment.expert.phone %}
+            <li class="info-item">
+              <span class="info-label"><i class="bi bi-telephone"></i> Téléphone :</span>
+              <span class="info-value">{{ appointment.expert.phone }}</span>
+            </li>
+            {% endif %}
+          </ul>
+          {% else %}
+          <div class="text-center">
+            <div class="expert-avatar">
+              <i class="bi bi-person-x"></i>
+            </div>
+            <p class="mt-2">Aucun expert assigné pour le moment</p>
+          </div>
+          {% endif %}
+        </div>
+        
+        <!-- Documents -->
+        {% if documents %}
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-file-earmark"></i> Documents</h3>
+          <ul class="list-group">
+            {% for document in documents %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <i class="bi bi-file-earmark-text me-2"></i>
+                {{ document.name }}
+              </div>
+              <a href="{{ document.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-download"></i>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        
+        <!-- Actions -->
+        <div class="appointment-info-section">
+          <h3 class="section-title"><i class="bi bi-gear"></i> Actions</h3>
+          <div class="action-buttons">
+            {% if appointment.status == 'scheduled' or appointment.status == 'confirmed' %}
+              <button type="button" class="btn btn-danger action-btn" data-bs-toggle="modal" data-bs-target="#cancelAppointmentModal">
+                <i class="bi bi-x-circle"></i> Annuler le rendez-vous
+              </button>
+            {% endif %}
+            {% if appointment.service_request %}
+              <a href="{% url 'custom_requests:request_detail' appointment.service_request.id %}" class="btn btn-outline-primary action-btn">
+                <i class="bi bi-file-earmark-text"></i> Voir la demande
+              </a>
+            {% endif %}
+            {% if appointment.meeting_link %}
+              <a href="{{ appointment.meeting_link }}" target="_blank" class="btn btn-primary action-btn">
+                <i class="bi bi-camera-video"></i> Rejoindre la réunion
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal d'annulation -->
+<div class="modal fade" id="cancelAppointmentModal" tabindex="-1" aria-labelledby="cancelAppointmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelAppointmentModalLabel">
+          <i class="bi bi-exclamation-triangle text-danger me-2"></i>
+          Confirmer l'annulation
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler ce rendez-vous prévu le <strong>{{ appointment.date_time|date:"d/m/Y à H:i" }}</strong> ?</p>
+        <div class="alert alert-warning">
+          <i class="bi bi-info-circle me-2"></i>
+          Cette action est irréversible. Une notification sera envoyée à l'expert concerné.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, garder</button>
+        <a href="{% url 'custom_requests:cancel_appointment' appointment.id %}" class="btn btn-danger">Oui, annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

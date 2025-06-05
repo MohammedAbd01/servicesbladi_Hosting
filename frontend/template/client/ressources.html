@@ -1,0 +1,103 @@
+{% extends 'client/base.html' %}
+
+{% block title %}Ressources - MRE{% endblock %}
+{% block meta_description %}Ressources et guides pour les clients MRE{% endblock %}
+{% block meta_keywords %}MRE, ressources, guides, services{% endblock %}
+
+{% block content %}
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Ressources et Guides</h2>
+      <div class="d-flex gap-2">
+        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+          <i class="bi bi-house-door me-2"></i>Accueil
+        </a>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <form method="get" action="{% url 'resources:client_resources' %}">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <select class="form-select" name="category">
+                <option value="">Toutes les catégories</option>
+                <option value="administrative" {% if selected_category == 'administrative' %}selected{% endif %}>Administrative</option>
+                <option value="fiscal" {% if selected_category == 'fiscal' %}selected{% endif %}>Fiscale</option>
+                <option value="tourism" {% if selected_category == 'tourism' %}selected{% endif %}>Tourisme</option>
+                <option value="real_estate" {% if selected_category == 'real_estate' %}selected{% endif %}>Immobilier</option>
+                <option value="investment" {% if selected_category == 'investment' %}selected{% endif %}>Investissement</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" name="search" placeholder="Rechercher une ressource..." value="{{ search|default:'' }}">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-outline-primary w-100">Filtrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Liste des ressources -->
+    <div class="row">
+      {% if resources %}
+        {% for resource in resources %}
+          <div class="col-md-4 mb-4">
+            <div class="resource-card">
+              <div class="p-3">
+                <div class="d-flex align-items-center mb-3">
+                  {% if resource.category == 'administrative' %}
+                    <i class="bi bi-file-earmark-text resource-icon me-3"></i>
+                  {% elif resource.category == 'fiscal' %}
+                    <i class="bi bi-calculator resource-icon me-3"></i>
+                  {% elif resource.category == 'tourism' %}
+                    <i class="bi bi-airplane resource-icon me-3"></i>
+                  {% elif resource.category == 'real_estate' %}
+                    <i class="bi bi-house resource-icon me-3"></i>
+                  {% elif resource.category == 'investment' %}
+                    <i class="bi bi-graph-up resource-icon me-3"></i>
+                  {% elif resource.category == 'legal' %}
+                    <i class="bi bi-scale resource-icon me-3"></i>
+                  {% elif resource.category == 'embassy' %}
+                    <i class="bi bi-building resource-icon me-3"></i>
+                  {% else %}
+                    <i class="bi bi-book resource-icon me-3"></i>
+                  {% endif %}
+                  <div>
+                    <h5 class="mb-1">{{ resource.title }}</h5>
+                    <span class="category-badge">{{ resource.get_category_display }}</span>
+                  </div>
+                </div>
+                <p class="text-muted mb-3">{{ resource.description|truncatechars:120 }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">Mis à jour le: {{ resource.updated_at|date:"d/m/Y" }}</small>
+                  <div>
+                    {% if resource.files.all %}
+                      <a href="{% url 'resources:client_download_resource' resource.files.first.id %}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-download me-2"></i>Télécharger
+                      </a>
+                    {% elif resource.links.all %}
+                      <a href="{{ resource.links.first.url }}" target="_blank" class="btn btn-sm btn-primary">
+                        <i class="bi bi-link-45deg me-2"></i>Visiter
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="col-12">
+          <div class="alert alert-info">
+            Aucune ressource ne correspond à votre recherche.
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

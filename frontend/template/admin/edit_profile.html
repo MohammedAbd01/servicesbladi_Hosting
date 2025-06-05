@@ -1,0 +1,319 @@
+{% extends 'admin/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Modifier mon Profil" %} - {{ block.super }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Styles pour la page de modification de profil admin */
+  .profile-page-container {
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Styles des cartes */
+  .profile-card {
+    margin-bottom: 2rem;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    background-color: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .profile-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  
+  .profile-card .card-header {
+    background: linear-gradient(135deg, #C49A5A 0%, #D4B483 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+  }
+
+  .profile-card .card-header h5 {
+    font-weight: 600;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-card .card-header h5 i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .profile-card .card-body {
+    padding: 2rem;
+  }
+
+  /* Styles des formulaires */
+  .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-size: 0.95rem;
+  }
+  
+  .form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #C49A5A;
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(196, 154, 90, 0.25);
+  }
+  
+  .form-control::placeholder {
+    color: #adb5bd;
+    opacity: 0.7;
+  }
+
+  /* Styles des boutons */
+  .btn {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #C49A5A 0%, #D4B483 100%);
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #B38A4A 0%, #C4A473 100%);
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary i {
+    margin-right: 8px;
+  }
+
+  .btn-outline-primary {
+    border: 2px solid #C49A5A;
+    color: #C49A5A;
+    background: transparent;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #C49A5A;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .dashboard-card {
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+
+  .dashboard-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #C49A5A 0%, #D4B483 100%);
+    color: white;
+    padding: 15px 20px;
+    border-bottom: none;
+  }
+
+  .dashboard-card .card-body {
+    padding: 25px;
+  }
+
+  .form-floating > .form-control,
+  .form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+  }
+
+  .form-floating > label {
+    padding: 1rem 0.75rem;
+  }
+
+  .section-divider {
+    margin: 2rem 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(196, 154, 90, 0.5), transparent);
+  }
+
+  .form-section-title {
+    color: #C49A5A;
+    font-weight: 500;
+    margin: 1.5rem 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-section-title i {
+    margin-right: 8px;
+  }
+
+  .textarea-large {
+    height: 120px !important;
+  }
+  
+  /* Animation pour les boutons */
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(196, 154, 90, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(196, 154, 90, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(196, 154, 90, 0); }
+  }
+  
+  .btn-pulse {
+    animation: pulse 2s infinite;
+  }
+
+  .dashboard-card .card-header h4 {
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .dashboard-card .card-header h4 i {
+    color: white;
+    margin-right: 10px;
+  }
+
+  .dashboard-card .card-header h5 {
+    color: white;
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .dashboard-card .card-header h5 i {
+    color: white;
+    margin-right: 10px;
+  }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<!-- En-tête de page avec titre -->
+<div class="dashboard-card mb-4">
+    <div class="card-header">
+        <h4 class="m-0"><i class="bi bi-person-circle me-2"></i>{% trans "Modifier mon Profil Administrateur" %}</h4>
+        <a href="{% url 'admin_profile' %}" class="btn btn-outline-light"><i class="bi bi-arrow-left me-2"></i>{% trans "Retour à Mon Profil" %}</a>
+    </div>
+</div>
+
+<!-- Affichage des messages -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <i class="bi {% if message.tags == 'success' %}bi-check-circle{% elif message.tags == 'error' %}bi-exclamation-triangle{% elif message.tags == 'warning' %}bi-exclamation-circle{% else %}bi-info-circle{% endif %} me-2"></i>
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Carte pour les informations personnelles -->
+<div class="dashboard-card mb-4">
+    <div class="card-header">
+        <h5 class="m-0"><i class="bi bi-person-fill me-2"></i>{% trans "Informations Personnelles" %}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            
+            <!-- Informations de base -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ user_form.name.id_for_label }}" class="form-label">{% trans "Nom" %}</label>
+                        {{ user_form.name }}
+                        {% if user_form.name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ user_form.name.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">{% trans "Prénom" %}</label>
+                        {{ user_form.first_name }}
+                        {% if user_form.first_name.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ user_form.first_name.errors|join:", " }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label for="{{ user_form.email.id_for_label }}" class="form-label">{% trans "Email" %}</label>
+                {{ user_form.email }}
+                {% if user_form.email.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ user_form.email.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle-fill me-2"></i>{% trans "Sauvegarder les modifications" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Rafraîchir la page après 1 seconde pour montrer le message de succès
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

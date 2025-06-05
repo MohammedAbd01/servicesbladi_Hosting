@@ -1,0 +1,22 @@
+Services Bladi - Mise à jour de votre demande
+
+Bonjour {{ client_name }},
+
+Nous vous informons que le statut de votre demande a été mis à jour par {{ expert_name }}.
+
+Demande: {{ request_title }}
+{% if request_description %}Description: {{ request_description }}{% endif %}
+
+Nouveau statut: {{ new_status }}
+Expert responsable: {{ expert_name }}
+
+Pour consulter les détails de votre demande:
+{{ site_url }}/accounts/dashboard/
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

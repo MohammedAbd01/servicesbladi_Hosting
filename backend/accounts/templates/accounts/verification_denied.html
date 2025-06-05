@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h2 class="card-title mb-4">Email Verification Required</h2>
+                    <div class="alert alert-warning">
+                        <p class="mb-3">Your account is not yet verified. Please check your email for the verification link.</p>
+                        <p>If you haven't received the email, you can request a new verification link below.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h4 class="h5 mb-3">What happens next?</h4>
+                        <ol class="text-start">
+                            <li>Check your email inbox (and spam folder)</li>
+                            <li>Click the verification link in the email</li>
+                            <li>Once verified, you can log in to your account</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-4">
+                        <form method="post" action="{% url 'accounts:resend_verification' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="email" value="{{ user.email }}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Resend Verification Email
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="text-muted">Need help? <a href="{% url 'contact' %}">Contact Support</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,238 @@
+{% extends 'client/base.html' %}
+{% load document_filters %}
+{% load static %}
+
+{% block title %}Mes Documents - MRE{% endblock %}
+{% block meta_description %}Gestion des documents client MRE{% endblock %}
+{% block meta_keywords %}MRE, documents, services{% endblock %}
+
+{% block content %}
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Mes Documents</h2>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+        <i class="bi bi-upload me-2"></i>Télécharger un document
+      </button>
+    </div>
+
+    <!-- Filtres -->
+    <form method="get" action="{% url 'custom_requests:documents' %}">
+      <div class="card mb-4">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <select class="form-select" name="type">
+                <option value="">Tous les types</option>
+                <option value="identity" {% if request.GET.type == 'identity' %}selected{% endif %}>Identité</option>
+                <option value="proof" {% if request.GET.type == 'proof' %}selected{% endif %}>Justificatif</option>
+                <option value="contract" {% if request.GET.type == 'contract' %}selected{% endif %}>Contrat</option>
+                <option value="invoice" {% if request.GET.type == 'invoice' %}selected{% endif %}>Facture</option>
+                <option value="report" {% if request.GET.type == 'report' %}selected{% endif %}>Rapport</option>
+                <option value="other" {% if request.GET.type == 'other' %}selected{% endif %}>Autre</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <input type="date" class="form-control" name="date" value="{{ request.GET.date|default:'' }}">
+            </div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" name="search" placeholder="Rechercher un document..." value="{{ request.GET.search|default:'' }}">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-outline-primary w-100">Filtrer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- Liste des documents -->
+    <div id="documents-container">
+      {% if documents %}
+        {% for document in documents %}
+          <div class="rdv-card p-3 mb-3 document-item" 
+               data-type="{{ document.type }}"
+               data-date="{{ document.upload_date|date:'Y-m-d' }}">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1">
+                  {% if document.mime_type == 'application/pdf' %}
+                    <i class="bi bi-file-pdf text-danger me-2"></i>
+                  {% elif 'image' in document.mime_type %}
+                    <i class="bi bi-file-image text-primary me-2"></i>
+                  {% elif 'word' in document.mime_type %}
+                    <i class="bi bi-file-word text-primary me-2"></i>
+                  {% elif 'excel' in document.mime_type or 'sheet' in document.mime_type %}
+                    <i class="bi bi-file-excel text-success me-2"></i>
+                  {% else %}
+                    <i class="bi bi-file-earmark me-2"></i>
+                  {% endif %}
+                  {{ document.name }}
+                </h5>
+                <p class="text-muted mb-0">
+                  <i class="bi bi-calendar-event me-2"></i>{{ document.upload_date|date:"d F Y - H:i" }}
+                </p>
+                <p class="text-muted mb-0">
+                  <i class="bi bi-tag me-2"></i>Type: {{ document|display_type }}
+                  {% if document.is_official %}
+                    <span class="status-badge status-confirme ms-2">Officiel</span>
+                  {% endif %}
+                </p>
+                {% if document.file_size %}
+                  <p class="text-muted mb-0">
+                    <i class="bi bi-hdd me-2"></i>Taille: {{ document.file_size|filesizeformat }}
+                  </p>
+                {% endif %}
+                {% if document.service_request %}
+                  <p class="text-muted mb-0">
+                    <i class="bi bi-link-45deg me-2"></i>Demande: {{ document.service_request.title|truncatechars:40 }}
+                  </p>
+                {% endif %}
+              </div>
+              <div class="text-end">
+                <div class="btn-group">
+                  <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary me-2" target="_blank" data-bs-toggle="tooltip" title="Voir le document">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  <a href="{{ document.file.url }}" download class="btn btn-sm btn-outline-secondary me-2" data-bs-toggle="tooltip" title="Télécharger">
+                    <i class="bi bi-download"></i>
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger delete-document" 
+                          data-url="{% url 'custom_requests:delete_document' document.id %}"
+                          data-bs-toggle="tooltip" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">
+          <div class="d-flex align-items-center">
+            <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+            <div>
+              <h5 class="mb-1">Aucun document trouvé</h5>
+              <p class="mb-0">Cliquez sur "Télécharger un document" pour ajouter votre premier document.</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <!-- Modal Upload Document -->
+  <div class="modal fade" id="uploadDocumentModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Télécharger un document</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{% url 'custom_requests:upload_document' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Nom du document</label>
+              <input type="text" class="form-control" name="name" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Type de document</label>
+              <select class="form-select" name="type" required>
+                <option value="identity">Identité</option>
+                <option value="proof">Justificatif</option>
+                <option value="contract">Contrat</option>
+                <option value="invoice">Facture</option>
+                <option value="report">Rapport</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fichier</label>
+              <input type="file" class="form-control" name="file" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Associer à une demande (optionnel)</label>
+              <select class="form-select" name="demande_id">
+                <option value="">Aucune demande</option>
+                {% for demande in service_requests %}
+                  <option value="{{ demande.id }}">{{ demande.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="isOfficialCheck" name="is_official">
+              <label class="form-check-label" for="isOfficialCheck">Document officiel</label>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Numéro de référence (optionnel)</label>
+              <input type="text" class="form-control" name="reference_number">
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="submit" class="btn btn-primary">Télécharger</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <style>
+    /* Style pour les cartes de documents */
+    .rdv-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border-left: 4px solid #C49A5A;
+    }
+    
+    .rdv-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .status-confirme {
+      background-color: rgba(40, 167, 69, 0.1);
+      color: #28a745;
+    }
+    
+    .status-en-attente {
+      background-color: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+    }
+    
+    .status-annule {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+    
+    .status-termine {
+      background-color: rgba(108, 117, 125, 0.1);
+      color: #6c757d;
+    }
+    
+    .document-item {
+      transition: all 0.3s ease;
+    }
+    
+    .document-item:hover {
+      background-color: rgba(196, 154, 90, 0.05);
+    }
+  </style>
+  
+  {% block extra_js %}
+    <script src="{% static 'js/document-filter.js' %}"></script>
+  {% endblock %}
+{% endblock %}

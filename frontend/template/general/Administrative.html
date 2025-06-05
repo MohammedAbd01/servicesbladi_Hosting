@@ -1,0 +1,332 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block title %}MRE - Services Administratifs{% endblock %}
+
+{% block content %}
+  <main class="main">
+    <section id="hero" class="hero section dark-background">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <h1 class="text-center">Services Administratifs</h1>
+            <p class="text-center">Simplifiez vos démarches administratives avec nos services dédiés</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Services Section -->
+    <section class="services section">
+      <div class="container">
+        <h2 class="text-center">Services Principaux</h2>
+        <div class="row gy-4">
+          <!-- Documents d'identité -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up">
+            <div class="service-item position-relative">
+              <div class="icon mb-3">
+                <i class="bi bi-person-badge" style="color: #f00d0d; font-size: 2.5rem;"></i>
+              </div>
+              <h3><a href="#modalDocuments" data-bs-toggle="modal">Documents d'Identité</a></h3>
+              <p>Renouvellement de passeport, carte d'identité nationale et autres documents officiels.</p>
+            </div>
+          </div>
+          <!-- Services Consulaires -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="service-item position-relative">
+              <div class="icon mb-3">
+                <i class="bi bi-building" style="color: #0d722a; font-size: 2.5rem;"></i>
+              </div>
+              <h3><a href="#modalConsulaires" data-bs-toggle="modal">Services Consulaires</a></h3>
+              <p>Assistance pour les démarches consulaires et les actes d'état civil.</p>
+            </div>
+          </div>
+          <!-- Légalisation -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="service-item position-relative">
+              <div class="icon mb-3">
+                <i class="bi bi-clipboard-check" style="color: #0d27f0; font-size: 2.5rem;"></i>
+              </div>
+              <h3><a href="#modalLegalisation" data-bs-toggle="modal">Légalisation</a></h3>
+              <p>Légalisation et authentification de documents officiels.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modals -->
+    <!-- Modal Documents d'Identité -->
+    <div class="modal fade" id="modalDocuments" tabindex="-1" aria-labelledby="modalDocumentsLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalDocumentsLabel">Documents d'Identité</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Documents Disponibles</h6>
+                <ul class="service-list">
+                  <li>Carte Nationale d'Identité Électronique</li>
+                  <li>Passeport Biométrique</li>
+                  <li>Carte de Séjour</li>
+                  <li>Carte Consulaire</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Services Proposés</h6>
+                <ul class="service-list">
+                  <li>Renouvellement de documents</li>
+                  <li>Première demande</li>
+                  <li>Remplacement en cas de perte</li>
+                  <li>Mise à jour des informations</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h6 class="text-primary mb-3">Documents Nécessaires</h6>
+              <ul class="service-list">
+                <li>Photos d'identité récentes</li>
+                <li>Justificatif de domicile</li>
+                <li>Ancien document (pour renouvellement)</li>
+                <li>Acte de naissance</li>
+                <li>Justificatif de situation professionnelle</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Prendre Rendez-vous</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Services Consulaires -->
+    <div class="modal fade" id="modalConsulaires" tabindex="-1" aria-labelledby="modalConsulairesLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalConsulairesLabel">Services Consulaires</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Services d'État Civil</h6>
+                <ul class="service-list">
+                  <li>Actes de naissance</li>
+                  <li>Actes de mariage</li>
+                  <li>Actes de décès</li>
+                  <li>Certificats de nationalité</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Assistance Administrative</h6>
+                <ul class="service-list">
+                  <li>Inscription consulaire</li>
+                  <li>Procuration</li>
+                  <li>Certificats divers</li>
+                  <li>Assistance juridique</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h6 class="text-primary mb-3">Informations Pratiques</h6>
+              <ul class="service-list">
+                <li>Service disponible sur rendez-vous</li>
+                <li>Traitement des demandes sous 48h</li>
+                <li>Assistance en français et en arabe</li>
+                <li>Service d'urgence disponible</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Contacter le Service</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Légalisation -->
+    <div class="modal fade" id="modalLegalisation" tabindex="-1" aria-labelledby="modalLegalisationLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLegalisationLabel">Légalisation de Documents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Types de Documents</h6>
+                <ul class="service-list">
+                  <li>Documents administratifs</li>
+                  <li>Documents commerciaux</li>
+                  <li>Diplômes et certificats</li>
+                  <li>Traductions officielles</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-primary mb-3">Services de Légalisation</h6>
+                <ul class="service-list">
+                  <li>Authentification de signature</li>
+                  <li>Certification conforme</li>
+                  <li>Apostille</li>
+                  <li>Validation de traduction</li>
+                </ul>
+              </div>
+            </div>
+            <div class="mt-4">
+              <h6 class="text-primary mb-3">Procédure</h6>
+              <ul class="service-list">
+                <li>Vérification des documents originaux</li>
+                <li>Contrôle de conformité</li>
+                <li>Application du sceau officiel</li>
+                <li>Délivrance du certificat de légalisation</li>
+              </ul>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary">Soumettre une Demande</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other sections and modals remain mostly unchanged except for link URLs -->
+    <!-- Update all button links to use Django URL template tags -->
+  </main>
+
+  <!-- Add custom stylesheet for this page -->
+  <style>
+    .service-item {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 20px;
+      background-color: #fff;
+    }
+    .service-item:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      border-color: #f0950d;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .service-item h3 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .service-item p {
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+    }
+    .modal-content {
+      border-radius: 15px;
+      border: none;
+    }
+    .modal-header {
+      border-bottom: none;
+      padding: 20px 30px;
+    }
+    .modal-body {
+      padding: 20px 30px;
+    }
+    .modal-footer {
+      border-top: none;
+      padding: 20px 30px;
+    }
+    .service-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .service-list {
+      list-style: none;
+      padding: 0;
+    }
+    .service-list li {
+      margin-bottom: 10px;
+      padding-left: 30px;
+      position: relative;
+    }
+    .service-list li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #28a745;
+    }
+    #hero {
+      height: 9cm;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+
+  <!-- Add page-specific JavaScript -->
+  <script>
+    // Animation pour les cartes de service
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll('.service-item').forEach(item => {
+        item.addEventListener('mouseenter', function () {
+          this.style.transform = 'translateY(-5px)';
+        });
+        item.addEventListener('mouseleave', function () {
+          this.style.transform = 'translateY(0)';
+        });
+      });
+
+      // Gestion des modals avec scroll
+      const modalIds = {
+        'Documents d\'Identité': '#modalDocuments',
+        'Services Consulaires': '#modalConsulaires',
+        'Légalisation': '#modalLegalisation',
+        'État civil': '#modalEtatCivil',
+        'Mariage': '#modalMariage',
+        'Décès': '#modalDeces',
+        'Permis de conduire': '#modalConduire',
+        'Administration en ligne': '#modalAdministrationEnLigne',
+        'Services de l\'ANAPEC': '#modalANAPEC',
+        'Services douaniers': '#modalDouanes',
+        'Réglementation des changes': '#modalChanges',
+        'Actions de la DEGI': '#modalDEGI',
+        'Dédouanement avec bénéfice': '#modalDedouanement',
+        'Règlement des dettes des MRE': '#modalDettes',
+        'Accompagnement entrepreneurial': '#modalEntrepreneuriat',
+        'Création d\'Entreprise': '#modalCreationEntreprise',
+        'Études de Marché': '#modalEtudesMarche',
+        'Partenariats': '#modalPartenariats',
+      };
+
+      document.querySelectorAll('.service-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const titleElement = item.querySelector('h3 a');
+          if (titleElement) {
+            const title = titleElement.textContent.trim();
+            const modalId = modalIds[title];
+            if (modalId) {
+              const modalElement = document.querySelector(modalId);
+              if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+              }
+            }
+          }
+        });
+      });
+    });
+  </script>
+{% endblock %}

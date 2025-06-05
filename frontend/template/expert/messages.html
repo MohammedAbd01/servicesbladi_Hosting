@@ -1,0 +1,770 @@
+{% extends 'expert/base.html' %}
+{% load static %}
+{% load message_filters %}
+{# Version: {% now "U" %} #}
+
+{% block title %}ServicesBladi - Messagerie Expert{% endblock %}
+{% block meta_description %}Espace expert - Messagerie avec les clients{% endblock %}
+{% block meta_keywords %}messages, experts, client, communication, assistance{% endblock %}
+
+{% block extra_styles %}
+<!-- Include consolidated messaging fixes -->
+<link rel="stylesheet" href="{% static 'css/messaging-fixes.css' %}">
+<!-- Critical fixes - must load last -->
+<link rel="stylesheet" href="{% static 'css/messaging-critical-fixes.css' %}">
+
+<style>
+  /* Chat interface styles - Enhanced for better readability */
+  .chat-container {
+    display: flex;
+    height: calc(100vh - 230px);
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+
+  .contacts-list {
+    width: 350px;
+    border-right: 1px solid #e5e5e5;
+    overflow-y: auto;
+  }
+
+  .contacts-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid #e5e5e5;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .contact-item:hover, .contact-item.active {
+    background-color: #f0f7ff;
+  }
+
+  .contact-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 1.25rem;
+    object-fit: cover;
+  }
+
+  .contact-info {
+    flex: 1;
+  }
+
+  .contact-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .contact-preview {
+    color: #555;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  .contact-meta {
+    text-align: right;
+    min-width: 60px;
+  }
+
+  .contact-time {
+    font-size: 0.85rem;
+    color: #777;
+    margin-bottom: 0.35rem;
+  }
+
+  .contact-unread {
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 0.8rem;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+  }
+
+  .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+  }
+
+  .chat-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 1.25rem;
+  }
+
+  .chat-contact-info {
+    flex: 1;
+  }
+
+  .chat-contact-name {
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .chat-contact-status {
+    font-size: 0.95rem;
+    color: #555;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+  }
+
+  .message {
+    display: flex;
+    margin-bottom: 1.5rem;
+  }
+
+  .message.received {
+    justify-content: flex-start;
+  }
+
+  .message.sent {
+    justify-content: flex-end;
+  }
+
+  .message-content {
+    max-width: 75%;
+    padding: 1rem 1.25rem;
+    border-radius: 20px;
+    position: relative;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .received .message-content {
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-bottom-left-radius: 5px;
+  }
+  .sent .message-content {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .message-time {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.5rem;
+    text-align: right;
+  }
+  .sent .message-time {
+    color: rgba(31, 31, 31, 0.7) !important;
+  }
+
+  .chat-input {
+    padding: 1.25rem;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    background: white;
+  }
+
+  .chat-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0.9rem 1.25rem;
+    font-size: 1.05rem;
+    border-radius: 24px;
+    background-color: #f0f2f5;
+  }
+
+  .chat-input button {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-left: 10px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .chat-input button:hover {
+    background-color: var(--primary-color-dark);
+  }
+
+  .chat-input button i {
+    font-size: 1.2rem;
+  }
+
+  /* Empty state when no contact is selected */
+  .empty-conversation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #777;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .empty-conversation i {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    color: #ccc;
+  }
+
+  .empty-conversation h4 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #555;
+  }
+
+  .empty-conversation p {
+    font-size: 1.1rem;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+
+  /* Search box styles */
+  .search-box {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 3rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 24px;
+    outline: none;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .search-box input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.2);
+  }
+
+  .search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 1.1rem;
+  }
+
+  /* Better responsiveness for mobile */
+  @media (max-width: 768px) {
+    .chat-container {
+      flex-direction: column;
+      height: calc(100vh - 180px);
+    }
+    
+    .contacts-list {
+      width: 100%;
+      height: 30%;
+      border-right: none;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .chat-main {
+      height: 70%;
+    }
+    
+    .message-content {
+      max-width: 90%;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Messagerie Clients</h2>
+  <div>
+    <button class="btn btn-outline-primary d-lg-none" id="toggleSidebar">
+      <i class="bi bi-list"></i>
+    </button>
+    {% if unread_messages_count > 0 %}
+    <button class="btn btn-outline-primary">
+      <i class="bi bi-bell"></i>
+      <span class="badge bg-danger">{{ unread_messages_count }}</span>
+    </button>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Chat Interface -->
+<div class="chat-container">
+  <!-- Clients List -->
+  <div class="contacts-list">
+    <div class="contacts-header">
+      <div class="input-group">
+        <span class="input-group-text bg-light border-0">
+          <i class="bi bi-search"></i>
+        </span>
+        <input type="text" class="form-control bg-light border-0" placeholder="Rechercher un client..." id="contactSearch">
+      </div>
+    </div>
+    
+    {% if clients %}
+      {% for client in clients %}        <div class="contact-item {% if active_client.id == client.id %}active{% endif %}" data-contact-id="{{ client.id }}">
+          <img src="{% static 'img/client-default.png' %}" alt="{{ client.name }}" class="contact-avatar">
+          <div class="contact-info">
+            <div class="contact-name">
+              {% if client.is_online %}
+                <span class="client-status status-online"></span>
+              {% else %}
+                <span class="client-status status-offline"></span>
+              {% endif %}
+              {{ client.name|default:client.email }}
+            </div>
+            <div class="contact-preview">{{ client.latest_message|default:"Commencer une conversation..." }}</div>
+          </div>
+          <div class="contact-meta">
+            {% if client.last_message_time %}
+              <div class="contact-time">{{ client.last_message_time|date:"H:i"|default:"" }}</div>
+            {% endif %}
+            {% if client.unread_count > 0 %}
+              <div class="contact-unread">{{ client.unread_count }}</div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Sample client for UI demo if no clients are assigned -->
+      <div class="contact-item active">
+        <img src="{% static 'img/client-default.png' %}" alt="Client" class="contact-avatar">
+        <div class="contact-info">
+          <div class="contact-name">
+            <span class="client-status status-online"></span>
+            Mohammed Abd
+          </div>
+          <div class="contact-preview">Bonjour, j'ai des questions concernant...</div>
+        </div>
+        <div class="contact-meta">
+          <div class="contact-time">10:25</div>
+          <div class="contact-unread">2</div>
+        </div>
+      </div>
+      
+      <div class="contact-item">
+        <img src="{% static 'img/client-default.png' %}" alt="Client" class="contact-avatar">
+        <div class="contact-info">
+          <div class="contact-name">
+            <span class="client-status status-offline"></span>
+            Fatima Benali
+          </div>
+          <div class="contact-preview">Merci pour votre aide avec...</div>
+        </div>
+        <div class="contact-meta">
+          <div class="contact-time">Hier</div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Chat Main Area -->
+  <div class="chat-main">
+    {% if active_client %}
+      <div class="chat-header">
+        <button class="btn btn-sm btn-outline-secondary me-2 d-lg-none" id="showContacts">
+          <i class="bi bi-arrow-left"></i>
+        </button>        <img src="{{ active_client.get_profile_picture_url }}" alt="{{ active_client.get_full_name }}" class="chat-avatar">
+        <div class="chat-contact-info">
+          <div class="chat-contact-name">{{ active_client.get_full_name|default:active_client.email }}</div><div class="chat-contact-status">
+            Client
+            {% if active_client.service %}
+              • {{ active_client.service }}
+            {% endif %}
+          </div>
+        </div>        </div>
+        <div class="chat-messages" id="chatMessages">
+        {% for message in messages|slice:":50" %}
+          <div class="message {% if message.sender == user %}sent{% else %}received{% endif %}">
+            <div class="message-content">
+              <div>{{ message.content|truncatechars:2000|linebreaksbr|escape }}</div>
+              <div class="message-time">{{ message.created_at|date:"H:i" }}</div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="empty-conversation">
+            <i class="bi bi-chat-dots"></i>
+            <h4>Commencez une conversation</h4>
+            <p>Envoyez un message pour démarrer la conversation</p>
+          </div>
+        {% endfor %}
+      </div>
+      
+      <form class="chat-input" id="messageForm" action="{% url 'expert_send_message' active_client.id %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="message" placeholder="Tapez votre message..." id="messageInput" required>
+        <button type="submit">
+          <i class="bi bi-send"></i>
+        </button>
+      </form>
+    {% else %}
+      <div class="empty-conversation">
+        <i class="bi bi-chat-dots"></i>
+        <h4>Sélectionnez un client</h4>
+        <p>Choisissez un client dans la liste pour commencer à discuter</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toggle sidebar on mobile
+    const toggleSidebarBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (toggleSidebarBtn) {
+      toggleSidebarBtn.addEventListener('click', function() {
+        sidebar.classList.toggle('active');
+      });
+    }
+    
+    // Mobile view - show contacts list
+    const showContactsBtn = document.getElementById('showContacts');
+    const contactsList = document.querySelector('.contacts-list');
+    
+    if (showContactsBtn) {
+      showContactsBtn.addEventListener('click', function() {
+        contactsList.classList.add('active');
+      });
+    }
+    
+    // Handle contact item clicks
+    const contactItems = document.querySelectorAll('.contact-item');
+    contactItems.forEach(item => {
+      item.addEventListener('click', function() {
+        // Get contact ID
+        const contactId = this.dataset.contactId;
+        if (contactId) {
+          window.location.href = "{% url 'expert_messages' %}?client=" + contactId;
+        }
+      });
+    });
+    
+    // Contact search functionality
+    const searchInput = document.getElementById('contactSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        contactItems.forEach(item => {
+          const name = item.querySelector('.contact-name').textContent.toLowerCase();
+          if (name.includes(searchTerm)) {
+            item.style.display = 'flex';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Auto-scroll to bottom of chat
+    const chatMessages = document.getElementById('chatMessages');
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Handle message form submission with AJAX
+    const messageForm = document.getElementById('messageForm');
+    const messageInput = document.getElementById('messageInput');
+    
+    if (messageForm) {
+      messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const message = messageInput.value.trim();
+        if (message) {
+          const formData = new FormData(messageForm);
+          
+          // Display the message immediately
+          const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const messageHTML = `
+            <div class="message sent">
+              <div class="message-content">
+                <div>${message}</div>
+                <div class="message-time">${currentTime}</div>
+              </div>
+            </div>
+          `;
+          
+          chatMessages.insertAdjacentHTML('beforeend', messageHTML);
+          messageInput.value = '';
+          
+          // Scroll to bottom
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          
+          // Send the message with AJAX
+          fetch(messageForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          }).then(response => response.json())
+            .then(data => {
+              if (!data.success) {
+                console.error('Error sending message:', data.error);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        }
+      });
+    }
+    
+    // Real-time updates with efficient polling
+    function checkNewMessages() {
+      // Get client_id from URL parameter
+      const urlParams = new URLSearchParams(window.location.search);
+      const clientId = urlParams.get('client');
+      
+      if (clientId) {
+        // Add timestamp to prevent caching
+        const timestamp = new Date().getTime();
+        
+        fetch(`{% url 'custom_requests:expert_check_messages' %}?client=${clientId}&_=${timestamp}`, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.new_messages) {
+            // Instead of reloading the page, fetch the most recent messages
+            fetch(`{% url 'expert_messages' %}?client=${clientId}&ajax=true&_=${timestamp}`, {
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache, no-store, must-revalidate'
+              }
+            })
+            .then(response => response.text())
+            .then(html => {
+              // Reload the page without using cache
+              window.location.reload(true);
+            })
+            .catch(error => {
+              console.error('Error fetching new messages:', error);
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error checking messages:', error);
+        });
+      }
+    }
+    
+    // Run once immediately to verify functionality
+    checkNewMessages();
+    
+    // Poll more frequently for better responsiveness (every 3 seconds)
+    setInterval(checkNewMessages, 3000);
+  });
+</script>
+{% endblock %}
+
+{% block scripts %}
+<!-- Avatar fallback script -->
+<script>  document.addEventListener('DOMContentLoaded', function() {
+    // Create a placeholder avatar with user initials
+    const createDefaultAvatar = (name = 'User') => {
+        // Create a data URL for a default avatar with the user's initials
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 200;
+        const context = canvas.getContext('2d');
+        
+        // Create a gradient background for better aesthetics
+        const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+        gradient.addColorStop(0, '#f0f2f5');
+        gradient.addColorStop(1, '#e1e4e8');
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Add a subtle circular border
+        context.beginPath();
+        context.arc(canvas.width/2, canvas.height/2, 95, 0, 2 * Math.PI);
+        context.strokeStyle = 'rgba(0,0,0,0.1)';
+        context.lineWidth = 3;
+        context.stroke();
+        
+        // Text settings with improved font
+        context.font = 'bold 80px Arial, Helvetica, sans-serif';
+        context.fillStyle = '#5a7184';  // Softer blue-gray for better readability
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        // Get first initials from the name (max 2 characters)
+        let initials = 'U';
+        if (name && name !== 'User' && name !== 'undefined') {
+            initials = name.split(' ')
+                .filter(part => part && part.length > 0)
+                .map(part => part.charAt(0))
+                .join('')
+                .toUpperCase()
+                .substring(0, 2);
+        }
+        
+        // Draw the text with a subtle shadow for depth
+        context.shadowColor = 'rgba(0,0,0,0.1)';
+        context.shadowBlur = 4;
+        context.shadowOffsetX = 1;
+        context.shadowOffsetY = 1;
+        context.fillText(initials, canvas.width/2, canvas.height/2);
+        
+        return canvas.toDataURL('image/png');
+    };
+    
+    // Function to handle broken image fallbacks
+    function setupImageFallbacks() {
+      const avatarImages = document.querySelectorAll('.contact-avatar, .chat-avatar');
+        avatarImages.forEach(function(img) {
+        // Add error handler to each image
+        img.onerror = function() {
+          handleImageError(this);
+        };
+        
+        // Enhanced check for broken images:
+        // 1. Image is fully loaded but has no width (broken)
+        // 2. Image has no source or undefined source
+        // 3. Image source is an invalid URL
+        // 4. Image source ends with default placeholder that doesn't exist
+        if ((img.complete && img.naturalWidth === 0) || 
+            !img.src || 
+            img.src === 'undefined' || 
+            img.src.includes('undefined') ||
+            (img.src.includes('/media/profile_pictures/') && img.src.endsWith('.jpg') && !img.naturalWidth)) {
+            handleImageError(img);
+        }
+        
+        // Also test image validity by trying to fetch it
+        if (img.src && !img.src.startsWith('data:')) {
+            fetch(img.src, { method: 'HEAD' })
+                .catch(() => {
+                    // If fetch fails, the image URL is invalid
+                    if (!img.classList.contains('avatar-fallback')) {
+                        handleImageError(img);
+                    }
+                });
+        }
+      });
+      
+      function handleImageError(img) {
+        // Get the name from alt text
+        const name = img.alt || 'User';
+        
+        // Generate avatar with initials
+        img.src = createDefaultAvatar(name);
+        
+        // Add a special class for additional styling if needed
+        img.classList.add('avatar-fallback');
+        
+        // Remove the error handler to prevent infinite loops
+        img.onerror = null;
+      }
+    }
+      // Run immediately
+    setupImageFallbacks();
+    
+    // Watch for dynamically added images with improved mutation handling
+    const observer = new MutationObserver((mutations) => {
+        let shouldFix = false;
+        
+        // Check if any relevant nodes were added
+        mutations.forEach(mutation => {
+            if (mutation.type === 'childList') {
+                // Check added nodes
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) { // Element node
+                        // If this is an image element that might need fixing
+                        if (node.tagName === 'IMG') {
+                            shouldFix = true;
+                        }
+                        // If this contains image elements that might need fixing
+                        else if (node.querySelector && node.querySelector('img')) {
+                            shouldFix = true;
+                        }
+                    }
+                });
+            }
+            // Check attribute changes (src attribute of images)
+            else if (mutation.type === 'attributes' && 
+                     mutation.attributeName === 'src' && 
+                     mutation.target.tagName === 'IMG') {
+                shouldFix = true;
+            }
+        });
+        
+        // Only run the fix if necessary
+        if (shouldFix) {
+            setupImageFallbacks();
+        }
+    });
+    
+    // Observe the entire body for changes, with all necessary options
+    observer.observe(document.body, {
+        childList: true,    // Watch for added/removed nodes
+        subtree: true,      // Watch all descendants
+        attributes: true,   // Watch attributes
+        attributeFilter: ['src']  // Only care about src attribute changes
+    });
+  });
+</script>
+
+<!-- Include consolidated messaging fixes JavaScript -->
+<script src="{% static 'js/messaging-fixes.js' %}"></script>
+<!-- Include messaging layout fix to prevent vertical text stacking -->
+<script src="{% static 'js/messaging-layout-fix.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,32 @@
+Services Bladi - Nouveau rendez-vous assigné
+
+Bonjour {{ expert_name }},
+
+Un nouveau rendez-vous vous a été assigné avec le client {{ client_name }}.
+
+Détails du rendez-vous:
+Date: {{ appointment_date }}
+Heure: {{ appointment_time }}
+Type: {{ appointment_type }}
+
+Client: {{ client_name }}
+Date d'assignation: {{ "now"|date:"d/m/Y à H:i" }}
+
+Préparez votre rendez-vous:
+- Consultez le dossier du client
+- Préparez les documents nécessaires
+- Vérifiez votre agenda
+- Configurez votre espace de travail
+
+Pour voir le rendez-vous:
+{{ site_url }}/accounts/dashboard/
+
+Important: En cas d'empêchement, prévenez le client et l'administration au plus tôt.
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

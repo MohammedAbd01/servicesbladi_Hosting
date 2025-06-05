@@ -1,0 +1,31 @@
+Services Bladi - Rappel de rendez-vous
+
+Bonjour {{ client_name }},
+
+RAPPEL IMPORTANT: Vous avez un rendez-vous prévu demain avec {{ expert_name }}.
+
+Détails du rendez-vous:
+Date: DEMAIN - {{ appointment_date }}
+Heure: {{ appointment_time }}
+Type: {{ appointment_type }}
+
+Expert: {{ expert_name }}
+
+Checklist de préparation:
+✓ Vérifiez vos documents
+✓ Préparez vos questions  
+✓ Testez votre connexion internet
+✓ Confirmez votre disponibilité
+
+Pour accéder à votre rendez-vous:
+{{ site_url }}/accounts/dashboard/
+
+Besoin de reporter? Contactez votre expert ou notre support au moins 2h avant le rendez-vous.
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

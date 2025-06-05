@@ -1,0 +1,24 @@
+Services Bladi - Nouveau Message
+
+Bonjour {{ recipient_name }},
+
+Vous avez reçu un nouveau message de {{ sender_name }} sur la plateforme Services Bladi.
+
+Message:
+"{{ message_content }}"
+
+{% if request_title %}
+Demande concernée: {{ request_title }}
+Expéditeur: {{ sender_name }}
+{% endif %}
+
+Pour répondre à ce message et continuer la conversation, connectez-vous à votre espace personnel:
+{{ site_url }}/accounts/dashboard/
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

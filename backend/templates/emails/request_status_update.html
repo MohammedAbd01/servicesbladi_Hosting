@@ -1,0 +1,61 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Mise à jour de votre demande - Services Bladi{% endblock %}
+
+{% block header_title %}Mise à jour de demande{% endblock %}
+{% block header_subtitle %}Le statut de votre demande a été mis à jour{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    Nous vous informons que le statut de votre demande a été mis à jour par {{ expert_name }}.
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">📋 Demande:</div>
+    <div class="info-value" style="margin-top: 10px; font-weight: 600; font-size: 18px;">
+        {{ request_title }}
+    </div>
+    {% if request_description %}
+    <div style="margin-top: 10px; color: #666; font-size: 14px;">
+        {{ request_description|truncatewords:20 }}
+    </div>
+    {% endif %}
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">📊 Nouveau statut:</div>
+        <div class="info-value">
+            <span class="status-badge status-{{ status_class }}">
+                {{ new_status }}
+            </span>
+        </div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">👨‍💼 Expert responsable:</div>
+        <div class="info-value">{{ expert_name }}</div>
+    </div>
+</div>
+
+<div class="content">
+    {% if status_class == 'pending' %}
+        Votre demande est en attente de traitement. Nous vous tiendrons informé de l'évolution.
+    {% elif status_class == 'in_progress' %}
+        Votre demande est actuellement en cours de traitement. Notre expert travaille activement sur votre dossier.
+    {% elif status_class == 'completed' %}
+        🎉 Félicitations! Votre demande a été traitée avec succès. Vous pouvez consulter les détails dans votre espace personnel.
+    {% elif status_class == 'cancelled' %}
+        Votre demande a été annulée. Si vous avez des questions, n'hésitez pas à nous contacter.
+    {% endif %}
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        📋 Voir ma demande
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>💡 Important:</strong> Consultez régulièrement votre espace personnel pour suivre l'évolution de vos demandes.
+</div>
+{% endblock %}

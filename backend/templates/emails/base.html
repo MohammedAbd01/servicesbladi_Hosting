@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Services Bladi{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 16px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 18px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .content {
+            font-size: 16px;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+        
+        .highlight-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #1e3c72;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .button {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: transform 0.2s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-in_progress {
+            background-color: #cce7ff;
+            color: #0066cc;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .email-footer {
+            background-color: #1e3c72;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            margin-bottom: 20px;
+        }
+        
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        
+        .footer-link {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 10px;
+            color: white;
+            font-size: 20px;
+            text-decoration: none;
+        }
+        
+        .contact-info {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 20px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0 10px;
+            }
+            
+            .email-body {
+                padding: 30px 20px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .header-title {
+                font-size: 20px;
+            }
+            
+            .greeting {
+                font-size: 16px;
+            }
+            
+            .content {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <img src="https://servicesbladi.com/static/img/logo_principale.png" alt="Services Bladi Logo" class="logo">
+            <h1 class="header-title">{% block header_title %}Services Bladi{% endblock %}</h1>
+            <p class="header-subtitle">{% block header_subtitle %}Services pour les Marocains résidant à l'étranger{% endblock %}</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="email-body">
+            {% block email_content %}
+            <div class="greeting">Bonjour {{ recipient_name|default:"" }},</div>
+            <div class="content">
+                {% block main_content %}
+                Contenu du message par défaut.
+                {% endblock %}
+            </div>
+            {% endblock %}
+        </div>
+        
+        <!-- Footer -->
+        <div class="email-footer">
+            <div class="footer-content">
+                <strong>Services Bladi</strong><br>
+                Votre partenaire pour tous vos démarches administratives
+            </div>
+            
+            <div class="footer-links">
+                <a href="{{ site_url }}" class="footer-link">Accueil</a>
+                <a href="{{ site_url }}/services/" class="footer-link">Services</a>
+                <a href="{{ site_url }}/contact/" class="footer-link">Contact</a>
+                <a href="{{ site_url }}/about/" class="footer-link">À propos</a>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="social-link">📘</a>
+                <a href="#" class="social-link">📧</a>
+                <a href="#" class="social-link">📱</a>
+            </div>
+            
+            <div class="contact-info">
+                <strong>Contactez-nous:</strong><br>
+                📞 +212 5 22 86 34 36 | 📱 +212 6 66 67 97 79<br>
+                🇫🇷 France: +33 783 187 890<br>
+                ✉️ contact@servicesbladi.com
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div style="font-size: 12px; opacity: 0.8;">
+                © 2025 Services Bladi. Tous droits réservés.<br>
+                Vous recevez cet email car vous êtes inscrit sur notre plateforme.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

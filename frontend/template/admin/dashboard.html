@@ -1,0 +1,702 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de bord | Administration{% endblock %}
+
+{% block admin_content %}
+<style>
+  /* Styles de base responsifs */
+  @media (max-width: 768px) {
+    .container-fluid {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    
+    .dashboard-stats {
+      margin-left: -8px;
+      margin-right: -8px;
+    }
+    
+    .dashboard-stats > [class*='col-'] {
+      padding-left: 8px;
+      padding-right: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .dashboard-card {
+      margin: 0;
+      height: 100%;
+    }
+    
+    .dashboard-card .card-body {
+      padding: 1.25rem;
+    }
+    
+    .dashboard-card h3 {
+      font-size: 1.5rem;
+    }
+    
+    .dashboard-card i {
+      font-size: 2rem;
+    }
+    
+    .dashboard-stats .row > div {
+      margin-bottom: 15px;
+    }
+    
+    .dashboard-stats .card {
+      margin-bottom: 15px;
+    }
+    
+    .dashboard-card {
+      margin-bottom: 20px;
+    }
+    
+    .table-responsive {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .mobile-toggle {
+      display: block;
+      margin-bottom: 15px;
+    }
+    
+    .card-header h5 {
+      font-size: 1rem;
+    }
+    
+    .dashboard-stats .card h3 {
+      font-size: 1.5rem;
+    }
+    
+    .dashboard-stats .card i {
+      font-size: 2rem;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .mobile-toggle {
+      display: none;
+    }
+  }
+  
+  /* Additional dashboard-specific styles from expert dashboard */
+  .dashboard-stats .card {
+      transition: transform 0.3s ease;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      background: linear-gradient(145deg, #ffffff, #f8f9fa);
+      overflow: hidden;
+      position: relative;
+    }
+
+  .dashboard-stats .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+  .dashboard-stats .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    }
+
+  .dashboard-stats .card-body {
+      padding: 1.5rem;
+    }
+
+  .dashboard-stats .card i {
+    font-size: 2.5rem;
+    opacity: 0.8;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: transform 0.3s ease;
+  }
+  
+  .dashboard-stats .card:hover i {
+    transform: scale(1.1);
+  }
+
+  .dashboard-stats .card h6 {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .dashboard-stats .card h3 {
+    color: #2c3e50;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  /* Styles pour le bouton de notification from expert dashboard */
+  #notificationButton {
+    padding: 0.6rem 0.75rem; 
+    border-radius: 50%; 
+    width: 42px; 
+    height: 42px; 
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2);
+    transition: all 0.2s ease;
+  }
+  
+  #notificationButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    background-color: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+  }
+  
+  #notificationButton:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Animation pour le dropdown from expert dashboard */
+  #notificationDropdown {
+    transform-origin: top right;
+    animation: notifFadeIn 0.3s ease forwards;
+  }
+  
+  @keyframes notifFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Styles from client dashboard */
+  /* Notification Styles */
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 350px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 10px;
+    animation: slideIn 0.5s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+  
+  .notification-header {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  .notification-header h6 {
+    margin: 0;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  
+  .notification-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .notification-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.3s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: inherit;
+  }
+  
+  .notification-item:hover {
+    background: #f8f9fa;
+  }
+  
+  .notification-item.unread {
+    background: #f8f9fa;
+    border-left: 4px solid #007bff;
+  }
+  
+  .notification-item.unread .unread-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #007bff;
+    transition: opacity 0.5s ease;
+  }
+  
+  .notification-item.unread.read-transition .unread-indicator {
+    opacity: 0;
+  }
+  
+  .notification-item .service {
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .notification-item .message {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+  
+  .notification-item .time {
+    color: #999;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .notification-item .time i {
+    font-size: 0.9rem;
+  }
+  
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .status-en_attente, .status-new, .status-pending_info { background: #fff3cd; color: #856404; }
+  .status-en_cours, .status-in_progress { background: #cce5ff; color: #004085; }
+  .status-termine, .status-completed { background: #d4edda; color: #155724; }
+  .status-annule, .status-cancelled, .status-rejected { background: #f8d7da; color: #721c24; }
+  
+  .notification-empty {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+  }
+  
+  .notification-empty i {
+    font-size: 2rem;
+    color: #ddd;
+    margin-bottom: 10px;
+  }
+  
+  .notification-bell {
+    position: relative;
+    margin-right: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .notification-bell:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .notification-bell:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  /* End of styles from client dashboard */
+
+  /* KEEPING these as they seem specific to admin content structure that were not part of stats-card or activity-card */
+  .activity-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+  }
+  
+  .activity-item:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  .activity-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+  
+  .mobile-toggle { /* Keeping mobile toggle style for admin */
+    display: none;
+  }
+  
+  @media (max-width: 992px) {
+    .mobile-toggle {
+      display: block;
+      margin-bottom: 20px;
+    }
+  }
+
+  /* Styles for recent activity cards */
+  .dashboard-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    transition: transform 0.3s ease;
+  }
+
+  .dashboard-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .dashboard-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.25rem 1.5rem;
+  }
+
+  .dashboard-card .card-header h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .dashboard-card .card-body {
+    padding: 1.5rem;
+  }
+</style>
+
+<div class="container-fluid py-3 py-md-4">
+  <!-- Mobile Sidebar Toggle Button -->
+  <div class="mobile-toggle d-md-none">
+    <button class="btn btn-outline-primary btn-sm mb-3" id="sidebarToggle">
+      <i class="bi bi-list"></i> Menu
+    </button>
+  </div>
+  
+  <div class="row">
+    <div class="col-12 d-flex align-items-center justify-content-between mb-4">
+      <h1 class="mb-0">Tableau de bord</h1>
+      <div class="dropdown">
+        <a class="btn btn-primary dropdown-toggle d-flex align-items-center" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-circle me-2"></i>
+          <span>{{ user.first_name }} {{ user.name }}</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="{% url 'admin_profile' %}"><i class="bi bi-person me-2"></i>Mon Profil</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+              {% csrf_token %}
+              <button type="submit" class="dropdown-item bg-transparent border-0" style="background: none;">
+                <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+              </button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards Row -->
+  <div class="row g-2 g-md-3 dashboard-stats">
+    <div class="col-6 col-md-6 col-lg-3">
+      <div class="dashboard-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted">Utilisateurs</h6>
+              <h3>{{ total_users|default:"0" }}</h3>
+            </div>
+            <i class="bi bi-people-fill text-primary"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-6 col-md-6 col-lg-3">
+      <div class="dashboard-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted">Clients</h6>
+              <h3>{{ total_clients|default:"0" }}</h3>
+            </div>
+            <i class="bi bi-person-vcard text-success"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-6 col-md-6 col-lg-3">
+      <div class="dashboard-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted">Experts</h6>
+              <h3>{{ total_experts|default:"0" }}</h3>
+            </div>
+            <i class="bi bi-person-workspace text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-6 col-md-6 col-lg-3">
+      <div class="dashboard-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="text-muted">Demandes</h6>
+              <h3>{{ total_requests|default:"0" }}</h3>
+            </div>
+            <i class="bi bi-file-text text-info"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <!-- Recent Activity Row -->
+  <div class="row g-3 mt-2">
+    <div class="col-12 col-lg-6 mb-4">
+      <div class="dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Demandes récentes</h5>
+          <a href="{% url 'admin_demandes' %}" class="btn btn-sm btn-primary">Voir tout</a>
+        </div>
+        <div class="card-body">
+          {% if recent_requests %}
+            {% for request in recent_requests %}
+              <div class="activity-item d-flex align-items-center">
+                <div class="activity-icon bg-primary">
+                  <i class="bi bi-file-text"></i>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">{{ request.service.name }}</h6>
+                  <small class="text-muted">
+                    <i class="bi bi-person me-1"></i> {{ request.client.user.first_name }} {{ request.client.user.name }}
+                    <i class="bi bi-clock ms-2 me-1"></i> {{ request.created_at|date:"d/m/Y" }}
+                  </small>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+              <p class="mt-2">Aucune demande récente</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-6 col-md-12 mb-4">
+      <div class="dashboard-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Utilisateurs récents</h5>
+          <a href="{% url 'admin_users' %}" class="btn btn-sm btn-primary">Voir tout</a>
+        </div>
+        <div class="card-body">
+          {% if recent_users %}
+            {% for user in recent_users %}
+              <div class="activity-item d-flex align-items-center">
+                <div class="activity-icon 
+                  {% if user.account_type == 'client' %}bg-success
+                  {% elif user.account_type == 'expert' %}bg-warning
+                  {% else %}bg-info{% endif %}">
+                  <i class="bi bi-person"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1">{{ user.first_name }} {{ user.name }}</h6>
+                  <small class="text-muted">
+                    <i class="bi bi-envelope me-1"></i> {{ user.email }}
+                    <span class="badge 
+                      {% if user.account_type == 'client' %}bg-success
+                      {% elif user.account_type == 'expert' %}bg-warning
+                      {% else %}bg-info{% endif %} ms-2">
+                      {{ user.account_type|title }}
+                    </span>
+                  </small>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-4">
+              <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+              <p class="mt-2">Aucun nouvel utilisateur</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Script pour le bouton de menu mobile
+  document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (sidebarToggle && sidebar) {
+      sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('show');
+      });
+    }
+    
+    // Fermer le menu au clic en dehors sur mobile
+    document.addEventListener('click', function(event) {
+      if (window.innerWidth < 768 && !event.target.closest('.sidebar') && !event.target.closest('#sidebarToggle')) {
+        sidebar.classList.remove('show');
+      }
+    });
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Initialize AOS
+  AOS.init({
+    duration: 1000,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false
+  });
+
+  // Toggle sidebar on mobile
+  document.querySelector('.btn-outline-primary').addEventListener('click', function() {
+    document.querySelector('.sidebar').classList.toggle('active');
+  });
+
+  // Update admin name if not already set by Django
+  document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('adminName') && document.getElementById('adminName').textContent.trim() === ' ') {
+      document.getElementById('adminName').textContent = 'Admin';
+    }
+
+    // Requests by service chart
+    {% if service_requests %}
+    const requestsCtx = document.getElementById('requestsChart').getContext('2d');
+    new Chart(requestsCtx, {
+      type: 'bar',
+      data: {
+        labels: [{% for item in service_requests %}'{{ item.name }}',{% endfor %}],
+        datasets: [{
+          label: 'Nombre de demandes',
+          data: [{% for item in service_requests %}{{ item.count }},{% endfor %}],
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(255, 206, 86, 0.6)',
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+    {% endif %}
+
+    // User type chart
+    {% if user_type_counts %}
+    const userTypeCtx = document.getElementById('userTypeChart').getContext('2d');
+    new Chart(userTypeCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Clients', 'Experts', 'Administrateurs'],
+        datasets: [{
+          data: [
+            {{ user_type_counts.client|default:0 }}, 
+            {{ user_type_counts.expert|default:0 }}, 
+            {{ user_type_counts.admin|default:0 }}
+          ],
+          backgroundColor: [
+            'rgba(40, 167, 69, 0.7)',
+            'rgba(255, 193, 7, 0.7)',
+            'rgba(23, 162, 184, 0.7)'
+          ],
+          borderColor: [
+            'rgba(40, 167, 69, 1)',
+            'rgba(255, 193, 7, 1)',
+            'rgba(23, 162, 184, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+    {% endif %}
+  });
+</script>
+{% endblock %}

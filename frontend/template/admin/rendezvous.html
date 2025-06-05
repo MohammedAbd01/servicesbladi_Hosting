@@ -1,0 +1,497 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Rendez-vous | Administration{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Gestion des Rendez-vous</h1>
+  </div>
+
+  <!-- Statistics Row -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-primary">
+          <i class="bi bi-calendar-date"></i>
+        </div>
+        <div class="count">{{ stats.total }}</div>
+        <div class="title">Total Rendez-vous</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-warning">
+          <i class="bi bi-calendar-week"></i>
+        </div>
+        <div class="count">{{ stats.upcoming }}</div>
+        <div class="title">À venir</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-success">
+          <i class="bi bi-calendar-check"></i>
+        </div>
+        <div class="count">{{ stats.completed }}</div>
+        <div class="title">Terminés</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-danger">
+          <i class="bi bi-calendar-x"></i>
+        </div>
+        <div class="count">{{ stats.cancelled }}</div>
+        <div class="title">Annulés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section mb-4">
+    <form method="get" class="row g-3">
+      <div class="col-md-2">
+        <label for="date" class="form-label">Date</label>
+        <select id="date" name="date" class="form-select">
+          <option value="">Toutes les dates</option>
+          <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Aujourd'hui</option>
+          <option value="tomorrow" {% if date_filter == 'tomorrow' %}selected{% endif %}>Demain</option>
+          <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Cette semaine</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="status" class="form-label">Statut</label>
+        <select id="status" name="status" class="form-select">
+          <option value="">Tous les statuts</option>
+          <option value="scheduled" {% if status_filter == 'scheduled' %}selected{% endif %}>Planifié</option>
+          <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Terminé</option>
+          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Annulé</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="client" class="form-label">Client</label>
+        <select id="client" name="client" class="form-select">
+          <option value="">Tous les clients</option>
+          {% for client in clients %}
+          <option value="{{ client.id }}" {% if client_id|stringformat:"s" == client.id|stringformat:"s" %}selected{% endif %}>
+            {{ client.first_name }} {{ client.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="expert" class="form-label">Expert</label>
+        <select id="expert" name="expert" class="form-select">
+          <option value="">Tous les experts</option>
+          {% for expert in experts %}
+          <option value="{{ expert.id }}" {% if expert_id|stringformat:"s" == expert.id|stringformat:"s" %}selected{% endif %}>
+            {{ expert.first_name }} {{ expert.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="search" class="form-label">Recherche</label>
+        <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}">
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-filter"></i> Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Appointments List -->
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="card-title mb-0">Liste des Rendez-vous</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Expert</th>
+              <th>Service</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for appointment in appointments %}
+            <tr>
+              <td>{{ appointment.date_time|date:"d/m/Y H:i" }}</td>
+              <td>{{ appointment.client.first_name }} {{ appointment.client.name }}</td>
+              <td>{{ appointment.expert.first_name }} {{ appointment.expert.name }}</td>
+              <td>
+                {% if appointment.service_request %}
+                {{ appointment.service_request.service.title }}
+                {% elif appointment.service %}
+                {{ appointment.service.title }}
+                {% else %}
+                N/A
+                {% endif %}
+              </td>
+              <td>{{ appointment.get_consultation_type_display }}</td>
+              <td>
+                {% if appointment.status == 'scheduled' %}
+                <span class="badge bg-info">En attente</span>
+                {% elif appointment.status == 'confirmed' %}
+                <span class="badge bg-primary">Confirmé</span>
+                {% elif appointment.status == 'completed' %}
+                <span class="badge bg-success">Terminé</span>
+                {% elif appointment.status == 'cancelled' %}
+                <span class="badge bg-danger">Annulé</span>
+                {% elif appointment.status == 'missed' %}
+                <span class="badge bg-secondary">Manqué</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ appointment.id }}">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ appointment.id }}">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">Aucun rendez-vous trouvé</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      {% if appointments.paginator.num_pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          {% if appointments.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if date_filter %}&date={{ date_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if client_id %}&client={{ client_id }}{% endif %}{% if expert_id %}&expert={{ expert_id }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ appointments.previous_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if client_id %}&client={{ client_id }}{% endif %}{% if expert_id %}&expert={{ expert_id }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+          {% endif %}
+          
+          {% for i in appointments.paginator.page_range %}
+            {% if appointments.number == i %}
+              <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% elif i > appointments.number|add:'-3' and i < appointments.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if client_id %}&client={{ client_id }}{% endif %}{% if expert_id %}&expert={{ expert_id }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if appointments.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ appointments.next_page_number }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if client_id %}&client={{ client_id }}{% endif %}{% if expert_id %}&expert={{ expert_id }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ appointments.paginator.num_pages }}{% if date_filter %}&date={{ date_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if client_id %}&client={{ client_id }}{% endif %}{% if expert_id %}&expert={{ expert_id }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;&raquo;</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- View Appointment Modals -->
+{% for appointment in appointments %}
+<div class="modal fade" id="viewModal{{ appointment.id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ appointment.id }}" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewModalLabel{{ appointment.id }}">Détails du rendez-vous</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="mb-3">Informations générales</h6>
+            <p><strong>Date et heure :</strong> {{ appointment.date_time|date:"d/m/Y H:i" }}</p>
+            <p><strong>Statut :</strong> 
+              {% if appointment.status == 'scheduled' %}
+              <span class="badge bg-info">En attente</span>
+              {% elif appointment.status == 'confirmed' %}
+              <span class="badge bg-primary">Confirmé</span>
+              {% elif appointment.status == 'completed' %}
+              <span class="badge bg-success">Terminé</span>
+              {% elif appointment.status == 'cancelled' %}
+              <span class="badge bg-danger">Annulé</span>
+              {% elif appointment.status == 'missed' %}
+              <span class="badge bg-secondary">Manqué</span>
+              {% endif %}
+            </p>
+            <p><strong>Type de consultation :</strong> {{ appointment.get_consultation_type_display }}</p>
+            {% if appointment.duration %}
+            <p><strong>Durée :</strong> {{ appointment.duration }} minutes</p>
+            {% endif %}
+          </div>
+          <div class="col-md-6">
+            <h6 class="mb-3">Participants</h6>
+            <p><strong>Client :</strong> {{ appointment.client.first_name }} {{ appointment.client.name }}</p>
+            <p><strong>Expert :</strong> {{ appointment.expert.first_name }} {{ appointment.expert.name }}</p>
+            {% if appointment.service %}
+            <p><strong>Service :</strong> {{ appointment.service.title }}</p>
+            {% endif %}
+          </div>
+        </div>
+        
+        {% if appointment.notes %}
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6 class="mb-3">Notes</h6>
+            <p>{{ appointment.notes }}</p>
+          </div>
+        </div>
+        {% endif %}
+        
+        {% if appointment.service_request %}
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6 class="mb-3">Demande associée</h6>
+            <p><strong>Titre :</strong> {{ appointment.service_request.title }}</p>
+            <p><strong>Description :</strong> {{ appointment.service_request.description }}</p>
+            <p><strong>Statut :</strong> {{ appointment.service_request.get_status_display }}</p>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Cancel Appointment Modals -->
+{% for appointment in appointments %}
+<div class="modal fade" id="cancelModal{{ appointment.id }}" tabindex="-1" aria-labelledby="cancelModalLabel{{ appointment.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{% url 'admin_cancel_appointment' appointment.id %}" method="post">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="cancelModalLabel{{ appointment.id }}">Annuler le rendez-vous</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Êtes-vous sûr de vouloir annuler ce rendez-vous ?</p>
+          <p><strong>Date :</strong> {{ appointment.date_time|date:"d/m/Y H:i" }}</p>
+          <p><strong>Client :</strong> {{ appointment.client.first_name }} {{ appointment.client.name }}</p>
+          <p><strong>Expert :</strong> {{ appointment.expert.first_name }} {{ appointment.expert.name }}</p>
+          
+          <div class="mb-3 mt-3">
+            <label for="cancel_reason{{ appointment.id }}" class="form-label">Raison de l'annulation</label>
+            <textarea class="form-control" id="cancel_reason{{ appointment.id }}" name="cancel_reason" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <button type="submit" class="btn btn-danger">Annuler le rendez-vous</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Set min date to today for date inputs
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(input => {
+    input.min = today;
+  });
+
+  // Handle cancel appointment form submission
+  document.querySelectorAll('form[action*="cancel"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      
+      // Vérifier si la raison d'annulation est remplie
+      const cancelReason = formData.get('cancel_reason');
+      if (!cancelReason || cancelReason.trim() === '') {
+        alert('Veuillez fournir une raison pour l\'annulation.');
+        return;
+      }
+      
+      // Afficher un message de confirmation
+      if (!confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')) {
+        return;
+      }
+
+      // Afficher les données envoyées pour le débogage
+      console.log('Envoi de la requête d\'annulation...');
+      console.log('URL:', this.action);
+      console.log('Raison:', cancelReason);
+      console.log('CSRF Token:', csrfToken);
+      
+      // Afficher toutes les données du formulaire
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+      
+      fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrfToken
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => {
+        console.log('Réponse reçue:', response.status);
+        console.log('Headers:', response.headers);
+        // Si la réponse est ok (200) ou une redirection (302), on recharge la page
+        if (response.ok || response.status === 302) {
+          console.log('Annulation réussie ou redirection, rechargement de la page...');
+          window.location.reload();
+        } else {
+          return response.text().then(text => {
+            console.error('Réponse du serveur:', text);
+            throw new Error(`Erreur ${response.status}: ${text}`);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+        alert('Une erreur est survenue lors de l\'annulation du rendez-vous. Veuillez réessayer.');
+      });
+    });
+  });
+});
+</script>
+{% endblock admin_content %}
+
+<style>
+  .sidebar {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 2rem;
+  }
+
+  .appointment-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+  }
+
+  .appointment-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .appointment-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+  }
+
+  .status-confirmed {
+    background-color: #f6ffed;
+    color: #52c41a;
+  }
+
+  .status-pending {
+    background-color: #fff7e6;
+    color: #fa8c16;
+  }
+
+  .status-cancelled {
+    background-color: #fff1f0;
+    color: #f5222d;
+  }
+
+  .status-completed {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+
+  .appointment-type {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+  }
+
+  .type-consultation {
+    background-color: #e6f7ff;
+    color: #1890ff;
+  }
+
+  .type-documentation {
+    background-color: #f6ffed;
+    color: #52c41a;
+  }
+
+  .type-other {
+    background-color: #f9f0ff;
+    color: #722ed1;
+  }
+
+  @media (max-width: 992px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+    .main-content {
+      margin-left: 0;
+    }
+    .sidebar.active {
+      transform: translateX(0);
+    }
+  }
+</style>
+
+</body>
+
+</html> 

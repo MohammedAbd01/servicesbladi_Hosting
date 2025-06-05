@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant MRE - Services aux Marocains Résidant à l'Étranger</title>
+    <link rel="stylesheet" href="{% load static %}{% static 'chatbot-mre.css' %}">
+</head>
+<body>
+    <!-- Bouton d'ouverture du chatbot -->
+    <div id="chatbot-button" class="chatbot-button">
+        <div class="chatbot-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <span class="chatbot-text">Assistant MRE</span>
+    </div>
+
+    <!-- Fenêtre du chatbot -->
+    <div id="chatbot-window" class="chatbot-window">
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop&crop=face&auto=format" alt="Assistant MRE" />
+            </div>
+            <div class="chatbot-info">
+                <h3>Assistant MRE</h3>
+                <p>Expert en services pour les Marocains à l'étranger</p>
+            </div>
+            <button id="chatbot-close" class="chatbot-close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face&auto=format" alt="Bot" />
+                </div>
+                <div class="message-content">
+                    <p><span class="morocco-flag"></span> Bienvenue ! Je suis votre assistant spécialisé pour les services aux Marocains Résidant à l'Étranger.</p>
+                    <p>Je peux vous aider avec :</p>
+                    <ul>
+                        <li>📊 Questions fiscales</li>
+                        <li>🏠 Immobilier au Maroc</li>
+                        <li>💰 Investissements</li>
+                        <li>📋 Démarches administratives</li>
+                        <li>🎓 Formation professionnelle</li>
+                    </ul>
+                    <p>Comment puis-je vous aider aujourd'hui ?</p>
+                    {% if not user_is_client %}
+                    <div class="action-buttons">
+                        <a href="{% url 'accounts:register' %}" class="action-btn">✨ S'inscrire</a>
+                        <a href="{% url 'accounts:login' %}" class="action-btn">🔑 Se connecter</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chatbot-input-container">
+            <div class="chatbot-input-wrapper">
+                <input type="text" id="chatbot-input" placeholder="Posez votre question sur les services MRE..." />
+                <button id="chatbot-send" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="chatbot-typing" id="chatbot-typing" style="display: none;">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span>L'assistant tape...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration transmise par Django
+        window.userIsClient = {{ user_is_client|yesno:"true,false" }};
+        window.chatbotApiUrl = "{% url 'chatbot:chat_api' %}";
+        window.feedbackApiUrl = "{% url 'chatbot:feedback_api' %}";
+        
+        // URLs Django pour les actions
+        window.registerUrl = "{% url 'accounts:register' %}";
+        window.loginUrl = "{% url 'accounts:login' %}";
+        {% if user_is_client %}
+        window.serviceRequestUrl = "{% url 'custom_requests:create' %}";
+        window.myServicesUrl = "{% url 'custom_requests:client_dashboard' %}";
+        {% endif %}
+    </script>
+    <script src="{% load static %}{% static 'chatbot-mre.js' %}"></script>
+</body>
+</html>

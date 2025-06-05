@@ -1,0 +1,518 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Messagerie - MRE{% endblock %}
+{% block meta_description %}Espace de messagerie client MRE{% endblock %}
+{% block meta_keywords %}MRE, messagerie, communication, experts{% endblock %}
+
+{% block head_extras %}
+<!-- Include consolidated messaging fixes -->
+<link rel="stylesheet" href="{% static 'css/messaging-fixes.css' %}">
+<!-- Critical fixes - must load last -->
+<link rel="stylesheet" href="{% static 'css/messaging-critical-fixes.css' %}">
+<!-- Add URL metadata for JavaScript -->
+<meta name="check-messages-url" content="/requests/client/check_messages/">
+<meta name="client-messages-url" content="/client/messages/">
+{% endblock %}
+
+{% block content %}
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>Messagerie</h2>
+      <div class="d-flex gap-2">
+        {% if unread_messages_count > 0 %}
+        <button class="btn btn-outline-primary">
+          <i class="bi bi-bell"></i>
+          <span class="badge bg-danger">{{ unread_messages_count }}</span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div class="chat-container">
+      <!-- Contacts List -->
+      <div class="contacts-list">
+        <div class="contacts-header">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-0">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text" class="form-control bg-light border-0" placeholder="Rechercher..." id="contactSearch">
+          </div>
+        </div>
+        
+        {% if contacts %}
+          {% for contact in contacts %}
+            <div class="contact-item {% if active_contact.id == contact.user.id %}active{% endif %}" data-contact-id="{{ contact.user.id }}">
+              <img src="{{ contact.user.get_profile_picture_url }}" alt="{{ contact.user.name }}" class="contact-avatar">
+              <div class="contact-info">
+                <div class="contact-name">{{ contact.user.name }} {{ contact.user.first_name }}</div>
+                <div class="contact-preview">{{ contact.last_message }}</div>
+              </div>
+              <div class="contact-meta">
+                {% if contact.last_message_time %}
+                  <div class="contact-time">{{ contact.last_message_time|date:"H:i" }}</div>
+                {% endif %}
+                {% if contact.unread_count > 0 %}
+                  <div class="contact-unread">{{ contact.unread_count }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="contact-item active">
+            <img src="{% static 'img/admin-default.png' %}" alt="Support" class="contact-avatar">
+            <div class="contact-info">
+              <div class="contact-name">Support ServicesBladi</div>
+              <div class="contact-preview">Comment pouvons-nous vous aider?</div>
+            </div>
+            <div class="contact-meta">
+              <div class="contact-time">Aujourd'hui</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        {% if active_contact %}
+          <div class="chat-header">
+            <button class="btn btn-sm btn-outline-secondary me-2 d-lg-none" id="showContacts">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <img src="{{ active_contact.get_profile_picture_url }}" alt="{{ active_contact.name }}" class="chat-avatar">
+            <div class="chat-contact-info">
+              <div class="chat-contact-name">{{ active_contact.name }} {{ active_contact.first_name }}</div>
+              <div class="chat-contact-status">
+                {% if active_contact.account_type == 'expert' %}Expert{% elif active_contact.account_type == 'admin' %}Administrateur{% else %}Client{% endif %}
+              </div>
+            </div>          </div>
+            <div class="chat-messages" id="chatMessages">
+            {% for message in messages|slice:":50" %}
+              <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <div class="message-content">
+                  <div>{{ message.content|truncatechars:2000|linebreaksbr|escape }}</div>
+                  <div class="message-time">{{ message.sent_at|date:"H:i" }}</div>
+                </div>
+              </div>
+            {% empty %}
+              <div class="empty-conversation">
+                <i class="bi bi-chat-dots"></i>
+                <h4>Commencez une conversation</h4>
+                <p>Envoyez un message pour démarrer la conversation</p>
+              </div>
+            {% endfor %}
+          </div>
+            <form class="chat-input" id="messageForm" action="/requests/client/send_message/{{ active_contact.id }}/" method="post">
+            {% csrf_token %}
+            <input type="text" name="message" placeholder="Tapez votre message..." id="messageInput" required>
+            <button type="submit">
+              <i class="bi bi-send"></i>
+            </button>
+          </form>
+        {% else %}
+          <div class="empty-conversation">
+            <i class="bi bi-chat-dots"></i>
+            <h4>Sélectionnez un contact</h4>
+            <p>Choisissez un contact dans la liste pour commencer à discuter</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Chat interface styles */
+    .chat-container {
+      display: flex;
+      height: calc(100vh - 210px);
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .contacts-list {
+      width: 300px;
+      border-right: 1px solid #eee;
+      overflow-y: auto;
+    }
+
+    .contacts-header {
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      position: sticky;
+      top: 0;
+      background: white;
+      z-index: 10;
+    }
+
+    .contact-item {
+      display: flex;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f5f5f5;
+      cursor: pointer;
+      transition: background 0.2s;
+      align-items: center;
+    }
+
+    .contact-item:hover, .contact-item.active {
+      background: #f8f9fa;
+    }
+
+    .contact-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+    }
+
+    .contact-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .contact-name {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-preview {
+      font-size: 0.8rem;
+      color: #6c757d;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin-left: 0.5rem;
+    }
+
+    .contact-time {
+      font-size: 0.7rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+
+    .contact-unread {
+      background: var(--primary-color);
+      color: white;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 10px;
+      min-width: 1.2rem;
+      text-align: center;
+    }
+
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+    }
+
+    .chat-contact-info {
+      flex: 1;
+    }
+
+    .chat-contact-name {
+      font-weight: 500;
+    }
+
+    .chat-contact-status {
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background: #f8f9fa;
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      display: flex;
+    }
+
+    .message.sent {
+      justify-content: flex-end;
+    }
+
+    .message-content {
+      max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      position: relative;
+    }    .sent .message-content {
+      background: #DCF8C6 !important;
+      background-color: #DCF8C6 !important;
+      color: #1f1f1f !important;
+      border-bottom-right-radius: 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .received .message-content {
+      background: white;
+      border: 1px solid #eee;
+      border-bottom-left-radius: 0;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      margin-top: 0.25rem;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 0.75rem;
+      border-top: 1px solid #eee;
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: 1px solid #eee;
+      border-radius: 20px;
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+    }
+
+    .chat-input button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .chat-input button:hover {
+      background: var(--secondary-color);
+    }
+
+    /* Placeholder for empty conversation */
+    .empty-conversation {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #999;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .empty-conversation i {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .contacts-list {
+        width: 100%;
+        position: absolute;
+        height: 100%;
+        z-index: 5;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      .contacts-list.active {
+        transform: translateX(0);
+      }
+      .chat-header {
+        padding: 0.75rem;
+      }
+    }
+  </style>    <script>
+// Client Messages - Ultra Safe Anti-Crash Script
+(function() {
+    'use strict';
+    
+    // Safety constants - minimal settings to prevent crashes
+    const SAFE_CONFIG = {
+        maxMessages: 25,
+        clickDelay: 2000,        // 2 second delay between clicks
+        messageLimit: 1000,      // Shorter message limit
+        maxRetries: 2,           // Fewer retries
+        pollDisabled: true       // Disable polling completely for safety
+    };
+    
+    let lastClickTime = 0;
+    let isNavigating = false;
+    
+    // Ultra-safe contact click handler
+    function handleContactClick(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const now = Date.now();
+        if (now - lastClickTime < SAFE_CONFIG.clickDelay) {
+            console.log('Click ignored - too soon');
+            return false;
+        }
+        
+        if (isNavigating) {
+            console.log('Already navigating');
+            return false;
+        }
+        
+        lastClickTime = now;
+        
+        try {
+            const contactId = this.dataset.contactId;
+            if (!contactId || !/^\d+$/.test(contactId)) {
+                console.warn('Invalid contact ID');
+                return false;
+            }
+            
+            const id = parseInt(contactId, 10);
+            if (isNaN(id) || id <= 0) {
+                console.warn('Invalid contact ID number');
+                return false;
+            }
+            
+            isNavigating = true;
+            
+            // Show visual feedback
+            this.style.opacity = '0.5';
+            
+            // Navigate after short delay
+            setTimeout(() => {
+                try {
+                    window.location.href = `/client/messages/?contact=${id}`;
+                } catch (error) {
+                    console.error('Navigation error:', error);
+                    isNavigating = false;
+                    this.style.opacity = '1';
+                }
+            }, 200);
+            
+        } catch (error) {
+            console.error('Contact click error:', error);
+            isNavigating = false;
+            this.style.opacity = '1';
+        }
+        
+        return false;
+    }
+    
+    // Ultra-safe search function
+    function safeSearch(searchTerm) {
+        if (!searchTerm || searchTerm.length > 50) return;
+        
+        try {
+            const items = document.querySelectorAll('.contact-item');
+            for (let i = 0; i < items.length && i < 20; i++) {
+                const item = items[i];
+                const nameEl = item.querySelector('.contact-name');
+                if (nameEl && nameEl.textContent) {
+                    const name = nameEl.textContent.toLowerCase();
+                    item.style.display = name.includes(searchTerm.toLowerCase()) ? 'flex' : 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+        }
+    }
+    
+    // Simple initialization without complex features
+    function initSafeMessaging() {
+        try {
+            // Setup contact clicks with safety
+            const contactItems = document.querySelectorAll('.contact-item');
+            contactItems.forEach(item => {
+                if (item.dataset.contactId) {
+                    item.removeEventListener('click', handleContactClick); // Remove any existing
+                    item.addEventListener('click', handleContactClick);
+                }
+            });
+            
+            // Setup search (simplified)
+            const searchInput = document.getElementById('contactSearch');
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', function(e) {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        safeSearch(e.target.value.trim());
+                    }, 500);
+                });
+            }
+            
+            // Safe scroll to bottom
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                try {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } catch (scrollError) {
+                    console.warn('Scroll error ignored');
+                }
+            }
+            
+            // Mobile contacts button
+            const showContactsBtn = document.getElementById('showContacts');
+            const contactsList = document.querySelector('.contacts-list');
+            if (showContactsBtn && contactsList) {
+                showContactsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    contactsList.classList.add('active');
+                });
+            }
+            
+            console.log('Safe messaging initialized');
+            
+        } catch (error) {
+            console.error('Init error:', error);
+        }
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSafeMessaging);
+    } else {
+        initSafeMessaging();
+    }
+    
+    // Global error handler
+    window.addEventListener('error', function(e) {
+        console.error('Global error caught and handled:', e.error);
+        e.preventDefault();
+        return true;
+    });
+    
+})();
+</script>
+{% endblock %}

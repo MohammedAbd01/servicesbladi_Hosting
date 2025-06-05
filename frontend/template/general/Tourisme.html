@@ -1,0 +1,405 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block title %}Services Touristiques | MRE{% endblock %}
+
+{% block meta_description %}Services touristiques pour les Marocains Résidant à l'Étranger{% endblock %}
+{% block meta_keywords %}tourisme, Maroc, MRE, voyage, séjour{% endblock %}
+
+{% block extra_css %}
+<style>
+  .service-item {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .service-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-content {
+    border-radius: 15px;
+    border: none;
+  }
+
+  .modal-header {
+    border-bottom: none;
+    padding: 20px 30px;
+  }
+
+  .modal-body {
+    padding: 20px 30px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    border-top: none;
+    padding: 20px 30px;
+  }
+
+  .service-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .service-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .service-list li {
+    margin-bottom: 10px;
+    padding-left: 30px;
+    position: relative;
+  }
+
+  .service-list li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #28a745;
+  }
+
+  #hero {
+    height: 9cm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Styles pour permettre le scroll de la page */
+  body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+  }
+
+  .modal {
+    overflow-y: auto;
+  }
+
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1040;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main">
+  <section id="hero" class="hero section dark-background">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-center">
+          <h1>Services Touristiques</h1>
+          <p>Découvrez le Maroc authentique avec nos services touristiques personnalisés</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="services" class="services section">
+    <div class="container">
+      <div class="row gy-4 justify-content-center">
+        <div class="col-lg-3 col-md-6" data-aos="fade-up">
+          <div class="service-item position-relative text-center">
+            <div class="icon mb-3">
+              <i class="bi bi-geo-alt-fill icon-geo"></i>
+            </div>
+
+            <h3><a href="#modalDestinations" data-bs-toggle="modal">Destinations Principales</a></h3>
+            <p>Explorez les merveilles du Maroc à travers nos circuits sélectionnés mettant en valeur les trésors culturels, historiques et naturels du royaume.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="service-item position-relative text-center">
+            <div class="icon mb-3">
+              <i class="bi bi-heart-fill icon-heart"></i>
+            </div>
+            <h3><a href="#modalBienEtre" data-bs-toggle="modal">Destinations Bien-être</a></h3>
+            <p>Ressourcez-vous dans nos havres de paix dédiés à la relaxation et au bien-être. Découvrez les traditions ancestrales marocaines de soins et de détente.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="service-item position-relative text-center">
+            <div class="icon mb-3">
+              <i class="bi bi-book-fill icon-book"></i>
+            </div>
+            <h3><a href="#modalUniversite" data-bs-toggle="modal">Université d'Été 2025</a></h3>
+            <p>Participez à notre programme exclusif combinant apprentissage, découverte culturelle et échanges enrichissants pendant la période estivale.</p>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+          <div class="service-item position-relative text-center">
+            <div class="icon mb-3">
+              <i class="bi bi-briefcase-fill icon-briefcase"></i>
+            </div>
+            <h3><a href="#modalSejours" data-bs-toggle="modal">Organisation de Séjours</a></h3>
+            <p>Bénéficiez de notre expertise pour planifier des séjours sur mesure répondant parfaitement à vos attentes, que ce soit en groupe, en famille ou en individuel.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modals for each card -->
+  <!-- Modal for Destinations Principales -->
+  <div class="modal fade" id="modalDestinations" tabindex="-1" aria-labelledby="modalDestinationsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalDestinationsLabel">Destinations Principales</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Circuits Culturels</h6>
+              <ul class="service-list">
+                <li>Marrakech et ses médinas historiques</li>
+                <li>Fès, capitale spirituelle et intellectuelle</li>
+                <li>Chefchaouen, la perle bleue du Rif</li>
+                <li>Meknès, ville impériale</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Sites Naturels</h6>
+              <ul class="service-list">
+                <li>Désert du Sahara et ses dunes</li>
+                <li>Atlas et ses villages berbères</li>
+                <li>Côte atlantique et ses plages</li>
+                <li>Cascades d'Ouzoud et de Ras El Ma</li>
+              </ul>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Séjours Balnéaires</h6>
+              <ul class="service-list">
+                <li>Agadir et ses stations balnéaires</li>
+                <li>Essaouira, la cité des alizés</li>
+                <li>Tanger et ses plages méditerranéennes</li>
+                <li>Saïdia, la perle bleue du nord</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Circuits Gastronomiques</h6>
+              <ul class="service-list">
+                <li>Découverte des saveurs marocaines</li>
+                <li>Ateliers culinaires traditionnels</li>
+                <li>Dégustations de thé à la menthe</li>
+                <li>Marchés locaux et souks d'épices</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="{% url 'accounts:login' %}" class="btn btn-primary">Réserver un circuit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Bien-être -->
+  <div class="modal fade" id="modalBienEtre" tabindex="-1" aria-labelledby="modalBienEtreLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalBienEtreLabel">Destinations Bien-être</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Hammams et Spas</h6>
+              <ul class="service-list">
+                <li>Rituels de bien-être traditionnels</li>
+                <li>Massages à l'huile d'argan</li>
+                <li>Soins du corps au savon noir</li>
+                <li>Hammams royaux et authentiques</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Retraites de Yoga</h6>
+              <ul class="service-list">
+                <li>Séances de yoga en plein désert</li>
+                <li>Méditation dans les montagnes de l'Atlas</li>
+                <li>Yoga sur les plages d'Essaouira</li>
+                <li>Retraites holistiques et détox</li>
+              </ul>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Thermalisme</h6>
+              <ul class="service-list">
+                <li>Stations thermales de Moulay Yacoub</li>
+                <li>Sources chaudes de Sidi Harazem</li>
+                <li>Cures thérapeutiques à Fès-Meknès</li>
+                <li>Soins hydrothérapeutiques naturels</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Hébergements Zen</h6>
+              <ul class="service-list">
+                <li>Riads avec jardins zen</li>
+                <li>Lodges écologiques en pleine nature</li>
+                <li>Palaces avec spas de luxe</li>
+                <li>Maisons d'hôtes avec vue panoramique</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="{% url 'accounts:login' %}" class="btn btn-primary">Réserver un séjour bien-être</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Université d'Été -->
+  <div class="modal fade" id="modalUniversite" tabindex="-1" aria-labelledby="modalUniversiteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalUniversiteLabel">Université d'Été 2025</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Programme Académique</h6>
+              <ul class="service-list">
+                <li>Cours de darija (dialecte marocain)</li>
+                <li>Histoire et civilisation du Maroc</li>
+                <li>Culture et traditions marocaines</li>
+                <li>Ateliers d'écriture et de calligraphie</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Activités Culturelles</h6>
+              <ul class="service-list">
+                <li>Visites guidées des sites historiques</li>
+                <li>Ateliers d'artisanat marocain</li>
+                <li>Événements musicaux et festivals</li>
+                <li>Échanges avec des artistes locaux</li>
+              </ul>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Opportunités de Réseautage</h6>
+              <ul class="service-list">
+                <li>Rencontres avec des professionnels</li>
+                <li>Échanges avec d'autres MRE</li>
+                <li>Événements communautaires</li>
+                <li>Tables rondes thématiques</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Informations Pratiques</h6>
+              <ul class="service-list">
+                <li>Dates: Juillet-Août 2025</li>
+                <li>Durée: 2 à 4 semaines</li>
+                <li>Hébergement universitaire disponible</li>
+                <li>Programme adapté aux enfants et adultes</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="{% url 'accounts:login' %}" class="btn btn-primary">S'inscrire au programme</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Séjours -->
+  <div class="modal fade" id="modalSejours" tabindex="-1" aria-labelledby="modalSejoursLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalSejoursLabel">Organisation de Séjours</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Types de Séjours</h6>
+              <ul class="service-list">
+                <li>Séjours familiaux</li>
+                <li>Voyages de groupe</li>
+                <li>Circuits individuels personnalisés</li>
+                <li>Voyages thématiques</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Services Inclus</h6>
+              <ul class="service-list">
+                <li>Réservation d'hébergement</li>
+                <li>Transport local et transferts</li>
+                <li>Guides et accompagnateurs</li>
+                <li>Activités et excursions</li>
+              </ul>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Offres Spéciales MRE</h6>
+              <ul class="service-list">
+                <li>Tarifs préférentiels</li>
+                <li>Service d'accueil à l'aéroport</li>
+                <li>Assistance 24/7 pendant votre séjour</li>
+                <li>Facilités administratives</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-primary mb-3">Options à la Carte</h6>
+              <ul class="service-list">
+                <li>Location de véhicules</li>
+                <li>Activités sportives et de loisirs</li>
+                <li>Expériences gastronomiques</li>
+                <li>Services de photographie</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+          <a href="{% url 'accounts:login' %}" class="btn btn-primary">Organiser votre séjour</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // JavaScript pour l'animation des cartes de service
+  document.addEventListener('DOMContentLoaded', function() {
+    // Animation pour les cartes de service
+    document.querySelectorAll('.service-item').forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-10px)';
+      });
+      item.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  });
+</script>
+{% endblock %}

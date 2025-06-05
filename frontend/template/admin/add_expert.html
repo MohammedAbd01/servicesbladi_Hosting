@@ -1,0 +1,219 @@
+{% extends 'admin/base.html' %}
+
+{% load static %}
+
+{% block title %}Ajouter un Expert | Administration{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2><i class="bi bi-person-plus me-2"></i>Ajouter un Expert</h2>
+      <p class="text-muted">Créer un nouveau compte expert pour votre équipe</p>
+    </div>
+    <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i>Retour aux utilisateurs
+    </a>
+  </div>
+
+  <!-- Form Content -->
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <i class="bi bi-person-vcard"></i>
+          <span>Informations de l'expert</span>
+        </div>
+        <div class="card-body">
+          {% if expert_form.errors %}
+          <div class="alert alert-danger">
+            {% for field in expert_form %}
+              {% for error in field.errors %}
+                <p class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+            {% for error in expert_form.non_field_errors %}
+              <p class="mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}</p>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form id="expertForm" action="{% url 'accounts:register_expert' %}" method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="user_type" value="expert">
+
+            <!-- Personal Information -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="first_name" class="form-label">Prénom <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                <div class="invalid-feedback">Veuillez saisir le prénom.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="last_name" class="form-label">Nom <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                <div class="invalid-feedback">Veuillez saisir le nom.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="email" name="email" required>
+              <div class="invalid-feedback">Veuillez saisir un email valide.</div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" required minlength="8">
+                <div class="invalid-feedback">Le mot de passe doit contenir au moins 8 caractères.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="password_confirm" class="form-label">Confirmer mot de passe <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                <div class="invalid-feedback">Veuillez confirmer le mot de passe.</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="phone" class="form-label">Téléphone <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="phone" name="phone" required>
+              <div class="invalid-feedback">Veuillez saisir un numéro de téléphone.</div>
+            </div>
+
+            <!-- Expert specific fields -->
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="expertise" class="form-label">Domaine d'expertise <span class="text-danger">*</span></label>
+                <select class="form-select" id="expertise" name="expertise" required>
+                  <option value="" selected disabled>Sélectionnez un domaine</option>
+                  <option value="fiscal">Fiscal</option>
+                  <option value="immobilier">Immobilier</option>
+                  <option value="investissement">Investissement</option>
+                  <option value="administratif">Administratif</option>
+                  <option value="tourisme">Tourisme</option>
+                  <option value="autre">Autre</option>
+                </select>
+                <div class="invalid-feedback">Veuillez sélectionner un domaine d'expertise.</div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="experience" class="form-label">Années d'expérience <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+                <div class="invalid-feedback">Veuillez saisir le nombre d'années d'expérience.</div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <a href="{% url 'admin_users' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-lg me-2"></i>Annuler
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-lg me-2"></i>Créer Expert
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Information Sidebar -->
+    <div class="col-lg-4">
+      <div class="dashboard-card">
+        <div class="card-header">
+          <i class="bi bi-info-circle"></i>
+          <span>Information</span>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="fw-bold text-primary">Rôle de l'expert</h6>
+            <p class="small text-muted mb-0">L'expert pourra gérer les demandes de services, planifier des rendez-vous et communiquer avec les clients.</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="fw-bold text-primary">Accès au système</h6>
+            <p class="small text-muted mb-0">L'expert recevra un email avec ses identifiants de connexion pour accéder à son espace de travail.</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="fw-bold text-primary">Domaines disponibles</h6>
+            <ul class="small text-muted mb-0">
+              <li>Fiscal</li>
+              <li>Immobilier</li>
+              <li>Investissement</li>
+              <li>Administratif</li>
+              <li>Tourisme</li>
+            </ul>
+          </div>
+
+          <div class="alert alert-info">
+            <i class="bi bi-lightbulb me-2"></i>
+            <strong>Conseil :</strong> Assurez-vous que l'expert dispose d'une adresse email valide pour recevoir ses identifiants de connexion.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Form validation
+  const form = document.getElementById('expertForm');
+  const passwordField = document.getElementById('password');
+  const confirmPasswordField = document.getElementById('password_confirm');
+  
+  // Password confirmation validation
+  function validatePassword() {
+    if (passwordField.value !== confirmPasswordField.value) {
+      confirmPasswordField.setCustomValidity('Les mots de passe ne correspondent pas');
+    } else {
+      confirmPasswordField.setCustomValidity('');
+    }
+  }
+  
+  passwordField.addEventListener('input', validatePassword);
+  confirmPasswordField.addEventListener('input', validatePassword);
+
+  // Bootstrap form validation
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    validatePassword();
+    
+    if (form.checkValidity()) {
+      // Submit form with AJAX
+      const formData = new FormData(form);
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message and redirect
+          alert('Expert créé avec succès!');
+          window.location.href = "{% url 'admin_users' %}";
+        } else {
+          // Show error messages
+          alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de la création de l\'expert');
+      });
+    }
+    
+    form.classList.add('was-validated');
+  }, false);
+});
+</script>
+{% endblock %}

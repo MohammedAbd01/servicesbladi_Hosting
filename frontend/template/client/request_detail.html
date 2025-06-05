@@ -1,0 +1,691 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Demande #{{ demande.id }} - Service Bladi{% endblock %}
+
+{% block extra_css %}
+<style>
+  .avatar-circle {
+    width: 60px;
+    height: 60px;
+    background-color: #007bff;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .avatar-circle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+  }
+  
+  .initials {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+  }
+  
+  .timeline {
+    position: relative;
+    padding-left: 20px;
+  }
+  
+  .timeline:before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    height: calc(100% - 10px);
+    width: 2px;
+    background-color: #e9ecef;
+    animation: grow 1s ease-out forwards;
+  }
+  
+  @keyframes grow {
+    from { height: 0; }
+    to { height: calc(100% - 10px); }
+  }
+    .timeline-item {
+    position: relative;
+    opacity: 0;
+    transform: translateX(-10px);
+    animation: fadeIn 0.5s ease-out forwards;
+    animation-delay: calc(var(--item-index, 0) * 0.15s);
+  }
+  
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .timeline-marker {
+    position: absolute;
+    left: -20px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7);
+  }
+  
+  .timeline-item:hover .timeline-marker {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.9);
+  }
+  
+  .timeline-content {
+    padding-left: 15px;
+  }
+  
+  .timeline-title {
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+  
+  .timeline-date {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+  }
+
+.section-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-color);
+    position: relative;
+}
+
+.section-title:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+}
+
+.card:hover .section-title:after {
+    width: 100px;
+}
+
+.description-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.description-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.description-text {
+    line-height: 1.6;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    padding: 1rem 1.25rem;
+}
+
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0,0,0,0.05);
+    padding: 1.25rem;
+}
+
+.btn {
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn:hover:after {
+    width: 300%;
+    height: 300%;
+}
+
+.btn-primary {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+}
+
+.btn-danger:hover {
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .request-detail-header,
+    .request-detail-content {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .btn-action {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-value {
+        margin-top: 5px;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .card:hover {
+        transform: none;
+    }
+}
+
+/* Badge styles */
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Table styles */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+.table-striped tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Messages styles */
+.messages-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 123, 255, 0.2) transparent;
+}
+
+.messages-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.messages-container::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 123, 255, 0.2);
+    border-radius: 10px;
+}
+
+.message {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.message:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Ripple effect for buttons */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 10px;
+    height: 10px;
+    animation: ripple-effect 0.6s linear;
+    transform: scale(0);
+    pointer-events: none;
+}
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(20);
+        opacity: 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Contenu principal -->
+<div class="container-fluid px-0">
+  <div class="row">
+    <!-- Contenu principal -->
+    <div class="col-md-8">
+      <!-- Carte d'information de la demande -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Informations de la demande</h5>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Titre:</div>
+            <div class="col-md-8">{{ demande.title }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Description:</div>
+            <div class="col-md-8">{{ demande.description|default:"Aucune description fournie." }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Date de création:</div>
+            <div class="col-md-8">{{ demande.created_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Dernière mise à jour:</div>
+            <div class="col-md-8">{{ demande.updated_at|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Priorité:</div>
+            <div class="col-md-8">
+              <span class="badge {% if demande.priority == 'high' %}bg-danger{% elif demande.priority == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                {% if demande.priority == 'high' %}Haute{% elif demande.priority == 'medium' %}Moyenne{% else %}Basse{% endif %}
+              </span>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4 fw-bold">Statut:</div>
+            <div class="col-md-8">
+              <span class="badge {% if demande.status == 'new' %}bg-info{% elif demande.status == 'in_progress' %}bg-warning{% elif demande.status == 'completed' %}bg-success{% elif demande.status == 'cancelled' %}bg-danger{% elif demande.status == 'pending_info' %}bg-secondary{% endif %}">
+                {% if demande.status == 'new' %}Nouvelle{% elif demande.status == 'in_progress' %}En cours{% elif demande.status == 'completed' %}Terminée{% elif demande.status == 'cancelled' %}Annulée{% elif demande.status == 'pending_info' %}En attente d'informations{% endif %}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte des documents -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Documents</h5>
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+            <i class="bi bi-upload me-1"></i> Ajouter un document
+          </button>
+        </div>
+        <div class="card-body">
+          {% if demande.documents.exists %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Téléchargé par</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for document in demande.documents.all %}
+                    <tr>
+                      <td>{{ document.name|default:document.file.name }}</td>
+                      <td>{{ document.type }}</td>
+                      <td>{{ document.uploaded_by.get_full_name }}</td>
+                      <td>{{ document.created_at|date:"d/m/Y" }}</td>
+                      <td>
+                        <a href="{{ document.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{{ document.file.url }}" download class="btn btn-sm btn-outline-success">
+                          <i class="bi bi-download"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-2"></i> Aucun document n'a été téléchargé pour cette demande.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre latérale -->
+    <div class="col-md-4">
+      <!-- Carte des actions -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Actions</h5>
+        </div>
+        <div class="card-body">
+          {% if demande.status != 'completed' and demande.status != 'cancelled' %}
+            <button class="btn btn-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#editModal">
+              <i class="bi bi-pencil-square me-2"></i> Modifier la demande
+            </button>
+          {% endif %}
+          
+          {% if demande.status == 'pending' or demande.status == 'new' %}
+            <button class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              <i class="bi bi-x-circle me-2"></i> Annuler la demande
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Carte d'information de l'expert -->
+      {% if demande.assigned_expert %}
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Expert assigné</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <img src="{{ demande.assigned_expert.get_profile_picture_url }}" alt="Photo de l'expert" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+            <div>
+              <h6 class="mb-0">{{ demande.assigned_expert.name }} {{ demande.assigned_expert.first_name }}</h6>
+              <small class="text-muted">{{ demande.assigned_expert.expert_profile.specialization }}</small>
+            </div>
+          </div>
+          <a href="{% url 'expert_profile' demande.assigned_expert.id %}" class="btn btn-outline-primary w-100">
+            <i class="bi bi-person-lines-fill me-2"></i>Voir le profil
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Carte des rendez-vous -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Rendez-vous</h5>
+        </div>
+        <div class="card-body">
+          {% if appointments %}
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for appointment in appointments %}
+                    <tr>
+                      <td>{{ appointment.date_time|date:"d/m/Y H:i" }}</td>
+                      <td>{{ appointment.get_type_display }}</td>
+                      <td>
+                        <a href="{% url 'custom_requests:appointment_detail' appointment.id %}" class="btn btn-sm btn-outline-primary">
+                          <i class="bi bi-eye"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle me-2"></i> Aucun rendez-vous n'a été planifié pour cette demande.
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de modification -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Modifier la demande #{{ demande.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form method="post" action="{% url 'custom_requests:edit_request' demande.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="title" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ demande.title }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="4">{{ demande.description }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label for="priority" class="form-label">Priorité</label>
+            <select class="form-select" id="priority" name="priority">
+              <option value="low" {% if demande.priority == 'low' %}selected{% endif %}>Basse</option>
+              <option value="medium" {% if demande.priority == 'medium' %}selected{% endif %}>Moyenne</option>
+              <option value="high" {% if demande.priority == 'high' %}selected{% endif %}>Haute</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal d'annulation -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">Annuler la demande #{{ demande.id }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler cette demande ? Cette action ne peut pas être annulée.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Garder la demande</button>
+        <form method="post" action="{% url 'custom_requests:cancel_request' demande.id %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Annuler la demande</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de téléchargement de document -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1" aria-labelledby="uploadDocumentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadDocumentModalLabel">Télécharger un document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <form action="{% url 'custom_requests:upload_document' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <input type="hidden" name="request_id" value="{{ demande.id }}">
+          <div class="mb-3">
+            <label for="document_name" class="form-label">Nom du document</label>
+            <input type="text" class="form-control" id="document_name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="document_type" class="form-label">Type de document</label>
+            <select class="form-select" id="document_type" name="type" required>
+              <option value="" disabled selected>Sélectionner un type</option>
+              <option value="identity">Pièce d'identité</option>
+              <option value="justification">Justificatif</option>
+              <option value="report">Rapport</option>
+              <option value="certificate">Certificat</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="document_file" class="form-label">Fichier</label>
+            <input type="file" class="form-control" id="document_file" name="file" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Télécharger</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Défilement vers le bas des messages
+    const messagesContainer = document.querySelector('.messages-container');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Ajout des délais d'animation aux éléments de la timeline
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    timelineItems.forEach((item, index) => {
+      item.style.setProperty('--item-index', index);
+    });
+    
+    // Ajout des effets de survol aux cartes
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', function() {
+        this.style.zIndex = '10';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.zIndex = '1';
+      });
+    });
+    
+    // Ajout de l'effet de vague aux boutons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const x = e.clientX - this.getBoundingClientRect().left;
+        const y = e.clientY - this.getBoundingClientRect().top;
+        
+        const ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+    
+    // Ajout de l'effet de fondu aux lignes de documents
+    const documentRows = document.querySelectorAll('tbody tr');
+    documentRows.forEach((row, index) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(10px)';
+      row.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      row.style.transitionDelay = `${index * 0.1}s`;
+      
+      setTimeout(() => {
+        row.style.opacity = '1';
+        row.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+{% endblock %}

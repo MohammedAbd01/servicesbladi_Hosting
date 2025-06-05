@@ -1,0 +1,63 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Nouveau document - Services Bladi{% endblock %}
+
+{% block header_title %}Nouveau Document{% endblock %}
+{% block header_subtitle %}Un document a été ajouté à votre dossier{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    📎 <strong>{{ uploader_name }}</strong> a ajouté un nouveau document à votre dossier.
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">📎 Document ajouté:</div>
+    <div style="margin-top: 15px;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px; margin-right: 10px;">📄</span>
+            <div>
+                <div style="font-weight: 600; font-size: 16px;">{{ document_name }}</div>
+                <div style="color: #666; font-size: 14px;">{{ document_type }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">👤 Ajouté par:</div>
+        <div class="info-value">{{ uploader_name }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">📅 Date d'ajout:</div>
+        <div class="info-value">{{ "now"|date:"d/m/Y à H:i" }}</div>
+    </div>
+</div>
+
+{% if request_title %}
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">📋 Demande concernée:</div>
+        <div class="info-value">{{ request_title }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">📂 Type de document:</div>
+        <div class="info-value">{{ document_type }}</div>
+    </div>
+</div>
+{% endif %}
+
+<div class="content">
+    Vous pouvez maintenant consulter ce document dans votre espace personnel. Assurez-vous de le vérifier et de donner votre avis si nécessaire.
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        📂 Voir mes documents
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>🔒 Sécurité:</strong> Tous vos documents sont stockés de manière sécurisée et ne sont accessibles qu'aux personnes autorisées.
+</div>
+{% endblock %}

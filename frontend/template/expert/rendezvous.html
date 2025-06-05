@@ -1,0 +1,276 @@
+{% extends 'expert/base.html' %}
+{% load static %}
+
+{% block title %}Rendez-vous - MRE{% endblock %}
+{% block meta_description %}Gestion des rendez-vous clients - Espace expert{% endblock %}
+{% block meta_keywords %}rendez-vous, expert, agenda, planning{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .calendar-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .appointment-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+  }
+
+  .appointment-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .appointment-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+  }
+
+  .status-confirmed {
+    background-color: #e3fcef;
+    color: #00a854;
+  }
+
+  .status-pending {
+    background-color: #fff7e6;
+    color: #fa8c16;
+  }
+
+  .status-cancelled {
+    background-color: #fff1f0;
+    color: #f5222d;
+  }
+
+  .appointment-type {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    background-color: #e6f7ff;
+    color: #1890ff;
+    margin-left: 0.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Django Messages Display -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      <i class="bi {% if message.tags == 'success' %}bi-check-circle{% elif message.tags == 'error' %}bi-exclamation-triangle{% elif message.tags == 'warning' %}bi-exclamation-circle{% else %}bi-info-circle{% endif %} me-2"></i>
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Gestion des Rendez-vous</h2>
+  <div class="d-flex">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
+      <i class="bi bi-plus-circle me-2"></i>Ajouter un rendez-vous
+    </button>
+  </div>
+</div>
+
+<!-- Calendrier -->
+<div class="calendar-container mb-4">
+  <div id="calendar"></div>
+</div>
+
+<!-- Filtres -->
+<div class="dashboard-card mb-4">
+  <div class="card-body">
+    <form method="get" action="{% url 'expert_rendezvous' %}" id="filter-form">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Statut</label>
+          <select class="form-select" name="status" id="status-filter">
+            <option value="">Tous les statuts</option>
+            <option value="scheduled" {% if current_status == 'scheduled' %}selected{% endif %}>Planifié</option>
+            <option value="confirmed" {% if current_status == 'confirmed' %}selected{% endif %}>Confirmé</option>
+            <option value="completed" {% if current_status == 'completed' %}selected{% endif %}>Terminé</option>
+            <option value="cancelled" {% if current_status == 'cancelled' %}selected{% endif %}>Annulé</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" name="date" id="date-filter" value="{{ current_date }}">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Recherche</label>
+          <input type="text" class="form-control" name="search" id="search-filter" placeholder="Rechercher..." value="{{ current_search }}">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">&nbsp;</label>
+          <div class="d-flex gap-1">
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="bi bi-search me-1"></i>Filtrer
+            </button>
+            <a href="{% url 'expert_rendezvous' %}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-x-lg"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Liste des rendez-vous -->
+<h4 class="mb-3">Rendez-vous</h4>
+
+{% if appointments %}  {% for appointment in appointments %}
+    <div class="appointment-card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1">{{ appointment.notes|truncatewords:5|default:"Rendez-vous" }}</h5>
+          <p class="text-muted mb-1">
+            <i class="bi bi-person me-1"></i> {{ appointment.client.name }} {{ appointment.client.first_name }}
+            <i class="bi bi-clock ms-3 me-1"></i> {{ appointment.date_time|date:"d/m/Y H:i" }} ({{ appointment.duration }}min)
+          </p>
+          <div class="d-flex align-items-center">
+            <span class="appointment-status status-{{ appointment.status }}">
+              {% if appointment.status == 'scheduled' %}
+                Planifié
+              {% elif appointment.status == 'confirmed' %}
+                Confirmé
+              {% elif appointment.status == 'completed' %}
+                Terminé
+              {% elif appointment.status == 'cancelled' %}
+                Annulé
+              {% endif %}
+            </span>
+            <span class="appointment-type">
+              {% if appointment.consultation_type == 'video' %}
+                <i class="bi bi-camera-video me-1"></i>Vidéoconférence
+              {% elif appointment.consultation_type == 'phone' %}
+                <i class="bi bi-telephone me-1"></i>Téléphone
+              {% else %}
+                <i class="bi bi-person-square me-1"></i>En personne
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        <div>
+          {% if appointment.status == 'scheduled' %}
+            <a href="{% url 'expert_confirm_appointment' appointment.id %}" class="btn btn-sm btn-success me-2">
+              <i class="bi bi-check-lg me-1"></i>Confirmer
+            </a>
+          {% endif %}
+          {% if appointment.status != 'cancelled' %}
+            <a href="{% url 'expert_cancel_appointment' appointment.id %}" class="btn btn-sm btn-danger me-2" onclick="return confirm('Êtes-vous sûr de vouloir annuler ce rendez-vous ?')">
+              <i class="bi bi-x-lg me-1"></i>Annuler
+            </a>
+          {% endif %}
+          <a href="{% url 'expert_appointment_detail' appointment.id %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-eye me-1"></i>Détails
+          </a>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i> Aucun rendez-vous trouvé. Vous pouvez en ajouter un en cliquant sur le bouton "Ajouter un rendez-vous".
+  </div>
+{% endif %}
+
+<!-- Modal Ajout Rendez-vous -->
+<div class="modal fade" id="addAppointmentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Ajouter un rendez-vous</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'expert_add_appointment' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Titre</label>
+            <input type="text" class="form-control" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Client</label>
+            <select class="form-select" name="client" required>
+              {% for client in clients %}
+                <option value="{{ client.id }}">{{ client.user.name }} {{ client.user.first_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date et heure de début</label>
+            <input type="datetime-local" class="form-control" name="start_time" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Date et heure de fin</label>
+            <input type="datetime-local" class="form-control" name="end_time" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Type de rendez-vous</label>
+            <select class="form-select" name="type" required>
+              <option value="video">Vidéoconférence</option>
+              <option value="phone">Téléphone</option>
+              <option value="in-person">En personne</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" name="description" rows="3"></textarea>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Init calendar - this is a placeholder, you would need to include a calendar library like FullCalendar
+    if (typeof FullCalendar !== 'undefined') {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+          // Events would be populated from the Django backend
+          {% for appointment in all_appointments %}
+          {
+            title: '{{ appointment.title }}',
+            start: '{{ appointment.start_time|date:"Y-m-d H:i:s" }}',
+            end: '{{ appointment.end_time|date:"Y-m-d H:i:s" }}',
+            url: '{% url "custom_requests:appointment_detail" appointment.id %}',
+            backgroundColor: (function() {
+              var status = '{{ appointment.status }}';
+              if (status === 'confirmed') return '#00a854';
+              if (status === 'pending') return '#fa8c16';
+              return '#f5222d';
+            })()
+          }{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ]
+      });
+      calendar.render();
+    }
+  });
+</script>
+{% endblock %} 

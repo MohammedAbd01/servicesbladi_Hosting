@@ -1,0 +1,29 @@
+Services Bladi - Nouveau document
+
+Bonjour {{ recipient_name }},
+
+{{ uploader_name }} a ajouté un nouveau document à votre dossier.
+
+Document ajouté: {{ document_name }}
+Type: {{ document_type }}
+Ajouté par: {{ uploader_name }}
+Date d'ajout: {{ "now"|date:"d/m/Y à H:i" }}
+
+{% if request_title %}
+Demande concernée: {{ request_title }}
+{% endif %}
+
+Vous pouvez maintenant consulter ce document dans votre espace personnel.
+
+Pour voir vos documents:
+{{ site_url }}/accounts/dashboard/
+
+Sécurité: Tous vos documents sont stockés de manière sécurisée et ne sont accessibles qu'aux personnes autorisées.
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

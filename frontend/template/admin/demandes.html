@@ -1,0 +1,350 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Demandes | Administration{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Gestion des Demandes</h1>
+  </div>
+
+  <!-- Statistics Row -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-primary">
+          <i class="bi bi-clipboard-data"></i>
+        </div>
+        <div class="count">{{ total_requests }}</div>
+        <div class="title">Total Demandes</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-warning">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="count">{{ pending_requests }}</div>
+        <div class="title">En Attente</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-info">
+          <i class="bi bi-gear-wide-connected"></i>
+        </div>
+        <div class="count">{{ in_progress_requests }}</div>
+        <div class="title">En Cours</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-success">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="count">{{ completed_requests }}</div>
+        <div class="title">Terminées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section mb-4">
+    <form method="get" class="row g-3">
+      <div class="col-md-2">
+        <label for="status" class="form-label">Statut</label>
+        <select id="status" name="status" class="form-select">
+          <option value="">Tous les statuts</option>
+          <option value="new" {% if status_filter == 'new' %}selected{% endif %}>Nouvelle</option>
+          <option value="pending_info" {% if status_filter == 'pending_info' %}selected{% endif %}>En attente d'info</option>
+          <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>En cours</option>
+          <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Terminée</option>
+          <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Annulée</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejetée</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="category" class="form-label">Catégorie</label>
+        <select id="category" name="category" class="form-select">
+          <option value="">Toutes les catégories</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="period" class="form-label">Période</label>
+        <select id="period" name="period" class="form-select">
+          <option value="">Toutes les périodes</option>
+          <option value="today" {% if period_filter == 'today' %}selected{% endif %}>Aujourd'hui</option>
+          <option value="week" {% if period_filter == 'week' %}selected{% endif %}>7 derniers jours</option>
+          <option value="month" {% if period_filter == 'month' %}selected{% endif %}>30 derniers jours</option>
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="search" class="form-label">Recherche</label>
+        <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}" placeholder="Client, Service, Description...">
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-filter"></i> Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="card-title mb-0">Liste des Demandes</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Client</th>
+              <th>Service</th>
+              <th>Date de création</th>
+              <th>Statut</th>
+              <th>Expert assigné</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in service_requests %}
+            <tr>
+              <td>{{ request.id }}</td>
+              <td>{{ request.client.first_name }} {{ request.client.name }}</td>
+              <td>{{ request.service.title }}</td>
+              <td>{{ request.created_at|date:"d/m/Y H:i" }}</td>
+              <td>
+                {% if request.status == 'new' %}
+                <span class="badge bg-secondary">Nouvelle</span>
+                {% elif request.status == 'pending_info' %}
+                <span class="badge bg-warning">En attente d'info</span>
+                {% elif request.status == 'in_progress' %}
+                <span class="badge bg-info">En cours</span>
+                {% elif request.status == 'completed' %}
+                <span class="badge bg-success">Terminée</span>
+                {% elif request.status == 'cancelled' %}
+                <span class="badge bg-danger">Annulée</span>
+                {% elif request.status == 'rejected' %}
+                <span class="badge bg-danger">Rejetée</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if request.expert %}
+                {{ request.expert.first_name }} {{ request.expert.name }}
+                {% else %}
+                <span class="text-muted">Non assigné</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#requestDetailModal{{ request.id }}" title="Voir détails">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#assignModal{{ request.id }}">
+                    <i class="bi bi-person-check"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#statusModal{{ request.id }}">
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Modal pour les détails de la demande -->
+            <div class="modal fade" id="requestDetailModal{{ request.id }}" tabindex="-1" aria-labelledby="requestDetailModalLabel{{ request.id }}" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="requestDetailModalLabel{{ request.id }}">Détails de la demande #{{ request.id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <h6 class="mb-3">Informations générales</h6>
+                        <p><strong>Service:</strong> {{ request.service.title }}</p>
+                        <p><strong>Client:</strong> {{ request.client.first_name }} {{ request.client.name }}</p>
+                        <p><strong>Date de création:</strong> {{ request.created_at|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Statut:</strong> 
+                          <span class="badge {% if request.status == 'new' %}bg-secondary{% elif request.status == 'pending_info' %}bg-warning{% elif request.status == 'in_progress' %}bg-info{% elif request.status == 'completed' %}bg-success{% elif request.status == 'cancelled' or request.status == 'rejected' %}bg-danger{% endif %}">
+                            {% if request.status == 'new' %}Nouvelle
+                            {% elif request.status == 'pending_info' %}En attente d'info
+                            {% elif request.status == 'in_progress' %}En cours
+                            {% elif request.status == 'completed' %}Terminée
+                            {% elif request.status == 'cancelled' %}Annulée
+                            {% elif request.status == 'rejected' %}Rejetée{% endif %}
+                          </span>
+                        </p>
+                      </div>
+                      <div class="col-md-6">
+                        <h6 class="mb-3">Description</h6>
+                        <p>{{ request.description }}</p>
+                        {% if request.expert %}
+                        <h6 class="mb-3 mt-3">Expert assigné</h6>
+                        <p>{{ request.expert.first_name }} {{ request.expert.name }}</p>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <a href="{% url 'admin_request_detail' request_id=request.id %}" class="btn btn-primary">Voir la demande complète</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">Aucune demande trouvée</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if service_requests.paginator.num_pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          {% if service_requests.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ service_requests.previous_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+          {% endif %}
+          
+          {% for i in service_requests.paginator.page_range %}
+            {% if service_requests.number == i %}
+              <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% elif i > service_requests.number|add:'-3' and i < service_requests.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if service_requests.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ service_requests.next_page_number }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ service_requests.paginator.num_pages }}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if period_filter %}&period={{ period_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;&raquo;</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Assign Expert Modals -->
+{% for request in service_requests %}
+<div class="modal fade" id="assignModal{{ request.id }}" tabindex="-1" aria-labelledby="assignModalLabel{{ request.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assignModalLabel{{ request.id }}">Assigner un Expert</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'admin_assign_expert' request.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="expert" class="form-label">Expert:</label>
+            <select class="form-select" id="expert" name="expert_id" required>
+              <option value="">Sélectionner un expert</option>
+              {% for expert in experts %}
+              <option value="{{ expert.id }}" {% if request.expert and request.expert.id == expert.id %}selected{% endif %}>{{ expert.first_name }} {{ expert.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="notes" class="form-label">Notes pour l'expert:</label>
+            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Assigner</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Status Update Modals -->
+<div class="modal fade" id="statusModal{{ request.id }}" tabindex="-1" aria-labelledby="statusModalLabel{{ request.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="statusModalLabel{{ request.id }}">Mettre à jour le statut</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'admin_update_request_status' request.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="status" class="form-label">Nouveau statut:</label>
+            <select class="form-select" id="status" name="status" required>
+              <option value="new" {% if request.status == 'new' %}selected{% endif %}>Nouvelle</option>
+              <option value="pending_info" {% if request.status == 'pending_info' %}selected{% endif %}>En attente d'info</option>
+              <option value="in_progress" {% if request.status == 'in_progress' %}selected{% endif %}>En cours</option>
+              <option value="completed" {% if request.status == 'completed' %}selected{% endif %}>Terminée</option>
+              <option value="cancelled" {% if request.status == 'cancelled' %}selected{% endif %}>Annulée</option>
+              <option value="rejected" {% if request.status == 'rejected' %}selected{% endif %}>Rejetée</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="comment" class="form-label">Commentaire:</label>
+            <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        </div>
+      </form>
+    </div>  </div>
+</div>
+{% endfor %}
+
+{% endblock admin_content %}

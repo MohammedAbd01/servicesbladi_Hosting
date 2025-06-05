@@ -1,0 +1,358 @@
+<!-- Ajout du CDN Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="expert-register-form" id="expertRegisterForm" style="display: none;">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-plus me-2"></i>Ajouter un Expert</h2>
+    <button type="button" class="btn btn-outline-secondary" id="closeExpertForm">
+      <i class="bi bi-x-lg"></i> Fermer
+    </button>
+  </div>
+
+  <!-- Compact Form Card -->
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-user-shield me-2"></i>Informations de l'expert</h5>
+        </div>
+        <div class="card-body">            {% if expert_form.errors %}
+            <div class="alert alert-danger">
+              {% for field in expert_form %}
+                {% for error in field.errors %}
+                  <p class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>{{ error }}</p>
+                {% endfor %}
+              {% endfor %}
+              {% for error in expert_form.non_field_errors %}
+                <p class="mb-1"><i class="fas fa-exclamation-circle me-2"></i>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+
+            <form id="expertRegisterFormElement" action="{% url 'accounts:register_expert' %}" method="post" class="needs-validation" novalidate>
+              {% csrf_token %}
+              <input type="hidden" name="user_type" value="expert">
+
+              <!-- Personal Information -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="first_name" class="form-label">Prénom <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="first_name" name="first_name" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="last_name" class="form-label">Nom <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="last_name" name="last_name" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="password" class="form-label">Mot de passe <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="password_confirm" class="form-label">Confirmer mot de passe <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="phone" class="form-label">Téléphone <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="phone" name="phone" required>
+              </div>
+
+              <!-- Expert specific fields -->
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="expertise" class="form-label">Domaine d'expertise <span class="text-danger">*</span></label>
+                  <select class="form-select" id="expertise" name="expertise" required>
+                    <option value="" selected disabled>Sélectionnez un domaine</option>
+                    <option value="fiscal">Fiscal</option>
+                    <option value="immobilier">Immobilier</option>
+                    <option value="investissement">Investissement</option>
+                    <option value="administratif">Administratif</option>
+                    <option value="tourisme">Tourisme</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="experience" class="form-label">Années d'expérience <span class="text-danger">*</span></label>
+                  <input type="number" class="form-control" id="experience" name="experience" min="0" required>
+                </div>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-secondary" id="cancelExpertRegister">
+                  <i class="fas fa-times me-2"></i>Annuler
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save me-2"></i>Enregistrer Expert
+                </button>
+              </div>
+            </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Information Card -->
+    <div class="col-lg-4">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Information</h6>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h6 class="text-primary">Rôle de l'expert</h6>
+            <p class="small text-muted mb-0">L'expert pourra gérer les demandes de services, planifier des rendez-vous et communiquer avec les clients.</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 class="text-primary">Accès au système</h6>
+            <p class="small text-muted mb-0">L'expert recevra un email avec ses identifiants de connexion pour accéder à son espace de travail.</p>
+          </div>
+          
+          <div>
+            <h6 class="text-primary">Domaines disponibles</h6>
+            <ul class="small text-muted mb-0">
+              <li>Fiscal</li>
+              <li>Immobilier</li>
+              <li>Investissement</li>
+              <li>Administratif</li>
+              <li>Tourisme</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const expertRegisterBtn = document.getElementById('expertRegisterBtn');
+  const expertRegisterForm = document.getElementById('expertRegisterForm');
+  const cancelExpertRegister = document.getElementById('cancelExpertRegister');
+  
+  if (expertRegisterBtn) {
+    expertRegisterBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      expertRegisterForm.style.display = 'block';
+      document.getElementById('expertFormBackdrop').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    });
+  }
+  
+  // Handle close button and backdrop click
+  const closeForm = function() {
+    expertRegisterForm.style.display = 'none';
+    document.getElementById('expertFormBackdrop').style.display = 'none';
+  };
+
+  if (cancelExpertRegister) {
+    cancelExpertRegister.addEventListener('click', closeForm);
+  }
+
+  const closeButton = document.getElementById('closeExpertForm');
+  if (closeButton) {
+    closeButton.addEventListener('click', closeForm);
+  }
+
+  const backdrop = document.getElementById('expertFormBackdrop');
+  if (backdrop) {
+    backdrop.addEventListener('click', closeForm);
+  }
+  
+  // Handle form submission with AJAX
+  const form = document.getElementById('expertRegisterFormElement');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message and reset form
+          alert('Expert enregistré avec succès!');
+          form.reset();
+          expertRegisterForm.style.display = 'none';
+          document.getElementById('expertFormBackdrop').style.display = 'none';
+          document.body.style.overflow = '';
+          // Optionally refresh the page or update the experts list
+          window.location.reload();
+        } else {
+          // Show error messages
+          alert('Erreur: ' + (data.message || 'Une erreur est survenue'));
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue lors de l\'enregistrement');
+      });
+    });
+  }
+
+  // Add form validation
+  const forms = document.querySelectorAll('.needs-validation');
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+});
+</script>
+
+<style>
+.expert-register-form {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #ffffff;
+}
+
+.expert-register-form .card {
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+}
+
+.expert-register-form .card-header {
+  background: #ffffff !important;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.expert-register-form .text-brown {
+  color: #8B4513 !important;
+}
+
+.expert-register-form .text-beige {
+  color: #D2B48C !important;
+}
+
+.expert-register-form .form-control,
+.expert-register-form .form-select {
+  border-radius: 0.75rem;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+  background-color: #fff;
+}
+
+.expert-register-form .form-control:focus,
+.expert-register-form .form-select:focus {
+  border-color: #8B4513;
+  box-shadow: 0 0 0 0.25rem rgba(139, 69, 19, 0.1);
+  background-color: #fff;
+}
+
+.expert-register-form .form-label {
+  font-size: 0.9rem;
+  letter-spacing: 0.3px;
+}
+
+.expert-register-form .btn {
+  border-radius: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.expert-register-form .btn-brown {
+  background: #8B4513;
+  border: none;
+}
+
+.expert-register-form .btn-outline-brown {
+  border: 2px solid #8B4513;
+  color: #8B4513;
+}
+
+.expert-register-form .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.expert-register-form .btn-outline-brown:hover {
+  background: #8B4513;
+  color: #fff;
+}
+
+.expert-register-form .btn-beige {
+  background: #D2B48C;
+  border: none;
+}
+
+.expert-register-form .btn-beige:hover {
+  background: #C8A27A;
+  color: #fff;
+}
+
+.expert-register-form .btn-outline-beige {
+  border: 2px solid #D2B48C;
+  color: #D2B48C;
+}
+
+.expert-register-form .btn-outline-beige:hover {
+  background: #D2B48C;
+  color: #fff;
+}
+
+.expert-register-form .alert {
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+}
+
+.expert-register-form .form-control::placeholder {
+  color: #adb5bd;
+}
+
+.expert-register-form .form-select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%238B4513' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-position: right 1rem center;
+  background-size: 16px 12px;
+}
+
+/* Animation pour les champs de formulaire */
+.expert-register-form .form-control:focus,
+.expert-register-form .form-select:focus {
+  transform: translateY(-1px);
+}
+
+/* Style pour les messages d'erreur */
+.expert-register-form .was-validated .form-control:invalid,
+.expert-register-form .was-validated .form-select:invalid {
+  border-color: #dc3545;
+  background-image: none;
+}
+
+.expert-register-form .was-validated .form-control:valid,
+.expert-register-form .was-validated .form-select:valid {
+  border-color: #198754;
+  background-image: none;
+}
+
+/* Style pour le backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+</style>

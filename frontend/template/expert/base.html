@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}ServicesBladi - Expert{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Espace expert services administratifs Maroc{% endblock %}">
+  <meta name="keywords" content="{% block meta_keywords %}maroc, administratif, expert{% endblock %}">
+
+  <!-- Favicons -->
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+  <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/animate.css/animate.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'css/main.css' %}" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link href="{% static 'css/expert-style.css' %}?v={{ request.session.cache_version|default:'1.0' }}" rel="stylesheet">
+
+  <style>
+    :root {
+      --sidebar-width: 280px;
+      --header-height: 70px;
+      --primary-color: #2a2c39;
+      --secondary-color: #C49A5A;
+      --background-color: #f8f9fa;
+      --card-bg-color: #ffffff;
+      --card-border-color: #dee2e6;
+      --default-text-color: #495057;
+      --heading-text-color: #343a40;
+      --light-gray-bg: #f8f9fa;
+      --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    body {
+      background-color: var(--background-color);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Sidebar Styles */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: white;
+      padding: 1.5rem 1rem;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.3) transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar {
+      width: 5px;
+    }
+    
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.3);
+      border-radius: 10px;
+    }
+
+    .sidebar-profile {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .profile-image {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .sidebar-menu a {
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: white;
+      text-decoration: none !important;
+    }
+
+    .sidebar-menu a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .sidebar-menu a.active {
+      background-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-weight: 500;
+    }
+    
+    .sidebar-menu a i {
+      font-size: 1.4rem;
+      margin-right: 0.75rem;
+      width: 28px;
+      text-align: center;
+      opacity: 0.9;
+    }
+    
+    .sidebar-menu a.active i {
+      opacity: 1;
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      padding: 30px;
+      width: calc(100% - var(--sidebar-width));
+      transition: all 0.3s;
+      background-color: var(--background-color);
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--card-border-color);
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--heading-text-color);
+      font-family: "Raleway", sans-serif;
+    }
+
+    .dashboard-card {
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--card-border-color);
+      border-radius: 0.5rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card .card-header {
+      background-color: var(--light-gray-bg);
+      color: var(--heading-text-color);
+      font-weight: 600;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--card-border-color);
+      border-top-left-radius: calc(0.5rem - 1px);
+      border-top-right-radius: calc(0.5rem - 1px);
+      display: flex;
+      align-items: center;
+    }
+
+    .dashboard-card .card-header i {
+      margin-right: 10px;
+      color: var(--secondary-color);
+    }
+
+    .dashboard-card .card-body {
+      padding: 1.25rem;
+    }
+
+    .dashboard-card .card-title {
+      font-family: "Raleway", sans-serif;
+      color: var(--heading-text-color);
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Button Styles */
+    .btn-primary {
+      background-color: var(--secondary-color) !important;
+      border-color: var(--secondary-color) !important;
+      color: #fff !important;
+    }
+
+    .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+      border-color: color-mix(in srgb, var(--secondary-color), #000000 10%) !important;
+    }
+
+    .btn-outline-primary {
+      color: var(--secondary-color) !important;
+      border-color: var(--secondary-color) !important;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--secondary-color) !important;
+      color: #fff !important;
+    }
+
+    /* Table Styles */
+    .table th {
+      font-family: "Raleway", sans-serif;
+      font-weight: 600;
+      color: var(--heading-text-color);
+    }
+
+    .table td {
+      color: var(--default-text-color);
+    }
+
+    /* Form Styles */
+    .form-control {
+      border-color: var(--card-border-color);
+    }
+
+    .form-control:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 0.2rem rgba(196, 154, 90, 0.25);
+    }
+
+    .form-label {
+      color: var(--heading-text-color);
+      font-weight: 500;
+    }
+
+    /* Links */
+    a {
+      color: var(--secondary-color);
+    }
+
+    a:hover {
+      color: color-mix(in srgb, var(--secondary-color), #000000 20%);
+    }
+
+    /* Headings */
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--heading-text-color);
+      font-family: "Raleway", sans-serif;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background-color: #e3fcef;
+      color: #00a854;
+    }
+
+    .status-pending {
+      background-color: #fff7e6;
+      color: #fa8c16;
+    }
+
+    .status-urgent {
+      background-color: #fff1f0;
+      color: #f5222d;
+    }
+
+    /* Notification Styles */
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      margin: 1rem auto;
+      transition: all 0.3s ease;
+    }
+
+    .notification-bell:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notification-dropdown {
+      position: absolute;
+      top: 50px;
+      left: 285px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      width: 350px;
+      max-height: 500px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+
+    .notification-dropdown.show {
+      display: block;
+    }
+
+    .notification-header {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background: #f8f9fa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .notification-header h6 {
+      margin: 0;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .notification-list {
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .notification-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      transition: background 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notification-item:hover {
+      background: #f8f9fa;
+    }
+
+    .notification-item.unread {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+    }
+
+    .notification-item .title {
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .notification-item .message {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .notification-item .time {
+      color: #999;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .notification-item .time i {
+      font-size: 0.9rem;
+    }
+
+    .notification-empty {
+      padding: 20px;
+      text-align: center;
+      color: #666;
+    }
+
+    .notification-empty i {
+      font-size: 2rem;
+      color: #ddd;
+      margin-bottom: 10px;
+    }    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        display: block;
+      }
+      
+      .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        z-index: 1040;
+        height: 100vh;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+      }
+      
+      .main-content {
+        margin-left: 0 !important;
+        width: 100%;
+        padding: 1rem;
+      }
+      
+      .mobile-menu-toggle {
+        display: block !important;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1050;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .mobile-menu-toggle:hover {
+        background: var(--secondary-color);
+        transform: scale(1.1);
+      }
+      
+      .notification-dropdown {
+        position: fixed !important;
+        top: 80px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+      
+      .dashboard-card {
+        margin-bottom: 15px;
+      }
+      
+      .table-responsive {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .mobile-menu-toggle {
+        display: none !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 0.75rem;
+      }
+      
+      .dashboard-card .card-body {
+        padding: 1rem;
+      }
+      
+      .notification-dropdown {
+        max-height: 60vh;
+      }
+    }
+  </style>
+
+  {% block extra_styles %}{% endblock %}
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+      <i class="bi bi-list"></i>
+    </button>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar"><div class="sidebar-profile">
+        <img src="{{ user.get_profile_picture_url }}" alt="Expert Profile" class="profile-image">
+        <h5 id="expertName" class="text-white">{{ user.name }} {{ user.first_name }}</h5>
+        <p class="text-white">Expert {{ expert.specialty }}</p>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="{% url 'expert_dashboard' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_dashboard' %}active{% endif %}">
+          <i class="bi bi-speedometer2"></i>
+          <span>Tableau de<br>bord</span>
+        </a>
+        <a href="{% url 'expert_demandes' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_demandes' %}active{% endif %}">
+          <i class="bi bi-file-text"></i>
+          <span>Demandes<br>assignées</span>
+        </a>
+        <a href="{% url 'expert_documents' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_documents' %}active{% endif %}">
+          <i class="bi bi-folder"></i>
+          <span>Gestion des<br>documents</span>
+        </a>
+        <a href="{% url 'expert_rendezvous' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_rendezvous' %}active{% endif %}">
+          <i class="bi bi-calendar"></i>
+          <span>Rendez-vous</span>
+        </a>
+        <a href="{% url 'expert_messages' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_messages' %}active{% endif %}">
+          <i class="bi bi-chat-dots"></i>
+          <span>Messages</span>
+          {% if unread_messages_count > 0 %}
+            <span class="badge bg-danger ms-2">{{ unread_messages_count }}</span>
+          {% endif %}
+        </a>
+        <a href="{% url 'expert_ressources' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'expert_ressources' %}active{% endif %}">
+          <i class="bi bi-book"></i>
+          <span>Gestion des<br>ressources</span>
+        </a>
+        <a href="{% url 'accounts:edit_profile' %}" class="text-white text-decoration-none {% if request.resolver_match.url_name == 'edit_profile' and request.resolver_match.app_name == 'accounts' %}active{% endif %}">
+          <i class="bi bi-pencil-square"></i>
+          <span>Modifier mon<br>profil</span>
+        </a>        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+          {% csrf_token %}
+          <button type="submit" class="text-white text-decoration-none bg-transparent border-0 w-100 text-start d-flex align-items-center" style="background: none;">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Déconnexion</span>
+          </button>
+        </form>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'vendor/swiper/swiper-bundle.min.js' %}"></script>
+  
+  {% block extra_scripts %}{% endblock %}
+    <script>
+    // General dashboard scripts
+    document.addEventListener('DOMContentLoaded', function() {
+      // Mobile menu toggle functionality
+      const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+      const sidebar = document.getElementById('sidebar');
+      
+      if (mobileMenuToggle && sidebar) {
+        mobileMenuToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('show');
+        });
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+          if (window.innerWidth <= 768) {
+            if (!sidebar.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+              sidebar.classList.remove('show');
+            }
+          }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+          if (window.innerWidth > 768) {
+            sidebar.classList.remove('show');
+          }
+        });
+      }
+      
+      // Initialize any common dashboard functionality here
+      
+      // Fonction pour toggler le dropdown de notifications
+      window.toggleNotifications = function() {
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+        
+        // Si le menu est affiché, marquer les notifications comme lues
+        if (dropdown.classList.contains('show')) {
+          markNotificationsAsRead();
+        }
+      };
+      
+      // Fermer le dropdown de notifications quand on clique ailleurs
+      window.addEventListener('click', function(e) {
+        if (!e.target.closest('.notification-bell')) {
+          const dropdown = document.getElementById('notificationDropdown');
+          if (dropdown && dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      });
+      
+      // Marquer les notifications comme lues
+      function markNotificationsAsRead() {
+        const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+        if (unreadNotifications.length === 0) return;
+        
+        // Obtenir le token CSRF
+        const csrfToken = getCookie('csrftoken');
+        
+        // Envoyer une requête AJAX pour marquer les notifications comme lues
+        fetch('/custom_requests/notifications/?mark_all_read=true', {
+          method: 'GET',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            // Mettre à jour visuellement
+            document.querySelector('.notification-badge').textContent = '0';
+            unreadNotifications.forEach(notification => {
+              notification.classList.remove('unread');
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors du marquage des notifications:', error);
+        });
+      }
+      
+      // Fonction pour obtenir un cookie (pour le token CSRF)
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+/* filepath: c:\Users\Airzo\Desktop\sb-style\frontend\static\css\chat-override.css */
+/* Chat styling override for expert messaging interface */
+
+/*** FIX 1: Proper text coloring for outgoing messages ***/
+/* Reset all Bootstrap variables for outgoing messages */
+.message-outgoing {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+    /* Override ALL Bootstrap CSS variables */
+    --bs-body-color: #1f1f1f !important;
+    --bs-body-color-rgb: 31, 31, 31 !important;
+    --bs-text-opacity: 1 !important;
+    --bs-link-color: #1f1f1f !important;
+    --bs-link-color-rgb: 31, 31, 31 !important;
+    --bs-emphasis-color: #1f1f1f !important;
+    --bs-emphasis-color-rgb: 31, 31, 31 !important;
+    --bs-secondary-color: #1f1f1f !important;
+    --bs-secondary-color-rgb: 31, 31, 31 !important;
+    --bs-tertiary-color: #1f1f1f !important;
+    --bs-tertiary-color-rgb: 31, 31, 31 !important;
+}
+
+/* Target every element inside outgoing messages */
+.message-outgoing *,
+.message-outgoing div,
+.message-outgoing span,
+.message-outgoing p,
+.message-outgoing .message-sender,
+.message-outgoing .message-content {
+    color: #1f1f1f !important;
+    --bs-body-color: #1f1f1f !important;
+    --bs-body-color-rgb: 31, 31, 31 !important;
+    --bs-text-opacity: 1 !important;
+    --bs-link-color: #1f1f1f !important;
+    --bs-emphasis-color: #1f1f1f !important;
+}
+
+/* Specific overrides for message timestamp with transparency */
+.message-outgoing .message-timestamp,
+.message-outgoing .message-status {
+    color: rgba(31, 31, 31, 0.7) !important;
+    --bs-body-color: rgba(31, 31, 31, 0.7) !important;
+    --bs-text-opacity: 0.7 !important;
+}
+
+/*** FIX 2: Profile image fallbacks ***/
+/* Base styles for all avatar images */
+img.contact-avatar,
+img.chat-avatar,
+img.profile-image {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: #6c757d;
+    object-fit: cover;
+    position: relative;
+}
+
+/* Special styling for fallback avatars */
+img.avatar-fallback {
+    background-color: #e9ecef;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+/* Ensure profile images have proper dimensions */
+.contact-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Fix for sent messages and any other conflicting styles */
+.sent .message-content,
+.message.sent .message-content {
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+}
+
+/* Fix for any sent message elements to ensure proper contrast */
+.sent .message-content *,
+.message.sent .message-content * {
+    color: #1f1f1f !important;
+}
+
+/* Enhanced message bubble alignment and wrapping fixes */
+.message {
+    display: block !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    width: fit-content !important;
+    max-width: 85% !important;
+    clear: both !important;
+}
+
+.message-outgoing {
+    float: right !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+}
+
+.message-incoming {
+    float: left !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    text-align: left !important;
+}
+
+/* Ensure proper clearfix for message containers */
+.chat-messages::after,
+.messages-container::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+.message::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+/* Fix for any dynamic message content that might be added via JavaScript */
+.message-content {
+    word-break: normal !important;
+    overflow-wrap: normal !important;
+    white-space: normal !important;
+    word-wrap: normal !important;
+    /* Ensure proper text flow and prevent vertical stacking */
+    display: block !important;
+    line-height: 1.4 !important;
+    /* Allow long words to break naturally only at word boundaries */
+    hyphens: auto !important;
+    /* Ensure minimum width for proper text layout */
+    min-width: 0 !important;
+}
+
+/* Responsive message adjustments */
+@media (max-width: 768px) {
+    .message {
+        max-width: 90% !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .message-outgoing,
+    .message-incoming {
+        margin-bottom: 15px !important;
+    }
+}

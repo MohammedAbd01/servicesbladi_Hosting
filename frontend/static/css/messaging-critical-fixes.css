@@ -1,0 +1,308 @@
+/* 
+ * CRITICAL MESSAGING FIXES - LOAD LAST
+ * This file contains the final overrides to ensure message bubble styling works correctly
+ * across all messaging templates and browsers.
+ */
+
+/* FORCE OVERRIDE ALL SENT MESSAGE STYLES */
+.message.sent .message-content,
+.sent .message-content,
+.message-outgoing,
+.message.sent,
+.sent,
+.outgoing,
+.chat-message.sent,
+.chat-message.outgoing,
+div[class*="sent"] .message-content,
+div[class*="outgoing"] .message-content,
+div[class*="sent"],
+div[class*="outgoing"] {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    background-image: none !important;
+    color: #1f1f1f !important;
+    -webkit-text-fill-color: #1f1f1f !important;
+    /* Override ALL possible CSS custom properties */
+    --bs-body-color: #1f1f1f !important;
+    --bs-body-color-rgb: 31, 31, 31 !important;
+    --bs-text-opacity: 1 !important;
+    --primary-color: #DCF8C6 !important;
+    --primary-color-light: #DCF8C6 !important;
+    --bs-primary: #DCF8C6 !important;
+    --bs-primary-rgb: 220, 248, 198 !important;
+    /* Border radius for better appearance */
+    border-radius: 18px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+}
+
+/* FORCE OVERRIDE ALL TEXT INSIDE SENT MESSAGES */
+.message.sent .message-content *,
+.sent .message-content *,
+.message-outgoing *,
+.message.sent *,
+.sent *,
+.outgoing *,
+.chat-message.sent *,
+.chat-message.outgoing *,
+div[class*="sent"] .message-content *,
+div[class*="outgoing"] .message-content *,
+div[class*="sent"] *,
+div[class*="outgoing"] * {
+    color: #1f1f1f !important;
+    -webkit-text-fill-color: #1f1f1f !important;
+    --bs-body-color: #1f1f1f !important;
+    --bs-text-opacity: 1 !important;
+}
+
+/* SPECIAL HANDLING FOR TIMESTAMPS */
+.message.sent .message-time,
+.sent .message-time,
+.message-outgoing .message-timestamp,
+.message.sent .message-timestamp,
+.sent .message-timestamp,
+.outgoing .message-timestamp,
+.chat-message.sent .message-time,
+.chat-message.outgoing .message-time,
+div[class*="sent"] .message-time,
+div[class*="outgoing"] .message-time,
+div[class*="sent"] .message-timestamp,
+div[class*="outgoing"] .message-timestamp {
+    color: rgba(31, 31, 31, 0.7) !important;
+    -webkit-text-fill-color: rgba(31, 31, 31, 0.7) !important;
+    --bs-body-color: rgba(31, 31, 31, 0.7) !important;
+    --bs-text-opacity: 0.7 !important;
+}
+
+/* OVERRIDE ANY GRADIENTS OR LINEAR BACKGROUNDS */
+.message.sent .message-content[style*="background"],
+.sent .message-content[style*="background"],
+.message-outgoing[style*="background"],
+.message.sent[style*="background"],
+.sent[style*="background"],
+.outgoing[style*="background"] {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    background-image: none !important;
+}
+
+/* FORCE OVERRIDE CSS CUSTOM PROPERTIES AT ROOT LEVEL */
+:root {
+    --sent-message-bg: #DCF8C6 !important;
+    --sent-message-color: #1f1f1f !important;
+    --outgoing-message-bg: #DCF8C6 !important;
+    --outgoing-message-color: #1f1f1f !important;
+}
+
+/* BROWSER-SPECIFIC FIXES */
+/* Safari/WebKit specific */
+@supports (-webkit-touch-callout: none) {
+    .message.sent .message-content,
+    .sent .message-content,
+    .message-outgoing,
+    .message.sent,
+    .sent,
+    .outgoing {
+        color: #1f1f1f !important;
+        background-color: #DCF8C6 !important;
+        -webkit-text-fill-color: #1f1f1f !important;
+    }
+}
+
+/* Firefox specific */
+@-moz-document url-prefix() {
+    .message.sent .message-content,
+    .sent .message-content,
+    .message-outgoing,
+    .message.sent,
+    .sent,
+    .outgoing {
+        background: #DCF8C6 !important;
+        color: #1f1f1f !important;
+    }
+}
+
+/* MESSAGE ALIGNMENT AND WRAPPING FIXES */
+.message {
+    display: block !important;
+    overflow-wrap: break-word !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+    width: fit-content !important;
+    max-width: 85% !important;
+    clear: both !important;
+    margin-bottom: 1rem !important;
+}
+
+.message.sent,
+.sent,
+.message-outgoing,
+.outgoing {
+    float: right !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    text-align: left !important;
+}
+
+.message.received,
+.received,
+.message-incoming,
+.incoming {
+    float: left !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    text-align: left !important;
+}
+
+/* CLEARFIX FOR MESSAGE CONTAINERS */
+.chat-messages::after,
+.messages-container::after,
+.message-list::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+.message::after {
+    content: "" !important;
+    display: table !important;
+    clear: both !important;
+}
+
+/* RESPONSIVE FIXES */
+@media (max-width: 768px) {
+    .message {
+        max-width: 90% !important;
+        font-size: 0.95rem !important;
+    }
+    
+    .message.sent,
+    .sent,
+    .message-outgoing,
+    .outgoing,
+    .message.received,
+    .received,
+    .message-incoming,
+    .incoming {
+        margin-bottom: 15px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .message {
+        max-width: 95% !important;
+        min-width: 80px !important;
+    }
+}
+
+/* CRITICAL FIX: Prevent vertical text stacking in message bubbles */
+.message-content,
+.message .message-content,
+[class*="message"] .message-content,
+.chat-messages .message-content {
+    /* Reset all word breaking properties to prevent vertical stacking */
+    word-break: normal !important;
+    word-wrap: normal !important;
+    overflow-wrap: normal !important;
+    white-space: normal !important;
+    
+    /* Ensure proper text flow */
+    display: block !important;
+    line-height: 1.4 !important;
+    
+    /* Allow natural word breaking only at appropriate points */
+    hyphens: auto !important;
+    
+    /* Ensure adequate width for text to flow naturally */
+    min-width: 0 !important;
+    max-width: 100% !important;
+    
+    /* Prevent CSS conflicts that might cause character stacking */
+    text-orientation: mixed !important;
+    writing-mode: horizontal-tb !important;
+    
+    /* Ensure font properties don't interfere with layout */
+    font-feature-settings: normal !important;
+    font-variant: normal !important;
+}
+
+/* Ensure message bubbles have adequate width for text */
+.message,
+[class*="message"] {
+    /* Provide sufficient width for text to flow horizontally */
+    min-width: 120px !important;
+    max-width: 85% !important;
+    
+    /* Ensure proper box model */
+    box-sizing: border-box !important;
+    
+    /* Reset any layout properties that might cause issues */
+    display: block !important;
+    
+    /* Ensure adequate padding for text readability */
+    padding: 12px 16px !important;
+}
+
+/* Fix for any inline styles or JavaScript-applied styles */
+.message-content[style*="word-break"],
+.message-content[style*="white-space"],
+.message-content[style*="overflow-wrap"] {
+    word-break: normal !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* ULTRA HIGH PRIORITY: Override any Bootstrap or framework CSS that might interfere */
+body .chat-container .chat-messages .message .message-content,
+body .message-content,
+html body .message-content {
+    /* Force normal text flow with maximum specificity */
+    word-break: normal !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-wrap: normal !important;
+    
+    /* Prevent any text orientation issues */
+    text-orientation: mixed !important;
+    writing-mode: horizontal-tb !important;
+    direction: ltr !important;
+    
+    /* Ensure proper display properties */
+    display: block !important;
+    
+    /* Reset any problematic font properties */
+    font-feature-settings: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    
+    /* Ensure proper line height for readability */
+    line-height: 1.4 !important;
+}
+
+/* Override any inline styles that might be applied via JavaScript */
+.message-content[style] {
+    word-break: normal !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* Force correct layout for expert chat specifically */
+.expert-chat .message-content,
+.client-chat .message-content,
+.admin-chat .message-content {
+    word-break: normal !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+}
+
+/* FINAL CATCH-ALL OVERRIDE */
+[class*="message"][class*="sent"],
+[class*="message"][class*="outgoing"] {
+    background: #DCF8C6 !important;
+    background-color: #DCF8C6 !important;
+    color: #1f1f1f !important;
+}
+
+[class*="message"][class*="sent"] *,
+[class*="message"][class*="outgoing"] * {
+    color: #1f1f1f !important;
+}

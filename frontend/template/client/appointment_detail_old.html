@@ -1,0 +1,824 @@
+{% extends 'client/base.html' %}
+
+{% block title %}Détail du Rendez-vous - MRE{% endblock %}
+{% block meta_description %}Détails du rendez-vous client MRE{% endblock %}
+{% block meta_keywords %}MRE, rendez-vous, détails{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #2a2c39;
+    --secondary-color: #C49A5A;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+  }
+
+  .appointment-detail-container {
+    padding: 1.5rem;
+  }
+
+  .appointment-header-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .appointment-header-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  }
+
+  .card-header-gradient {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 2rem;
+    border: none;
+    position: relative;
+  }
+
+  .card-header-gradient::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .appointment-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .appointment-title i {
+    font-size: 1.8rem;
+    opacity: 0.9;
+  }
+
+  .appointment-subtitle {
+    opacity: 0.9;
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .modern-status-badge {
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;    font-weight: 500;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+
+  .modern-status-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+  }
+
+  .status-scheduled {
+    background: linear-gradient(135deg, #fff7e6 0%, #ffeaa7 100%);
+    color: #fa8c16;
+    border-color: #ffd591;
+  }
+
+  .status-confirmed {
+    background: linear-gradient(135deg, #e3fcef 0%, #95de64 100%);
+    color: #00a854;
+    border-color: #95de64;
+  }
+
+  .status-completed {
+    background: linear-gradient(135deg, #e6f7ff 0%, #69c0ff 100%);
+    color: #1890ff;
+    border-color: #69c0ff;
+  }
+
+  .status-cancelled {
+    background: linear-gradient(135deg, #fff1f0 0%, #ff7875 100%);
+    color: #f5222d;
+    border-color: #ff7875;
+  }
+
+  .info-section {
+    padding: 2rem;
+  }
+
+  .modern-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 1.5rem;
+    border-radius: 15px;
+    border: 1px solid #e9ecef;
+    border-left: 4px solid var(--secondary-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  }
+
+  .info-card:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-left-color: var(--primary-color);
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-label i {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+  }
+
+  .info-value {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .detail-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .detail-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .modern-card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 1.75rem 2rem;
+    border: none;
+    position: relative;
+  }
+
+  .modern-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.2), transparent);
+  }
+
+  .modern-card-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .modern-card-title i {
+    font-size: 1.4rem;
+    opacity: 0.9;
+  }
+
+  .expert-profile-modern {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .expert-profile-modern::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .expert-avatar-modern {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255,255,255,0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .expert-name-modern {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .expert-specialty-modern {
+    opacity: 0.9;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .expert-contact-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .expert-contact-btn {
+    padding: 0.75rem;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .expert-contact-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    color: white;
+  }
+
+  .action-buttons-modern {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .action-btn-modern {
+    flex: 1;
+    min-width: 160px;
+    padding: 0.875rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .action-btn-modern:hover::before {
+    left: 100%;
+  }
+
+  .action-btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+
+  .back-btn-modern {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.875rem 1.75rem;
+    border-radius: 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    border: 2px solid var(--primary-color);
+  }
+
+  .back-btn-modern:hover {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  }
+
+  .notes-section-modern {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    position: relative;
+  }
+
+  .notes-section-modern::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 10px;
+    pointer-events: none;
+  }
+
+  .documents-list-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .document-item-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
+
+  .document-item-modern:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-color: var(--secondary-color);
+  }
+
+  .document-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .document-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+  }
+
+  .document-download-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    background: white;
+    transition: all 0.3s ease;
+  }
+
+  .document-download-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  @media (max-width: 992px) {
+    .appointment-detail-container {
+      padding: 1rem;
+    }
+    
+    .modern-info-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-buttons-modern {
+      flex-direction: column;
+    }
+    
+    .action-btn-modern {
+      min-width: auto;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="appointment-detail-container">
+  <a href="{% url 'custom_requests:client_appointments' %}" class="back-btn-modern">
+    <i class="bi bi-arrow-left"></i>
+    Retour aux rendez-vous
+  </a>
+
+  <!-- Main appointment details card -->
+  <div class="appointment-header-card">
+    <div class="card-header-gradient">
+      <h1 class="appointment-title">
+        <i class="bi bi-calendar-check-fill"></i>
+        {% if appointment.consultation_type == 'in_person' %}
+          Rendez-vous en personne
+        {% elif appointment.consultation_type == 'video' %}
+          Rendez-vous par vidéo
+        {% elif appointment.consultation_type == 'phone' %}
+          Rendez-vous téléphonique
+        {% else %}
+          Rendez-vous {{ appointment.consultation_type|default:"" }}
+        {% endif %}
+      </h1>
+      <div class="appointment-subtitle">
+        <i class="bi bi-calendar-event"></i>
+        {{ appointment.date_time|date:"l d F Y à H:i"|default:"20 Mars 2024 à 14:30" }}
+      </div>
+      {% if appointment.status == 'scheduled' %}
+        <span class="modern-status-badge status-scheduled">
+          <i class="bi bi-clock"></i> Planifié
+        </span>
+      {% elif appointment.status == 'confirmed' %}
+        <span class="modern-status-badge status-confirmed">
+          <i class="bi bi-check-circle"></i> Confirmé
+        </span>
+      {% elif appointment.status == 'completed' %}
+        <span class="modern-status-badge status-completed">
+          <i class="bi bi-trophy"></i> Terminé
+        </span>
+      {% elif appointment.status == 'cancelled' %}
+        <span class="modern-status-badge status-cancelled">
+          <i class="bi bi-x-circle"></i> Annulé
+        </span>
+      {% else %}
+        <span class="modern-status-badge status-confirmed">
+          <i class="bi bi-check-circle"></i> Confirmé
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="info-section">
+      <div class="modern-info-grid">
+        <div class="info-card">
+          <div class="info-label">
+            <i class="bi bi-tag-fill"></i>
+            Type de consultation
+          </div>
+          <div class="info-value">
+            {% if appointment.consultation_type == 'in_person' %}
+              En personne
+            {% elif appointment.consultation_type == 'video' %}
+              Vidéoconférence
+            {% elif appointment.consultation_type == 'phone' %}
+              Téléphone
+            {% else %}
+              En personne
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-label">
+            <i class="bi bi-hourglass-split"></i>
+            Durée
+          </div>
+          <div class="info-value">{{ appointment.duration|default:"60" }} minutes</div>
+        </div>
+
+        {% if appointment.location or appointment.consultation_type == 'in_person' %}
+        <div class="info-card">
+          <div class="info-label">
+            <i class="bi bi-geo-alt-fill"></i>
+            Lieu
+          </div>
+          <div class="info-value">{{ appointment.location|default:"Bureau MRE, Casablanca" }}</div>
+        </div>
+        {% endif %}
+
+        {% if appointment.meeting_link %}
+        <div class="info-card">
+          <div class="info-label">
+            <i class="bi bi-camera-video-fill"></i>
+            Lien de réunion
+          </div>
+          <div class="info-value">
+            <a href="{{ appointment.meeting_link }}" target="_blank" class="btn btn-sm btn-primary">
+              <i class="bi bi-box-arrow-up-right me-1"></i> Rejoindre
+            </a>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Service and request details -->
+      {% if appointment.service_request %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-file-earmark-text-fill"></i>
+            Demande associée
+          </h3>
+        </div>
+        <div class="info-section">
+          <div class="modern-info-grid">
+            <div class="info-card">
+              <div class="info-label">
+                <i class="bi bi-file-earmark"></i>
+                Titre de la demande
+              </div>
+              <div class="info-value">
+                <a href="#" class="text-decoration-none">{{ appointment.service_request.title|default:"Consultation administrative" }}</a>
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">
+                <i class="bi bi-calendar-plus"></i>
+                Date de création
+              </div>
+              <div class="info-value">{{ appointment.service_request.created_at|date:"d/m/Y"|default:"15/03/2024" }}</div>
+            </div>
+          </div>
+          {% if appointment.service_request.description %}
+          <div class="notes-section-modern">
+            <h6><i class="bi bi-chat-text me-2"></i>Description de la demande</h6>
+            <p class="mb-0">{{ appointment.service_request.description|linebreaks }}</p>
+          </div>
+          {% else %}
+          <div class="notes-section-modern">
+            <h6><i class="bi bi-chat-text me-2"></i>Description de la demande</h6>
+            <p class="mb-0">Consultation pour des démarches administratives liées à mon statut MRE. J'ai besoin d'aide pour le renouvellement de mes documents et d'informations sur les nouvelles procédures.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Service details -->
+      {% if appointment.service %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-briefcase-fill"></i>
+            Service
+          </h3>
+        </div>
+        <div class="info-section">
+          <div class="modern-info-grid">
+            <div class="info-card">
+              <div class="info-label">
+                <i class="bi bi-briefcase"></i>
+                Nom du service
+              </div>
+              <div class="info-value">{{ appointment.service.title|default:"Service Administratif" }}</div>
+            </div>
+          </div>
+          {% if appointment.service.description %}
+          <div class="notes-section-modern">
+            <h6><i class="bi bi-info-circle me-2"></i>Description du service</h6>
+            <p class="mb-0">{{ appointment.service.description|linebreaks }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Notes section -->
+      {% if appointment.notes %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-journal-text"></i>
+            Notes du rendez-vous
+          </h3>
+        </div>
+        <div class="info-section">
+          <div class="notes-section-modern">
+            <p class="mb-0">{{ appointment.notes|linebreaks }}</p>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-journal-text"></i>
+            Notes du rendez-vous
+          </h3>
+        </div>
+        <div class="info-section">
+          <div class="notes-section-modern">
+            <p class="mb-0">Rendez-vous pour discuter des procédures administratives et obtenir une assistance personnalisée pour les démarches MRE.</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Expert profile -->
+      <div class="expert-profile-modern">
+        <div class="expert-avatar-modern">
+          <i class="bi bi-person-badge-fill"></i>
+        </div>
+        <h4 class="expert-name-modern">{{ appointment.expert.name|default:"Ahmed" }} {{ appointment.expert.first_name|default:"Benali" }}</h4>
+        <p class="expert-specialty-modern">{{ appointment.expert.expertise|default:"Expert en démarches administratives MRE" }}</p>
+        <div class="expert-contact-buttons">
+          {% if appointment.expert.email %}
+          <a href="mailto:{{ appointment.expert.email }}" class="expert-contact-btn">
+            <i class="bi bi-envelope"></i>
+          </a>
+          {% endif %}
+          {% if appointment.expert.phone %}
+          <a href="tel:{{ appointment.expert.phone }}" class="expert-contact-btn">
+            <i class="bi bi-telephone"></i>
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Documents -->
+      {% if documents %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            Documents
+          </h3>
+        </div>
+        <div class="info-section">
+          <ul class="documents-list-modern">
+            {% for document in documents %}
+            <li class="document-item-modern">
+              <div class="document-info">
+                <i class="bi bi-file-earmark-text document-icon"></i>
+                {{ document.name }}
+              </div>
+              <a href="{{ document.file.url }}" target="_blank" class="document-download-btn">
+                <i class="bi bi-download"></i>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% else %}
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-file-earmark-arrow-down"></i>
+            Documents
+          </h3>
+        </div>
+        <div class="info-section">
+          <ul class="documents-list-modern">
+            <li class="document-item-modern">
+              <div class="document-info">
+                <i class="bi bi-file-earmark-text document-icon text-primary"></i>
+                Guide démarches administratives
+              </div>
+              <a href="#" class="document-download-btn">
+                <i class="bi bi-download"></i>
+              </a>
+            </li>
+            <li class="document-item-modern">
+              <div class="document-info">
+                <i class="bi bi-file-earmark-pdf document-icon text-danger"></i>
+                Formulaire de demande
+              </div>
+              <a href="#" class="document-download-btn">
+                <i class="bi bi-download"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      <div class="detail-card">
+        <div class="modern-card-header">
+          <h3 class="modern-card-title">
+            <i class="bi bi-gear-fill"></i>
+            Actions
+          </h3>
+        </div>
+        <div class="info-section">
+          <div class="action-buttons-modern">
+            {% if appointment.status == 'scheduled' or appointment.status == 'confirmed' %}
+            <a href="#" class="action-btn-modern btn btn-outline-primary">
+              <i class="bi bi-journal-text"></i>
+              Ajouter note
+            </a>
+            <a href="#" class="action-btn-modern btn btn-outline-info">
+              <i class="bi bi-calendar3"></i>
+              Replanifier
+            </a>
+            <a href="#" class="action-btn-modern btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              <i class="bi bi-x-circle"></i>
+              Annuler
+            </a>
+            {% else %}
+            <a href="#" class="action-btn-modern btn btn-outline-secondary">
+              <i class="bi bi-download"></i>
+              Télécharger CR
+            </a>
+            <a href="#" class="action-btn-modern btn btn-outline-success">
+              <i class="bi bi-chat-dots"></i>
+              Contacter expert
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Annuler le rendez-vous
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir annuler ce rendez-vous ?</p>
+        <div class="alert alert-warning">
+          <i class="bi bi-info-circle me-2"></i>
+          Cette action est irréversible. L'expert sera automatiquement notifié.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, garder</button>
+        <a href="#" class="btn btn-danger">Oui, annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Nouvelle demande assignée - Services Bladi{% endblock %}
+
+{% block header_title %}Nouvelle Assignation{% endblock %}
+{% block header_subtitle %}Une nouvelle demande vous a été assignée{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    Une nouvelle demande vous a été assignée. Le client <strong>{{ client_name }}</strong> a besoin de votre expertise.
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">📋 Nouvelle demande:</div>
+    <div class="info-value" style="margin-top: 10px; font-weight: 600; font-size: 18px;">
+        {{ request_title }}
+    </div>
+    {% if request_description %}
+    <div style="margin-top: 15px; color: #666; line-height: 1.6;">
+        <strong>Description:</strong><br>
+        {{ request_description }}
+    </div>
+    {% endif %}
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">👤 Client:</div>
+        <div class="info-value">{{ client_name }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">📅 Date d'assignation:</div>
+        <div class="info-value">{{ "now"|date:"d/m/Y à H:i" }}</div>
+    </div>
+</div>
+
+<div class="content">
+    <strong>🎯 Prochaines étapes:</strong>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>Examinez attentivement la demande du client</li>
+        <li>Contactez le client si vous avez besoin de clarifications</li>
+        <li>Commencez le traitement de la demande</li>
+        <li>Mettez à jour le statut régulièrement</li>
+    </ul>
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        🔍 Examiner la demande
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>⚡ Rappel:</strong> Un traitement rapide et de qualité améliore votre évaluation sur la plateforme.
+</div>
+{% endblock %}

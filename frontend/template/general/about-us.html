@@ -1,0 +1,133 @@
+{% extends 'general/base.html' %}
+{% load static %}
+
+{% block title %}ServicesBladi - À propos{% endblock %}
+{% block meta_description %}À propos de ServicesBladi - Services pour les Marocains Résidant à l'Étranger{% endblock %}
+{% block meta_keywords %}MRE, Maroc, services, expatriés, diaspora{% endblock %}
+
+{% block extra_css %}
+<style>
+  .about-section {
+    padding: 60px 0;
+  }
+  .about-content {
+    margin-bottom: 30px;
+  }
+  .team-member {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .team-member img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  .values-section {
+    background-color: #f8f9fa;
+    padding: 60px 0;
+  }
+  .value-item {
+    text-align: center;
+    padding: 30px;
+    margin-bottom: 30px;
+  }
+  .value-item i {
+    font-size: 48px;
+    color: #0d6efd;
+    margin-bottom: 20px;
+  }
+  #hero {
+    height: 9cm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+{% endblock %}
+
+{% block body_class %}index-page{% endblock %}
+
+{% block content %}
+  <section id="hero" class="hero section dark-background">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="text-center">À propos de ServicesBladi</h1>
+          <p class="text-center">Notre mission est d'accompagner les Marocains Résidant à l'Étranger dans leurs projets</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="about-content">
+            <h2>Notre Histoire</h2>
+            <p>ServicesBladi a été créé pour répondre aux besoins spécifiques des Marocains vivant à l'étranger. Notre plateforme offre une gamme complète de services pour faciliter leurs démarches et projets au Maroc.</p>
+            <p>Depuis notre création, nous avons accompagné des milliers de Marocains dans leurs projets touristiques, administratifs, d'investissement, immobiliers et fiscaux.</p>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="about-content">
+            <h2>Notre Mission</h2>
+            <p>Nous nous engageons à fournir des services de qualité, adaptés aux besoins des Marocains de l'étranger. Notre objectif est de simplifier leurs démarches et de les accompagner dans la réalisation de leurs projets.</p>
+            <p>Grâce à notre réseau de partenaires et notre expertise, nous offrons des solutions personnalisées et efficaces.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="values-section">
+    <div class="container">
+      <h2 class="text-center mb-5">Nos Valeurs</h2>
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="value-item">
+            <i class="bi bi-people"></i>
+            <h3>Confiance</h3>
+            <p>Nous construisons des relations de confiance avec nos clients, en garantissant la transparence et l'intégrité dans toutes nos actions.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="value-item">
+            <i class="bi bi-star"></i>
+            <h3>Excellence</h3>
+            <p>Nous nous engageons à fournir des services de la plus haute qualité, en nous appuyant sur notre expertise et notre expérience.</p>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="value-item">
+            <i class="bi bi-heart"></i>
+            <h3>Engagement</h3>
+            <p>Nous sommes dévoués à la satisfaction de nos clients et à la réussite de leurs projets, en leur offrant un accompagnement personnalisé.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="team-section">
+    <div class="container">
+      <h2 class="text-center mb-5">Mehdi ABOULFARAJ</h2>
+      <div class="row align-items-center">
+        <div class="col-md-4 text-center text-md-start">
+          <img src="{% static 'img/team/team-1.jpg' %}" alt="Équipe ServicesBladi"
+               style="width: 250px; height: 250px; object-fit: cover; border-radius: 50%;">
+        </div>
+        <div class="col-md-8 text-center text-md-start">
+          <p>Directeur associé du cabinet ADVAL et D.G du cabinet PGC Paris et cabinet AM Consulting – Paris
+
+            Dispose de plus de 25 ans d'expérience locale et internationale dans les domaines du management, de la finance, du conseil au Maroc et en France.
+            
+            Son expérience d'ex-Chargé de mission au Cabinet du Ministère de la Privatisation,
+            
+            D'ex-Directeur d'Audit et de contrôle interne à l'Agence Marchica, et d'ex Directeur Général du Cabinet de Consulting Comptable – Financier et Fiscal (AM CONSULTING) France-Maroc pendant plusieurs années, lui a permis d'acquérir une grande expertise en matière de Comptabilité – finances – Fiscalité – Audit et en Investissement avec un suivi des projets clés en main.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

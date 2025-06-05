@@ -1,0 +1,59 @@
+{% extends "emails/base.html" %}
+
+{% block title %}Nouveau rendez-vous assigné - Services Bladi{% endblock %}
+
+{% block header_title %}Nouveau Rendez-vous{% endblock %}
+{% block header_subtitle %}Un rendez-vous vous a été assigné{% endblock %}
+
+{% block main_content %}
+<div class="content">
+    📅 Un nouveau rendez-vous vous a été assigné avec le client <strong>{{ client_name }}</strong>.
+</div>
+
+<div class="highlight-box">
+    <div class="info-label">📅 Détails du rendez-vous:</div>
+    <div style="margin-top: 15px;">
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px; margin-right: 10px;">📅</span>
+            <div>
+                <strong>{{ appointment_date }}</strong> à <strong>{{ appointment_time }}</strong>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 24px; margin-right: 10px;">💻</span>
+            <div>{{ appointment_type }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="info-grid">
+    <div class="info-item">
+        <div class="info-label">👤 Client:</div>
+        <div class="info-value">{{ client_name }}</div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">📅 Date d'assignation:</div>
+        <div class="info-value">{{ "now"|date:"d/m/Y à H:i" }}</div>
+    </div>
+</div>
+
+<div class="content">
+    <strong>📋 Préparez votre rendez-vous:</strong>
+    <ul style="margin-left: 20px; margin-top: 10px;">
+        <li>Consultez le dossier du client</li>
+        <li>Préparez les documents nécessaires</li>
+        <li>Vérifiez votre agenda</li>
+        <li>Configurez votre espace de travail</li>
+    </ul>
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}/accounts/dashboard/" class="button">
+        📋 Voir le rendez-vous
+    </a>
+</div>
+
+<div class="content" style="margin-top: 30px; font-size: 14px; color: #666;">
+    <strong>⏰ Important:</strong> En cas d'empêchement, prévenez le client et l'administration au plus tôt.
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+Services Bladi - Bienvenue!
+
+Bonjour {{ user_name }},
+
+Bienvenue sur Services Bladi! Votre compte {{ user_type }} a été créé avec succès.
+
+Votre partenaire pour toutes vos démarches administratives
+Services dédiés aux Marocains résidant à l'étranger
+
+Découvrez nos services:
+- Démarches administratives: Cartes d'identité, passeports, actes d'état civil
+- Services immobiliers: Achat, vente, location de biens au Maroc  
+- Services financiers: Ouverture de comptes, investissements
+- Services juridiques: Conseils et assistance juridique
+- Services éducatifs: Inscriptions scolaires et universitaires
+
+Type de compte: {{ user_type }}
+Date d'inscription: {{ "now"|date:"d/m/Y" }}
+
+{% if is_admin_created and password %}
+INFORMATIONS DE CONNEXION:
+Email: {{ user.email }}
+Mot de passe temporaire: {{ password }}
+
+IMPORTANT: Veuillez changer votre mot de passe lors de votre première connexion.
+{% endif %}
+
+Pour accéder à votre espace:
+{{ site_url }}/accounts/dashboard/
+
+Besoin d'aide? Notre équipe d'experts est là pour vous accompagner.
+
+Nos coordonnées:
+Maroc: +212 5 22 86 34 36 | +212 6 66 67 97 79
+France: +33 783 187 890
+Email: contact@servicesbladi.com
+
+Cordialement,
+L'équipe Services Bladi
+
+---
+Services Bladi
+Contact: +212 5 22 86 34 36 | contact@servicesbladi.com
+© 2025 Services Bladi. Tous droits réservés.

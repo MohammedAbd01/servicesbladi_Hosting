@@ -1,0 +1,257 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block title %}Gestion des Documents | Administration{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2">Gestion des Documents</h1>
+  </div>
+
+  <!-- Statistics Row -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-primary">
+          <i class="bi bi-file-earmark"></i>
+        </div>
+        <div class="count">{{ total_documents }}</div>
+        <div class="title">Total Documents</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-success">
+          <i class="bi bi-file-earmark-check"></i>
+        </div>
+        <div class="count">{{ verified_documents }}</div>
+        <div class="title">Documents Vérifiés</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-warning">
+          <i class="bi bi-file-earmark-break"></i>
+        </div>
+        <div class="count">{{ pending_documents }}</div>
+        <div class="title">En Attente</div>
+      </div>
+    </div>
+    
+    <div class="col-md-3">
+      <div class="stats-card">
+        <div class="icon text-danger">
+          <i class="bi bi-file-earmark-x"></i>
+        </div>
+        <div class="count">{{ rejected_documents }}</div>
+        <div class="title">Refusés</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="filter-section mb-4">
+    <form method="get" class="row g-3">
+      <div class="col-md-3">
+        <label for="client" class="form-label">Client</label>
+        <select id="client" name="client" class="form-select">
+          <option value="">Tous les clients</option>
+          {% for client in clients %}
+          <option value="{{ client.id }}" {% if client_id|stringformat:"s" == client.id|stringformat:"s" %}selected{% endif %}>
+            {{ client.user.first_name }} {{ client.user.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-3">
+        <label for="document-type" class="form-label">Type de document</label>
+        <select id="document-type" name="type" class="form-select">
+          <option value="">Tous les types</option>
+          {% for type in document_types %}
+          <option value="{{ type }}" {% if document_type == type %}selected{% endif %}>{{ type }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="status" class="form-label">Statut</label>
+        <select id="status" name="status" class="form-select">
+          <option value="">Tous</option>
+          <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>En attente</option>
+          <option value="verified" {% if status_filter == 'verified' %}selected{% endif %}>Vérifié</option>
+          <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Refusé</option>
+        </select>
+      </div>
+      
+      <div class="col-md-2">
+        <label for="search" class="form-label">Recherche</label>
+        <input type="text" class="form-control" id="search" name="search" value="{{ search_query }}">
+      </div>
+      
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-filter"></i> Filtrer
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Documents List -->
+  <div class="card">
+    <div class="card-header bg-white">
+      <h5 class="card-title mb-0">Liste des Documents</h5>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Nom du document</th>
+              <th>Client</th>
+              <th>Demande</th>
+              <th>Type</th>
+              <th>Date d'ajout</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documents %}
+            <tr>
+              <td>{{ doc.name }}</td>
+              <td>{{ doc.uploaded_by.first_name }} {{ doc.uploaded_by.name }}</td>
+              <td>{% if doc.service_request %}{{ doc.service_request.service.name }}{% else %}N/A{% endif %}</td>
+              <td>{{ doc.get_type_display }}</td>
+              <td>{{ doc.upload_date|date:"d/m/Y H:i" }}</td>
+              <td>
+                {% if doc.status == 'verified' %}
+                <span class="badge bg-success">Vérifié</span>
+                {% elif doc.status == 'rejected' %}
+                <span class="badge bg-danger">Refusé</span>
+                {% else %}
+                <span class="badge bg-warning">En attente</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                  {% if doc.status != 'verified' %}
+                  <a href="{% url 'custom_requests:admin_verify_document' doc.id %}" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-check"></i>
+                  </a>
+                  {% endif %}
+                  {% if doc.status != 'rejected' %}
+                  <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ doc.id }}">
+                    <i class="bi bi-x"></i>
+                  </button>
+                  {% endif %}
+                  <a href="{% url 'custom_requests:admin_delete_document' doc.id %}" class="btn btn-sm btn-outline-danger" 
+                     onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce document?');">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center">Aucun document trouvé</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      {% if documents.paginator.num_pages > 1 %}
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+          {% if documents.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if client_id %}&client={{ client_id }}{% endif %}{% if document_type %}&type={{ document_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="First">
+                <span aria-hidden="true">&laquo;&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ documents.previous_page_number }}{% if client_id %}&client={{ client_id }}{% endif %}{% if document_type %}&type={{ document_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&laquo;</span>
+            </li>
+          {% endif %}
+          
+          {% for i in documents.paginator.page_range %}
+            {% if documents.number == i %}
+              <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+            {% elif i > documents.number|add:'-3' and i < documents.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ i }}{% if client_id %}&client={{ client_id }}{% endif %}{% if document_type %}&type={{ document_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+          
+          {% if documents.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ documents.next_page_number }}{% if client_id %}&client={{ client_id }}{% endif %}{% if document_type %}&type={{ document_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ documents.paginator.num_pages }}{% if client_id %}&client={{ client_id }}{% endif %}{% if document_type %}&type={{ document_type }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" aria-label="Last">
+                <span aria-hidden="true">&raquo;&raquo;</span>
+              </a>
+            </li>
+          {% else %}
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link">&raquo;&raquo;</span>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Reject Document Modals -->
+{% for doc in documents %}
+<div class="modal fade" id="rejectModal{{ doc.id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ doc.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="rejectModalLabel{{ doc.id }}">Refuser le Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'custom_requests:admin_reject_document' doc.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <p>Vous êtes sur le point de refuser le document "<strong>{{ doc.name }}</strong>".</p>
+          <div class="mb-3">
+            <label for="rejection_reason" class="form-label">Raison du refus:</label>
+            <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          <button type="submit" class="btn btn-danger">Refuser le Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
