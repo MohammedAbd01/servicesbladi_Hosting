@@ -3,7 +3,7 @@ name: Deploy Django App to Azure
 on:
   push:
     branches:
-      - main
+      - main  # or 'master'
 
 jobs:
   build-and-deploy:
@@ -25,21 +25,16 @@ jobs:
 
       - name: Collect static files
         run: |
-          cd backend
-          python manage.py collectstatic --noinput
+          python backend/manage.py collectstatic --noinput
 
-      - name: Copy SSL cert into backend
-        run: |
-          cp backend/BaltimoreCyberTrustRoot.crt.pem backend/BaltimoreCyberTrustRoot.crt.pem
-
-      - name: Zip the backend folder
-        run: |
-          cd backend
-          zip -r ../backend.zip .
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: servicesbladi
           slot-name: production
-          package: backend.zip
+          package: ./backend
