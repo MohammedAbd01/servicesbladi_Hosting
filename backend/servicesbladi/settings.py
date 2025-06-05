@@ -16,7 +16,7 @@ from django.utils.translation import gettext_lazy as _
 import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef')
@@ -101,13 +101,15 @@ WSGI_APPLICATION = 'servicesbladi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'servicesbladi',  # Replace with the actual DB name you created on Azure
+        'NAME': 'your_db_name',
         'USER': 'servicesbladiadmin@servicesbladi',
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
         'OPTIONS': {
-            'ssl': {'ssl-ca': '/path/to/BaltimoreCyberTrustRoot.crt.pem'},  # See next step
+            'ssl': {
+                'ca': os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')
+            }
         }
     }
 }
