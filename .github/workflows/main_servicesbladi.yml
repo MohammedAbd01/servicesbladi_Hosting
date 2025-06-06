@@ -1,4 +1,4 @@
-# Deploy Django App to Azure Web App - Optimized for Fast Deployment
+﻿# Deploy Django App to Azure Web App - Optimized for Fast Deployment
 name: Deploy Django App to Azure
 
 on:
@@ -16,7 +16,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # Prevent hanging workflows
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
@@ -30,7 +30,9 @@ jobs:
       - name: Create logs directory
         run: |
           mkdir -p backend/logs
-          mkdir -p deployment/logs      - name: Install dependencies
+          mkdir -p deployment/logs
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
@@ -38,10 +40,6 @@ jobs:
       - name: Run Django migrations (skipped during build)
         run: |
           cd backend
-          # Skip migrations during build to avoid DB connection issues
-          # python manage.py makemigrations --noinput
-          # python manage.py migrate --noinput
-          # python manage.py createcachetable --noinput
           echo "Skipping migrations during build - will run in Azure startup"
 
       - name: Collect static files
@@ -54,7 +52,6 @@ jobs:
       - name: Run Django tests (optional)
         run: |
           cd backend
-          # python manage.py test --noinput
           echo "Skipping tests for now"
 
       - name: Login to Azure using OIDC
@@ -66,38 +63,21 @@ jobs:
 
       - name: Prepare deployment package
         run: |
-          # Create deployment directory
           mkdir -p deployment
-          
-          # Copy backend files (including all Django apps)
           cp -r backend/* deployment/
-          
-          # Ensure frontend templates and static files are in the right place
           mkdir -p deployment/templates/frontend
           mkdir -p deployment/staticfiles/frontend
-          
-          # Copy frontend templates 
           if [ -d "frontend/template" ]; then
             cp -r frontend/template/* deployment/templates/frontend/
           fi
-          
-          # Copy frontend static files to be collected by Django
           if [ -d "frontend/static" ]; then
             cp -r frontend/static/* deployment/staticfiles/frontend/
           fi
-          
-          # Copy SSL certificate to root of deployment
           cp backend/BaltimoreCyberTrustRoot.crt.pem deployment/
-          
-          # Copy Azure configuration files
           cp web.config deployment/
           cp startup.txt deployment/
           cp azure_app_settings.json deployment/ || echo "Azure app settings not found, skipping"
-          
-          # Ensure logs directory exists
           mkdir -p deployment/logs
-          
-          # Set proper permissions for Azure
           chmod -R 755 deployment/
 
       - name: Deploy to Azure Web App
