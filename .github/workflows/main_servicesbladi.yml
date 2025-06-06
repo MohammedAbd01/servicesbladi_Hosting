@@ -43,12 +43,12 @@ jobs:
           # python manage.py makemigrations --noinput
           # python manage.py migrate --noinput
           # python manage.py createcachetable --noinput
-          echo "Skipping migrations during build - will run in Azure startup"
-
-      - name: Collect static files
+          echo "Skipping migrations during build - will run in Azure startup"      - name: Collect static files
         run: |
           cd backend
-          python manage.py collectstatic --noinput
+          echo "Collecting static files..."
+          python manage.py collectstatic --noinput --clear
+          echo "Static files collected successfully"
 
       - name: Run Django tests (optional)
         run: |
