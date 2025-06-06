@@ -128,9 +128,24 @@ jobs:
           # Print confirmation
           echo "Deployment package prepared successfully"
 
+      - name: Stop Azure Web App
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az webapp stop --name servicesbladi --resource-group <your-resource-group-name>
+            echo "Azure Web App stopped successfully"
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: servicesbladi
           slot-name: production
           package: ./deployment
+
+      - name: Start Azure Web App
+        if: always() # Ensure this step runs even if deployment fails, to restart the app
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            az webapp start --name servicesbladi --resource-group <your-resource-group-name>
+            echo "Azure Web App started successfully"

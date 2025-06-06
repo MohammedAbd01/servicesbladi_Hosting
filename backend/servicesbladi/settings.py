@@ -6,13 +6,20 @@ from django.utils.translation import gettext_lazy as _
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Import Azure-specific configuration
+IS_AZURE = False  # Default to False
+SSL_CERT_PATH = os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')  # Default for local
+DATABASES_SSL_OPTIONS = {'ssl': {'ca': SSL_CERT_PATH}}  # Default for local
+
 try:
-    from azure_config import DATABASES_SSL_OPTIONS, SSL_CERT_PATH
+    from azure_config import DATABASES_SSL_OPTIONS as AZURE_DATABASES_SSL_OPTIONS, SSL_CERT_PATH as AZURE_SSL_CERT_PATH
     IS_AZURE = True
+    # Override with Azure specific paths if running in Azure
+    SSL_CERT_PATH = AZURE_SSL_CERT_PATH
+    DATABASES_SSL_OPTIONS = AZURE_DATABASES_SSL_OPTIONS
 except ImportError:
-    IS_AZURE = False
-    SSL_CERT_PATH = os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')
-    DATABASES_SSL_OPTIONS = {'ssl': {'ca': SSL_CERT_PATH}}
+    # This block will execute in local development if azure_config.py is not found
+    # SSL_CERT_PATH and DATABASES_SSL_OPTIONS are already set to local defaults above
+    pass
 
 SECRET_KEY = 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef'
 
@@ -93,10 +100,7 @@ DATABASES = {
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
-        'OPTIONS': {
-            'ssl': {'ca': SSL_CERT_PATH},
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-        },
+        'OPTIONS': DATABASES_SSL_OPTIONS,  # Use the determined SSL options
     }
 }
 
@@ -108,10 +112,10 @@ CHANNEL_LAYERS = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator','OPTIONS': {'min_length': 8}},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 LANGUAGE_CODE = 'fr'
