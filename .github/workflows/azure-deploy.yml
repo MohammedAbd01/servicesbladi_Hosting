@@ -1,3 +1,4 @@
+# YAML syntax note: Lines starting with # are comments, and those starting with // are ignored by GitHub
 # Deploy Django App to Azure Web App - Optimized for Fast Deployment
 name: Deploy Django App to Azure
 
