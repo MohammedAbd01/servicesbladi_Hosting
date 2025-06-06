@@ -4,16 +4,12 @@ import os
 # SSL certificate path for Azure App Service
 SSL_CERT_PATH = '/home/site/wwwroot/BaltimoreCyberTrustRoot.crt.pem'
 
-# Database configuration with proper SSL handling
-if os.path.exists(SSL_CERT_PATH):
-    DATABASES_SSL_OPTIONS = {
-        'ssl': {'ca': SSL_CERT_PATH}
-    }
-else:
-    # Fallback if cert file is not found
-    DATABASES_SSL_OPTIONS = {
-        'ssl': {'ssl_disabled': False}
-    }
+# Database configuration with disabled SSL to allow non-secure connections
+# This is only recommended for development/testing purposes
+DATABASES_SSL_OPTIONS = {
+    'ssl': False,  # Disable SSL entirely
+    'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+}
 
 # Static files configuration for Azure
 AZURE_STATIC_ROOT = '/home/site/wwwroot/staticfiles'

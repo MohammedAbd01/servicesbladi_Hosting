@@ -5,7 +5,7 @@ python -c "import time; import MySQLdb; \
 count=0; \
 while count < 10: \
     try: \
-        MySQLdb.connect(host='servicesbladi.mysql.database.azure.com', user='servicesbladiadmin', passwd='Aa123456a', db='servicesbladi', ssl={'ca': 'BaltimoreCyberTrustRoot.crt.pem'}); \
+        MySQLdb.connect(host='servicesbladi.mysql.database.azure.com', user='servicesbladiadmin', passwd='Aa123456a', db='servicesbladi', ssl=False); \
         break; \
     except Exception as e: \
         print(f'MySQL connection attempt {count+1}/10 failed: {e}'); \
