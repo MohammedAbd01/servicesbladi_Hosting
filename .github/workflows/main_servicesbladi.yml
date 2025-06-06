@@ -13,10 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
@@ -27,10 +27,12 @@ jobs:
         run: |
           python backend/manage.py collectstatic --noinput
 
-      - name: Login to Azure
+      - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          client-id: daaecf53-bedf-479a-b16b-8b790712a16c
+          tenant-id: 9210d1eb-8ed1-4887-acf7-e273346079fd
+          subscription-id: 297a9bc4-d230-43c1-bfdb-f9b7c86494bd
 
       - name: Copy SSL cert to wwwroot
         run: cp backend/BaltimoreCyberTrustRoot.crt.pem /home/site/wwwroot/
