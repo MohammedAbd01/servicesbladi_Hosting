@@ -1,0 +1,35 @@
+# Azure App Service Application Settings
+# These should be configured in Azure Portal -> Configuration -> Application Settings
+
+[
+    {
+        "name": "DJANGO_SETTINGS_MODULE",
+        "value": "servicesbladi.settings",
+        "slotSetting": false
+    },
+    {
+        "name": "PYTHONPATH", 
+        "value": "/home/site/wwwroot",
+        "slotSetting": false
+    },
+    {
+        "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+        "value": "3",
+        "slotSetting": false
+    },
+    {
+        "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+        "value": "true",
+        "slotSetting": false
+    },
+    {
+        "name": "ENABLE_ORYX_BUILD",
+        "value": "true",
+        "slotSetting": false
+    },
+    {
+        "name": "PRE_BUILD_SCRIPT_PATH",
+        "value": "startup.txt",
+        "slotSetting": false
+    }
+]

@@ -1,1 +1,5 @@
-python backend/manage.py collectstatic --noinput
+# Azure startup commands for Django
+python manage.py migrate --noinput
+python manage.py createcachetable --noinput
+python manage.py collectstatic --noinput
+gunicorn servicesbladi.wsgi:application --config gunicorn.conf.py

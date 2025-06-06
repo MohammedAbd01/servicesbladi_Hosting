@@ -2,26 +2,24 @@ import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
-<<<<<<< HEAD
-=======
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
->>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Import Azure-specific configuration
+try:
+    from azure_config import DATABASES_SSL_OPTIONS, SSL_CERT_PATH
+    IS_AZURE = True
+except ImportError:
+    IS_AZURE = False
+    SSL_CERT_PATH = os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')
+    DATABASES_SSL_OPTIONS = {'ssl': {'ca': SSL_CERT_PATH}}
 
 SECRET_KEY = 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef'
 
 DEBUG = False
 
-<<<<<<< HEAD
-ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net']
-=======
 # ALLOWED_HOSTS for Azure
-DEBUG = False
-
-ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net']
-
-# Application definition
->>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
+ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net', 'servicesbladi.azurewebsites.net', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,6 +44,7 @@ AUTH_USER_MODEL = 'accounts.Utilisateur'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -88,25 +87,12 @@ ASGI_APPLICATION = 'servicesbladi.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-<<<<<<< HEAD
         'NAME': 'servicesbladi',
-=======
-        'NAME': 'your_db_name',
->>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
         'USER': 'servicesbladiadmin@servicesbladi',
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
-        'OPTIONS': {
-<<<<<<< HEAD
-            'ssl': {'ca': os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')}
-        },
-=======
-            'ssl': {
-                'ca': os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')
-            }
-        }
->>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
+        'OPTIONS': DATABASES_SSL_OPTIONS,
     }
 }
 
@@ -142,10 +128,84 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, '../frontend/static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
+# Use WhiteNoise for serving static files in production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Security settings for production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False  # Azure handles SSL termination
+USE_TZ = True
+
+# CSRF and session settings
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Cache configuration for Azure
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_table',
+    }
+}
+
+# Logging configuration for Azure
+LOG_DIR = '/home/site/wwwroot/logs' if IS_AZURE else os.path.join(BASE_DIR, 'logs')
+
+# Ensure logs directory exists
+try:
+    os.makedirs(LOG_DIR, exist_ok=True)
+except:
+    pass  # Ignore permission errors
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'django.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'servicesbladi': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -158,11 +218,12 @@ SESSION_COOKIE_AGE = 86400
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-    }
-}
+# Remove this old cache config - it's been moved above
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+#     }
+# }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

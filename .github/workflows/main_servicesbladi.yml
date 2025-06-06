@@ -1,55 +1,104 @@
+# Deploy Django App to Azure Web App
 name: Deploy Django App to Azure
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
+      - name: Create logs directory
+        run: |
+          mkdir -p backend/logs
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
+      - name: Run Django migrations
+        run: |
+          cd backend
+          python manage.py makemigrations --noinput
+          python manage.py migrate --noinput
+          python manage.py createcachetable --noinput
+
       - name: Collect static files
         run: |
-          python backend/manage.py collectstatic --noinput
+          cd backend
+          python manage.py collectstatic --noinput
+
+      - name: Run Django tests (optional)
+        run: |
+          cd backend
+          # python manage.py test --noinput
+          echo "Skipping tests for now"
 
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
-<<<<<<< HEAD
           client-id: daaecf53-bedf-479a-b16b-8b790712a16c
           tenant-id: 9210d1eb-8ed1-4887-acf7-e273346079fd
           subscription-id: 297a9bc4-d230-43c1-bfdb-f9b7c86494bd
 
-      - name: Copy SSL cert to wwwroot
-        run: cp backend/BaltimoreCyberTrustRoot.crt.pem /home/site/wwwroot/
-=======
-          client-id: daaecf53-bedf-479a-b16b-8b790712a16c # << Your App Registration Client ID
-          tenant-id: 9210d1eb-8ed1-4887-acf7-e273346079fd # << Your Azure Tenant ID
-          subscription-id: 297a9bc4-d230-43c1-bfdb-f9b7c86494bd # << Your Subscription ID
->>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
+      - name: Prepare deployment package
+        run: |
+          # Create deployment directory
+          mkdir -p deployment
+          
+          # Copy backend files (including all Django apps)
+          cp -r backend/* deployment/
+          
+          # Ensure frontend templates and static files are in the right place
+          mkdir -p deployment/templates/frontend
+          mkdir -p deployment/staticfiles/frontend
+          
+          # Copy frontend templates 
+          if [ -d "frontend/template" ]; then
+            cp -r frontend/template/* deployment/templates/frontend/
+          fi
+          
+          # Copy frontend static files to be collected by Django
+          if [ -d "frontend/static" ]; then
+            cp -r frontend/static/* deployment/staticfiles/frontend/
+          fi
+          
+          # Copy SSL certificate to root of deployment
+          cp backend/BaltimoreCyberTrustRoot.crt.pem deployment/
+          
+          # Copy Azure configuration files
+          cp web.config deployment/
+          cp startup.txt deployment/
+          cp azure_app_settings.json deployment/ || echo "Azure app settings not found, skipping"
+          
+          # Ensure logs directory exists
+          mkdir -p deployment/logs
+          
+          # Set proper permissions for Azure
+          chmod -R 755 deployment/
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: servicesbladi
           slot-name: production
-          package: ./backend
+          package: ./deployment
