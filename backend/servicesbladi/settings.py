@@ -61,8 +61,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, '../frontend/template'),
             os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'frontend/template'),
+            os.path.join(BASE_DIR, '../frontend/template'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -88,11 +89,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'servicesbladi',
-        'USER': 'servicesbladiadmin@servicesbladi',
+        'USER': 'servicesbladiadmin',
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
-        'OPTIONS': DATABASES_SSL_OPTIONS,
+        'OPTIONS': {
+            'ssl': {'ca': SSL_CERT_PATH},
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        },
     }
 }
 
@@ -126,7 +130,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, '../frontend/static')]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'frontend/static'),
+    os.path.join(BASE_DIR, '../frontend/static'),
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Use WhiteNoise for serving static files in production - using basic storage for maximum compatibility

@@ -1,5 +1,26 @@
 # Azure startup commands for Django
-python manage.py migrate --noinput
-python manage.py createcachetable --noinput
+# Check if MySQL is ready before proceeding
+echo "Waiting for MySQL connection..."
+python -c "import time; import MySQLdb; \
+count=0; \
+while count < 10: \
+    try: \
+        MySQLdb.connect(host='servicesbladi.mysql.database.azure.com', user='servicesbladiadmin', passwd='Aa123456a', db='servicesbladi', ssl={'ca': 'BaltimoreCyberTrustRoot.crt.pem'}); \
+        break; \
+    except Exception as e: \
+        print(f'MySQL connection attempt {count+1}/10 failed: {e}'); \
+        count += 1; \
+        time.sleep(5); \
+" || echo "MySQL connection check failed, but continuing anyway"
+
+# Run migrations with error handling
+python manage.py migrate --noinput || echo "Migration failed but continuing"
+
+# Create cache table with error handling
+python manage.py createcachetable --noinput || echo "Cache table creation failed but continuing"
+
+# Collect static files
 python manage.py collectstatic --noinput --clear
+
+# Start Gunicorn
 gunicorn servicesbladi.wsgi:application --config gunicorn.conf.py
