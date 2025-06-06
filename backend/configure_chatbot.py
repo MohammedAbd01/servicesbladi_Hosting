@@ -69,7 +69,7 @@ Comment puis-je vous aider aujourd'hui ?"""
     
     print("\n" + "=" * 60)
     print("🎉 CHATBOT MRE COMPLÈTEMENT ACTIVÉ!")
-    print("🌐 Test disponible sur: http://127.0.0.1:8000/test-chatbot/")
+    print("🌐 Test disponible sur: http://127.0.0.1:8080/test-chatbot/")
     print("🚀 Widget visible sur toutes les pages du site")
 
 if __name__ == '__main__':

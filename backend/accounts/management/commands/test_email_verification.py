@@ -40,7 +40,7 @@ class Command(BaseCommand):
         self.stdout.write("-" * 40)
         
         try:
-            verification_url = f"http://127.0.0.1:8000/accounts/verify/{user.verification_token}/"
+            verification_url = f"http://127.0.0.1:8080/accounts/verify/{user.verification_token}/"
             self.stdout.write(f"Verification URL: {verification_url}")
             
             result = EmailNotificationService.send_verification_email(user, verification_url)

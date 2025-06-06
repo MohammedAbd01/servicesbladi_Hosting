@@ -80,4 +80,4 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(f'❌ Erreur lors du test: {e}')
             
-        self.stdout.write('\n🌐 Testez l\'interface sur: http://127.0.0.1:8000/test-chatbot/')
+        self.stdout.write('\n🌐 Testez l\'interface sur: http://127.0.0.1:8080/test-chatbot/')
