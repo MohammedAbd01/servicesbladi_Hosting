@@ -29,18 +29,21 @@ jobs:
       - name: Create logs directory
         run: |
           mkdir -p backend/logs
+          mkdir -p deployment/logs
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
 
-      - name: Run Django migrations
+      - name: Run Django migrations (skipped during build)
         run: |
           cd backend
-          python manage.py makemigrations --noinput
-          python manage.py migrate --noinput
-          python manage.py createcachetable --noinput
+          # Skip migrations during build to avoid DB connection issues
+          # python manage.py makemigrations --noinput
+          # python manage.py migrate --noinput
+          # python manage.py createcachetable --noinput
+          echo "Skipping migrations during build - will run in Azure startup"
 
       - name: Collect static files
         run: |

@@ -154,15 +154,7 @@ CACHES = {
     }
 }
 
-# Logging configuration for Azure
-LOG_DIR = '/home/site/wwwroot/logs' if IS_AZURE else os.path.join(BASE_DIR, 'logs')
-
-# Ensure logs directory exists
-try:
-    os.makedirs(LOG_DIR, exist_ok=True)
-except:
-    pass  # Ignore permission errors
-
+# Logging configuration - simplified to avoid file permission issues during build
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -177,12 +169,6 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'django.log'),
-            'formatter': 'verbose',
-        },
         'console': {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
@@ -190,17 +176,17 @@ LOGGING = {
         },
     },
     'root': {
-        'handlers': ['console', 'file'],
+        'handlers': ['console'],
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,
         },
         'servicesbladi': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
