@@ -9,6 +9,10 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -30,12 +34,18 @@ jobs:
       - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
+<<<<<<< HEAD
           client-id: daaecf53-bedf-479a-b16b-8b790712a16c
           tenant-id: 9210d1eb-8ed1-4887-acf7-e273346079fd
           subscription-id: 297a9bc4-d230-43c1-bfdb-f9b7c86494bd
 
       - name: Copy SSL cert to wwwroot
         run: cp backend/BaltimoreCyberTrustRoot.crt.pem /home/site/wwwroot/
+=======
+          client-id: daaecf53-bedf-479a-b16b-8b790712a16c # << Your App Registration Client ID
+          tenant-id: 9210d1eb-8ed1-4887-acf7-e273346079fd # << Your Azure Tenant ID
+          subscription-id: 297a9bc4-d230-43c1-bfdb-f9b7c86494bd # << Your Subscription ID
+>>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2

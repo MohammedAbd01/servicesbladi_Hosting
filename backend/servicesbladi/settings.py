@@ -2,13 +2,26 @@ import os
 from pathlib import Path
 from django.utils.translation import gettext_lazy as _
 
+<<<<<<< HEAD
+=======
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+>>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'django-insecure-dj217004uhfoid4ut98h9843h98fn-dkn2f808jf9jkef'
 
 DEBUG = False
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net']
+=======
+# ALLOWED_HOSTS for Azure
+DEBUG = False
+
+ALLOWED_HOSTS = ['servicesbladi-dqf3hchmcqeudmfm.spaincentral-01.azurewebsites.net']
+
+# Application definition
+>>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -75,14 +88,25 @@ ASGI_APPLICATION = 'servicesbladi.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+<<<<<<< HEAD
         'NAME': 'servicesbladi',
+=======
+        'NAME': 'your_db_name',
+>>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
         'USER': 'servicesbladiadmin@servicesbladi',
         'PASSWORD': 'Aa123456a',
         'HOST': 'servicesbladi.mysql.database.azure.com',
         'PORT': '3306',
         'OPTIONS': {
+<<<<<<< HEAD
             'ssl': {'ca': os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')}
         },
+=======
+            'ssl': {
+                'ca': os.path.join(BASE_DIR, 'BaltimoreCyberTrustRoot.crt.pem')
+            }
+        }
+>>>>>>> 9276f0596624fe123a0b9b346af8254c7d98ee99
     }
 }
 
