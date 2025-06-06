@@ -68,9 +68,11 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-            os.path.join(BASE_DIR, 'frontend/template'),
-            os.path.join(BASE_DIR, '../frontend/template'),
+            os.path.join(BASE_DIR, 'templates'),  # For backend/project-level templates
+            os.path.join(BASE_DIR, 'frontend/template'),  # For frontend templates
+            # The path os.path.join(BASE_DIR, 'templates/frontend') could also be used here
+            # as your deployment script copies frontend templates there too.
+            # Keeping it simple with one primary location for frontend templates is often clearer.
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -135,8 +137,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend/static'),
-    os.path.join(BASE_DIR, '../frontend/static'),
+    os.path.join(BASE_DIR, 'frontend/static'),  # This path is correct for the Azure deployed structure
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
