@@ -1,4 +1,4 @@
-# Deploy Django App to Azure Web App
+# Deploy Django App to Azure Web App - Optimized for Fast Deployment
 name: Deploy Django App to Azure
 
 on:
@@ -16,6 +16,7 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Prevent hanging workflows
 
     steps:
       - name: Checkout code
