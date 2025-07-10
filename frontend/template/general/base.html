@@ -60,10 +60,10 @@
           <li class="dropdown"><a href="#" class="{% if 'tourisme' in request.path or 'administrative' in request.path or 'investment' in request.path or 'immobilier' in request.path or 'fiscale' in request.path %}active{% endif %}"><span data-translate="services">Services</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="{% url 'tourisme' %}">Tourisme</a></li>
-              <li><a href="{% url 'administrative' %}">Administrative</a></li>
+              <li><a href="{% url 'administrative' %}">démarche administrative </a></li>
               <li><a href="{% url 'investment' %}">Investissement</a></li>
               <li><a href="{% url 'immobilier' %}">Immobilier</a></li>
-              <li><a href="{% url 'fiscale' %}">Fiscale</a></li>
+              <li><a href="{% url 'fiscale' %}">Optimisation fiscale</a></li>
             </ul>
           </li>
           <li><a href="{% url 'contact' %}" class="{% if 'contact' in request.path %}active{% endif %}" data-translate="contact">Contact</a></li>
